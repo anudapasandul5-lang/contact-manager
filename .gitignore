@@ -1,0 +1,24 @@
+# Environment
+.env
+.env.local
+.env*.local
+
+# Dependencies
+node_modules/
+
+# Next.js
+contact-manager/.next/
+contact-manager/out/
+
+# Logs
+*.log
+dev-server.out.log
+dev-server.err.log
+
+# Playwright
+.playwright-cli/
+.playwright-mcp/
+
+# OS
+.DS_Store
+Thumbs.db
