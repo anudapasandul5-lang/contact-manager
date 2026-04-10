@@ -1,11 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import dotenv from "dotenv";
-
-// Load .env.local before importing @/env so module validation passes
-dotenv.config({ path: ".env.local" });
-
-import { validateEnv } from "@/env";
+import { validateEnv } from "@/lib/validate-env";
 
 const FULL_ENV = {
   NEXT_PUBLIC_SUPABASE_URL: "https://abc.supabase.co",
