@@ -32,17 +32,4 @@ export function validateEnv(
   ) as Record<RequiredVar, string>;
 }
 
-let cachedEnv: Record<RequiredVar, string> | undefined;
-
-function getEnv(): Record<RequiredVar, string> {
-  if (!cachedEnv) {
-    cachedEnv = validateEnv(process.env as Record<string, string | undefined>);
-  }
-  return cachedEnv;
-}
-
-export const env = new Proxy({} as Record<RequiredVar, string>, {
-  get(target, prop) {
-    return getEnv()[prop as RequiredVar];
-  },
-});
+export const env = validateEnv(process.env as Record<string, string | undefined>);
