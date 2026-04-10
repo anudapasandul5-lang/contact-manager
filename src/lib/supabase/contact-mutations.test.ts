@@ -29,6 +29,7 @@ test("createContactWithRelations calls create_contact_with_relations RPC with co
     phone: null,
     role: null,
     bio: null,
+    notes: null,
     type: "employee",
     companyIds: ["company-1", "company-1"],
     projectIds: [],
@@ -39,6 +40,7 @@ test("createContactWithRelations calls create_contact_with_relations RPC with co
   assert.equal(calls[0]!.args["p_name"], "Test");
   assert.equal(calls[0]!.args["p_user_id"], "user-1");
   assert.equal(calls[0]!.args["p_type"], "employee");
+  assert.equal(calls[0]!.args["p_notes"], null);
   assert.deepEqual(calls[0]!.args["p_company_ids"], ["company-1"]);
   assert.deepEqual(calls[0]!.args["p_project_ids"], []);
 });
@@ -54,6 +56,7 @@ test("createContactWithRelations throws when RPC returns an error", async () => 
         phone: null,
         role: null,
         bio: null,
+        notes: null,
         type: "employee",
         companyIds: [],
         projectIds: [],
@@ -74,6 +77,7 @@ test("updateContactWithRelations calls update_contact_with_relations RPC with co
     phone: null,
     role: "Engineer",
     bio: null,
+    notes: null,
     type: "employee",
     companyIds: [],
     projectIds: ["project-1"],
@@ -98,6 +102,7 @@ test("updateContactWithRelations throws when RPC returns an error", async () => 
         phone: null,
         role: null,
         bio: null,
+        notes: null,
         type: "employee",
         companyIds: [],
         projectIds: [],

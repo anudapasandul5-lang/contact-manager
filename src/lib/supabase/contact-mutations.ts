@@ -6,6 +6,7 @@ export interface ContactMutationPayload {
   phone: string | null;
   role: string | null;
   bio: string | null;
+  notes: string | null;
   type: ContactType;
   companyIds: string[];
   projectIds: string[];
@@ -36,6 +37,7 @@ export async function createContactWithRelations(
     p_phone: payload.phone,
     p_role: payload.role,
     p_bio: payload.bio,
+    p_notes: payload.notes,
     p_type: payload.type,
     p_company_ids: uniqueIds(payload.companyIds),
     p_project_ids: uniqueIds(payload.projectIds),
@@ -62,6 +64,7 @@ export async function updateContactWithRelations(
     p_phone: payload.phone,
     p_role: payload.role,
     p_bio: payload.bio,
+    p_notes: payload.notes,
     p_type: payload.type,
     p_company_ids: uniqueIds(payload.companyIds),
     p_project_ids: uniqueIds(payload.projectIds),

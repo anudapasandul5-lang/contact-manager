@@ -11,6 +11,7 @@ CREATE OR REPLACE FUNCTION create_contact_with_relations(
   p_phone       text,
   p_role        text,
   p_bio         text,
+  p_notes       text,
   p_type        text,
   p_company_ids uuid[],
   p_project_ids uuid[]
@@ -24,8 +25,8 @@ AS $$
 DECLARE
   v_row jsonb;
 BEGIN
-  INSERT INTO contacts (id, user_id, name, email, phone, role, bio, type)
-  VALUES (p_id, p_user_id, p_name, p_email, p_phone, p_role, p_bio, p_type)
+  INSERT INTO contacts (id, user_id, name, email, phone, role, bio, type, notes)
+  VALUES (p_id, p_user_id, p_name, p_email, p_phone, p_role, p_bio, p_type, p_notes)
   RETURNING to_jsonb(contacts.*) INTO v_row;
 
   IF array_length(p_company_ids, 1) IS NOT NULL THEN
@@ -51,6 +52,7 @@ CREATE OR REPLACE FUNCTION update_contact_with_relations(
   p_phone       text,
   p_role        text,
   p_bio         text,
+  p_notes       text,
   p_type        text,
   p_company_ids uuid[],
   p_project_ids uuid[]
@@ -66,7 +68,8 @@ DECLARE
 BEGIN
   UPDATE contacts
      SET name  = p_name,  email = p_email, phone = p_phone,
-         role  = p_role,  bio   = p_bio,   type  = p_type
+         role  = p_role,  bio   = p_bio,   type  = p_type,
+         notes = p_notes
    WHERE id = p_id AND user_id = p_user_id
   RETURNING to_jsonb(contacts.*) INTO v_row;
 
