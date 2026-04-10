@@ -19,29 +19,12 @@ export interface VendorMutationPayload {
   people: VendorPersonMutationPayload[];
 }
 
-type QueryResult<T> = Promise<{ data: T; error: { code?: string; message: string } | null }>;
-
 type SupabaseLike = {
-  from: (table: string) => {
-    insert: (values: unknown) => {
-      select?: () => { single?: () => QueryResult<any>; maybeSingle?: () => QueryResult<any> };
-    };
-    update: (values: unknown) => {
-      eq: (column: string, value: string) => any;
-    };
-    delete: () => {
-      eq: (column: string, value: string) => any;
-    };
-    select: (query?: string) => {
-      order: (column: string, options?: { ascending?: boolean }) => Promise<{ data: any; error: { code?: string; message: string } | null }>;
-      eq: (column: string, value: string) => any;
-    };
-    eq?: (column: string, value: string) => any;
-  };
+  from: (table: string) => any;
   rpc: (
     fn: string,
     args?: Record<string, unknown>,
-  ) => Promise<{ data: unknown; error: { message: string } | null }>;
+  ) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
 };
 
 function uniqueIds(ids: string[]) {
