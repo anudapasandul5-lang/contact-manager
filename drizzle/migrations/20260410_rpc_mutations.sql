@@ -18,6 +18,8 @@ CREATE OR REPLACE FUNCTION create_contact_with_relations(
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
+-- Caller (API route) MUST pass the authenticated user's own ID as p_user_id.
+-- join table inserts are implicitly scoped to the user via the parent row's RLS.
 AS $$
 DECLARE
   v_row jsonb;
@@ -56,6 +58,8 @@ CREATE OR REPLACE FUNCTION update_contact_with_relations(
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
+-- Caller (API route) MUST pass the authenticated user's own ID as p_user_id.
+-- join table inserts are implicitly scoped to the user via the parent row's RLS.
 AS $$
 DECLARE
   v_row jsonb;
@@ -101,6 +105,8 @@ CREATE OR REPLACE FUNCTION create_vendor_with_relations(
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
+-- Caller (API route) MUST pass the authenticated user's own ID as p_user_id.
+-- join table inserts are implicitly scoped to the user via the parent row's RLS.
 AS $$
 DECLARE
   v_row    jsonb;
@@ -125,7 +131,7 @@ BEGIN
     VALUES (
       COALESCE((v_person->>'id')::uuid, gen_random_uuid()),
       p_id,
-      v_person->>'name',
+      COALESCE(v_person->>'name', ''),
       v_person->>'email',
       v_person->>'phone',
       v_person->>'role',
@@ -152,6 +158,8 @@ CREATE OR REPLACE FUNCTION update_vendor_with_relations(
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
+-- Caller (API route) MUST pass the authenticated user's own ID as p_user_id.
+-- join table inserts are implicitly scoped to the user via the parent row's RLS.
 AS $$
 DECLARE
   v_row    jsonb;
@@ -185,7 +193,7 @@ BEGIN
     VALUES (
       COALESCE((v_person->>'id')::uuid, gen_random_uuid()),
       p_id,
-      v_person->>'name',
+      COALESCE(v_person->>'name', ''),
       v_person->>'email',
       v_person->>'phone',
       v_person->>'role',
