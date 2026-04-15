@@ -1,0 +1,139 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { Network, Users, Sun, Moon, LogOut } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useTheme } from "@/hooks/useTheme";
+
+const tabs = [
+  { href: "/mind-map", label: "Mind Map", icon: Network },
+  { href: "/contacts", label: "Contacts", icon: Users },
+];
+
+export function Header() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const { theme, toggleTheme, mounted } = useTheme();
+  const isDark = mounted && theme === "dark";
+
+  async function handleSignOut() {
+    await fetch("/api/auth/sign-out", { method: "POST" });
+    startTransition(() => {
+      router.replace("/login");
+      router.refresh();
+    });
+  }
+
+  return (
+    <header
+      className="sticky top-0 z-40"
+      style={{
+        background: `linear-gradient(145deg, var(--clay-card), var(--clay-card-alt))`,
+        borderBottom: `1px solid var(--clay-header-border)`,
+        boxShadow: "var(--clay-shadow-sm)",
+        transition: "background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
+      }}
+    >
+      <div className="flex items-center justify-between px-6 py-3">
+        {/* Brand */}
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-8 w-8 items-center justify-center rounded-xl"
+            style={{
+              background: "linear-gradient(145deg, #6366f1, #4f46e5)",
+              boxShadow: "3px 3px 8px rgba(99,102,241,0.25), -1px -1px 3px rgba(255,255,255,0.15)",
+            }}
+          >
+            <Network className="h-4 w-4 text-white" />
+          </div>
+          <h1
+            className="text-[15px] font-bold tracking-tight"
+            style={{
+              color: "var(--clay-text)",
+              fontFamily: "var(--font-space-grotesk), ui-sans-serif",
+              transition: "color 0.3s ease",
+            }}
+          >
+            Contact Manager
+          </h1>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {/* Nav tabs */}
+          <nav
+            className="flex gap-1 rounded-xl p-1"
+            style={{
+              background: `linear-gradient(145deg, var(--clay-card-end), var(--clay-surface))`,
+              boxShadow: "var(--clay-inset-input)",
+              transition: "background 0.3s ease, box-shadow 0.3s ease",
+            }}
+          >
+            {tabs.map((tab) => {
+              const isActive = pathname.startsWith(tab.href);
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-4 py-1.5 text-sm font-medium transition-all duration-200",
+                  )}
+                  style={
+                    isActive
+                      ? {
+                          background: `linear-gradient(145deg, var(--clay-card), var(--clay-card-end))`,
+                          color: isDark ? "#a5b4fc" : "#4f46e5",
+                          boxShadow: "var(--clay-shadow-sm)",
+                        }
+                      : {
+                          color: "var(--clay-text-muted)",
+                        }
+                  }
+                >
+                  <tab.icon
+                    className="h-3.5 w-3.5"
+                    style={{ color: isActive ? (isDark ? "#a5b4fc" : "#6366f1") : "var(--clay-text-muted)" }}
+                  />
+                  {tab.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Dark mode toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200"
+            style={{
+              background: `linear-gradient(145deg, var(--clay-card), var(--clay-card-end))`,
+              boxShadow: "var(--clay-shadow-sm)",
+              color: "var(--clay-text-secondary)",
+            }}
+            title={mounted ? (isDark ? "Switch to light mode" : "Switch to dark mode") : "Toggle theme"}
+          >
+            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSignOut}
+            disabled={isPending}
+            className="flex h-8 items-center gap-2 rounded-lg px-3 transition-all duration-200 disabled:opacity-60"
+            style={{
+              background: `linear-gradient(145deg, var(--clay-card), var(--clay-card-end))`,
+              boxShadow: "var(--clay-shadow-sm)",
+              color: "var(--clay-text-secondary)",
+            }}
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="text-sm">{isPending ? "Signing out..." : "Sign Out"}</span>
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}

@@ -64,10 +64,12 @@ import {
   type SearchResultKind,
 } from "./declutter";
 import {
+  buildManualExpandedCompanyIds,
+  buildManualExpandedProjectIds,
   buildSearchExpandedCompanyIds,
   buildSearchExpandedProjectIds,
   buildViewportFocusNodeIds,
-  shouldResetViewForPaneClick,
+  shouldClearFocusForPaneClick,
 } from "./focus-view";
 import { getFilterCategoryForNode, type FilterCategory } from "./node-filters";
 import {
@@ -779,7 +781,6 @@ function MindMapCanvasInner() {
   const filterExpandedPositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const previousFocusTargetsRef = useRef<Set<GravityTarget>>(new Set());
   const [focusTargets, setFocusTargets] = useState<Set<GravityTarget>>(new Set());
-  const [resetViewportSequence, setResetViewportSequence] = useState(0);
 
   const companyContacts = useMemo(() => {
     if (!selectedCompany || !networkData) return [];
@@ -1077,6 +1078,15 @@ function MindMapCanvasInner() {
       }),
     [activeNeighborhoodSource, currentSearchResult, nodes],
   );
+  const manualExpandedCompanyIds = useMemo(
+    () =>
+      buildManualExpandedCompanyIds({
+        activeNodeId: activeNeighborhoodNodeId,
+        source: activeNeighborhoodSource,
+        nodes,
+      }),
+    [activeNeighborhoodNodeId, activeNeighborhoodSource, nodes],
+  );
   const searchExpandedProjectIds = useMemo(
     () =>
       buildSearchExpandedProjectIds({
@@ -1086,20 +1096,35 @@ function MindMapCanvasInner() {
       }),
     [activeNeighborhoodSource, currentSearchResult, nodes],
   );
+  const manualExpandedProjectIds = useMemo(
+    () =>
+      buildManualExpandedProjectIds({
+        activeNodeId: activeNeighborhoodNodeId,
+        source: activeNeighborhoodSource,
+        nodes,
+      }),
+    [activeNeighborhoodNodeId, activeNeighborhoodSource, nodes],
+  );
   const effectiveCollapsedCompanies = useMemo(() => {
     const next = new Set(collapsedCompanies);
     searchExpandedCompanyIds.forEach((companyId) => {
       next.delete(companyId);
     });
+    manualExpandedCompanyIds.forEach((companyId) => {
+      next.delete(companyId);
+    });
     return next;
-  }, [collapsedCompanies, searchExpandedCompanyIds]);
+  }, [collapsedCompanies, manualExpandedCompanyIds, searchExpandedCompanyIds]);
   const effectiveCollapsedProjects = useMemo(() => {
     const next = new Set(collapsedProjects);
     searchExpandedProjectIds.forEach((projectId) => {
       next.delete(projectId);
     });
+    manualExpandedProjectIds.forEach((projectId) => {
+      next.delete(projectId);
+    });
     return next;
-  }, [collapsedProjects, searchExpandedProjectIds]);
+  }, [collapsedProjects, manualExpandedProjectIds, searchExpandedProjectIds]);
 
   useEffect(() => {
     if (currentSearchResult) {
@@ -1382,8 +1407,6 @@ function MindMapCanvasInner() {
       setActiveNeighborhoodSource("manual");
 
       if (node.type === "company" && networkData) {
-        const companyId = node.id.replace("company-", "");
-        onCollapseCompany(companyId);
       } else if (node.type === "vendor" && networkData) {
         const vendorId = typeof node.data?.vendorId === "string"
           ? node.data.vendorId
@@ -1393,9 +1416,7 @@ function MindMapCanvasInner() {
       } else if (node.type === "project" && networkData) {
         const projectId = node.id.replace("project-", "");
         const isStandaloneContainer = Boolean(node.data?.isStandaloneContainer);
-        if (isStandaloneContainer) {
-          onCollapseProject(projectId);
-        } else {
+        if (!isStandaloneContainer) {
           const project = networkData.projects.find((p) => p.id === projectId);
           if (project) setSelectedProject(project);
         }
@@ -1409,7 +1430,7 @@ function MindMapCanvasInner() {
         }
       }
     },
-    [networkData, onCollapseCompany, onCollapseProject, searchQuery, toggleCollapse]
+    [networkData, searchQuery, toggleCollapse]
   );
 
   const onNodeMouseEnter = useCallback((_: React.MouseEvent, node: Node) => {
@@ -1452,10 +1473,9 @@ function MindMapCanvasInner() {
     }
   }, [activeNeighborhoodSource]);
 
-  const clearManualFocusAndReset = useCallback(() => {
+  const clearManualFocus = useCallback(() => {
     setActiveNeighborhoodNodeId(null);
     setActiveNeighborhoodSource(null);
-    setResetViewportSequence((prev) => prev + 1);
   }, []);
 
   const onToggleFilterCategory = useCallback((category: FilterCategory) => {
@@ -1590,10 +1610,10 @@ function MindMapCanvasInner() {
     if (selectedContact) {
       setSelectedContact(null);
     }
-    if (shouldResetViewForPaneClick(activeNeighborhoodSource)) {
-      clearManualFocusAndReset();
+    if (shouldClearFocusForPaneClick(activeNeighborhoodSource)) {
+      clearManualFocus();
     }
-  }, [activeNeighborhoodSource, clearManualFocusAndReset, selectedContact]);
+  }, [activeNeighborhoodSource, clearManualFocus, selectedContact]);
 
   const onNodeDragStop = useCallback((_: React.MouseEvent, draggedNode: Node) => {
     if (isAnimatingRef.current) {
@@ -1699,7 +1719,6 @@ function MindMapCanvasInner() {
           searchQuery={searchQuery}
           nodesReady={nodes.length > 0}
           isAnimating={isAnimating}
-          resetViewportSequence={resetViewportSequence}
         />
       </ReactFlow>
 
@@ -1857,7 +1876,7 @@ function MindMapCanvasInner() {
         onClose={() => {
           setSelectedContact(null);
           if (activeNeighborhoodSource === "manual" && activeNeighborhoodNodeId?.startsWith("contact-")) {
-            clearManualFocusAndReset();
+            clearManualFocus();
           }
         }}
         onEdit={(contact) => {

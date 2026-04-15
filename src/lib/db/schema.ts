@@ -1,0 +1,163 @@
+import { pgTable, text, timestamp, pgEnum, primaryKey, boolean, uniqueIndex } from "drizzle-orm/pg-core";
+
+export const contactTypeEnum = pgEnum("contact_type", [
+  "employee",
+  "vendor",
+]);
+
+export const projectStatusEnum = pgEnum("project_status", [
+  "planning",
+  "active",
+  "completed",
+]);
+
+export const relationshipStrengthEnum = pgEnum("relationship_strength", [
+  "weak",
+  "warm",
+  "strong",
+]);
+
+export const relationshipEvidenceTypeEnum = pgEnum("relationship_evidence_type", [
+  "manual",
+  "shared_company",
+  "shared_project",
+]);
+
+export const introRequestStatusEnum = pgEnum("intro_request_status", [
+  "draft",
+  "requested",
+  "accepted",
+  "declined",
+  "completed",
+]);
+
+export const companies = pgTable("companies", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  industry: text("industry").notNull(),
+  color: text("color"),
+  is_owned: boolean("is_owned").notNull().default(false),
+  user_id: text("user_id"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const vendors = pgTable("vendors", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  specialty: text("specialty"),
+  notes: text("notes"),
+  color: text("color"),
+  legacy_contact_id: text("legacy_contact_id").references(() => contacts.id, { onDelete: "set null" }),
+  user_id: text("user_id"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const contacts = pgTable("contacts", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  role: text("role"),
+  type: contactTypeEnum("type").notNull(),
+  notes: text("notes"),
+  bio: text("bio"),
+  user_id: text("user_id"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const vendorPeople = pgTable("vendor_people", {
+  id: text("id").primaryKey(),
+  vendor_id: text("vendor_id")
+    .notNull()
+    .references(() => vendors.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  role: text("role"),
+  bio: text("bio"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const projects = pgTable("projects", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  status: projectStatusEnum("status").notNull().default("planning"),
+  company_id: text("company_id").references(() => companies.id),
+  user_id: text("user_id"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const contactCompanies = pgTable("contact_companies", {
+  contact_id: text("contact_id")
+    .notNull()
+    .references(() => contacts.id, { onDelete: "cascade" }),
+  company_id: text("company_id")
+    .notNull()
+    .references(() => companies.id, { onDelete: "cascade" }),
+}, (t) => [primaryKey({ columns: [t.contact_id, t.company_id] })]);
+
+export const contactProjects = pgTable("contact_projects", {
+  contact_id: text("contact_id")
+    .notNull()
+    .references(() => contacts.id, { onDelete: "cascade" }),
+  project_id: text("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+}, (t) => [primaryKey({ columns: [t.contact_id, t.project_id] })]);
+
+export const vendorCompanies = pgTable("vendor_companies", {
+  vendor_id: text("vendor_id")
+    .notNull()
+    .references(() => vendors.id, { onDelete: "cascade" }),
+  company_id: text("company_id")
+    .notNull()
+    .references(() => companies.id, { onDelete: "cascade" }),
+}, (t) => [primaryKey({ columns: [t.vendor_id, t.company_id] })]);
+
+export const vendorProjects = pgTable("vendor_projects", {
+  vendor_id: text("vendor_id")
+    .notNull()
+    .references(() => vendors.id, { onDelete: "cascade" }),
+  project_id: text("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+}, (t) => [primaryKey({ columns: [t.vendor_id, t.project_id] })]);
+
+export const personRelationships = pgTable("person_relationships", {
+  id: text("id").primaryKey(),
+  source_contact_id: text("source_contact_id")
+    .notNull()
+    .references(() => contacts.id, { onDelete: "cascade" }),
+  target_contact_id: text("target_contact_id")
+    .notNull()
+    .references(() => contacts.id, { onDelete: "cascade" }),
+  strength: relationshipStrengthEnum("strength").notNull().default("weak"),
+  is_inferred: boolean("is_inferred").notNull().default(false),
+  evidence_type: relationshipEvidenceTypeEnum("evidence_type").notNull().default("manual"),
+  evidence_company_id: text("evidence_company_id").references(() => companies.id, { onDelete: "set null" }),
+  evidence_project_id: text("evidence_project_id").references(() => projects.id, { onDelete: "set null" }),
+  last_confirmed_at: timestamp("last_confirmed_at"),
+  how_they_know_each_other: text("how_they_know_each_other"),
+  notes: text("notes"),
+  user_id: text("user_id"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+}, (t) => [uniqueIndex("person_relationships_pair_unique").on(t.source_contact_id, t.target_contact_id)]);
+
+export const introRequests = pgTable("intro_requests", {
+  id: text("id").primaryKey(),
+  requester_contact_id: text("requester_contact_id").references(() => contacts.id, { onDelete: "set null" }),
+  connector_contact_id: text("connector_contact_id")
+    .notNull()
+    .references(() => contacts.id, { onDelete: "cascade" }),
+  target_contact_id: text("target_contact_id")
+    .notNull()
+    .references(() => contacts.id, { onDelete: "cascade" }),
+  status: introRequestStatusEnum("status").notNull().default("draft"),
+  message_draft: text("message_draft"),
+  requested_at: timestamp("requested_at"),
+  resolved_at: timestamp("resolved_at"),
+  outcome_notes: text("outcome_notes"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});

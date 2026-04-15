@@ -40,3 +40,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# dev scripts and one-off tooling (not app code)
+*.csv
+*.mjs
+*.cjs
+test_supabase.js
+signup-*.txt
+output/
+*.log
+
+# local tooling
+.claude/
+.playwright-cli/

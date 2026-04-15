@@ -1,7 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateRequest, applySessionCookies } from "@/lib/auth/session";
 import { parseContactPayload } from "@/lib/api/validation";
+import {
+  applyRelatedMediaToContacts,
+  attachSignedMediaUrls,
+  mapEntitiesById,
+} from "@/lib/media/media";
 import { getSupabaseServer } from "@/lib/supabase/server";
+import { createContactWithRelations } from "@/lib/supabase/contact-mutations";
 
 export const runtime = "nodejs";
 
@@ -12,14 +18,31 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
-  const { data, error } = await supabase
-    .from("contacts")
-    .select("*, contact_companies(companies(*)), contact_projects(projects(*))")
-    .order("name");
+  const [
+    { data, error },
+    { data: companiesData, error: companiesError },
+    { data: projectsData, error: projectsError },
+  ] = await Promise.all([
+    supabase
+      .from("contacts")
+      .select("*, contact_companies(companies(*)), contact_projects(projects(*))")
+      .eq("user_id", auth.user.id)
+      .order("name"),
+    supabase.from("companies").select("*").eq("user_id", auth.user.id).order("name"),
+    supabase.from("projects").select("*").eq("user_id", auth.user.id).order("name"),
+  ]);
 
-  const response = error
-    ? NextResponse.json({ error: error.message }, { status: 500 })
-    : NextResponse.json(data);
+  const payload = error || companiesError || projectsError
+    ? null
+    : applyRelatedMediaToContacts(
+        await attachSignedMediaUrls(supabase as never, "contact", data ?? []),
+        mapEntitiesById(await attachSignedMediaUrls(supabase as never, "company", companiesData ?? [])),
+        mapEntitiesById(await attachSignedMediaUrls(supabase as never, "project", projectsData ?? [])),
+      );
+
+  const response = error || companiesError || projectsError
+    ? NextResponse.json({ error: error?.message ?? companiesError?.message ?? projectsError?.message }, { status: 500 })
+    : NextResponse.json(payload ?? []);
 
   applySessionCookies(response, auth.resolved);
   return response;
@@ -35,23 +58,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const payload = parseContactPayload(body);
     const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
+    const contact = await createContactWithRelations(supabase, auth.user.id, payload);
+    const [enrichedContact] = await attachSignedMediaUrls(supabase as never, "contact", [contact]);
 
-    const { data: contact, error } = await supabase.rpc("create_contact_with_relations", {
-      p_name: payload.name,
-      p_email: payload.email ?? null,
-      p_phone: payload.phone ?? null,
-      p_role: payload.role ?? null,
-      p_bio: payload.bio ?? null,
-      p_type: payload.type,
-      p_company_ids: payload.companyIds,
-      p_project_ids: payload.projectIds,
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const response = NextResponse.json(contact, { status: 201 });
+    const response = NextResponse.json(enrichedContact, { status: 201 });
     applySessionCookies(response, auth.resolved);
     return response;
   } catch (error) {
