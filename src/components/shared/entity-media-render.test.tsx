@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ReactFlowProvider } from "@xyflow/react";
-import type { ReactElement } from "react";
+import { Handle, Position, ReactFlowProvider } from "@xyflow/react";
+import { isValidElement, type ReactElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ContactCard } from "@/components/contacts/ContactCard";
 import { CompanyNode } from "@/components/mind-map/CompanyNode";
@@ -10,6 +10,22 @@ import { ProjectNode } from "@/components/mind-map/ProjectNode";
 
 function renderWithFlowProvider(node: ReactElement) {
   return renderToStaticMarkup(<ReactFlowProvider>{node}</ReactFlowProvider>);
+}
+
+function collectElementsByType(node: ReactNode, type: unknown): ReactElement[] {
+  if (!isValidElement(node)) {
+    return [];
+  }
+
+  const matches = node.type === type ? [node] : [];
+  const childNodes = node.props.children;
+
+  if (!childNodes) {
+    return matches;
+  }
+
+  const children = Array.isArray(childNodes) ? childNodes : [childNodes];
+  return matches.concat(children.flatMap((child) => collectElementsByType(child, type)));
 }
 
 test("ContactCard renders an image when a contact photo URL is present", () => {
@@ -98,4 +114,24 @@ test("ProjectNode renders an image when a project logo URL is present", () => {
   assert.match(markup, /<img[^>]+src="https:\/\/signed\.test\/project\.webp"/);
   assert.match(markup, /object-contain/);
   assert.match(markup, /background:rgba\(255,255,255,0\.92\)/);
+});
+
+test("ProjectNode exposes both inbound and outbound handles for standalone project edges", () => {
+  const tree = ProjectNode({
+    id: "project-1",
+    data: {
+      label: "Launch",
+      status: "active",
+    },
+  } as never);
+  const handles = collectElementsByType(tree, Handle);
+
+  assert.ok(
+    handles.some((handle) => handle.props.type === "target" && handle.props.position === Position.Left),
+    "expected ProjectNode to render a left target handle",
+  );
+  assert.ok(
+    handles.some((handle) => handle.props.type === "source" && handle.props.position === Position.Right),
+    "expected ProjectNode to render a right source handle",
+  );
 });

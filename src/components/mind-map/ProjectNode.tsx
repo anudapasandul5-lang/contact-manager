@@ -71,6 +71,7 @@ export function ProjectNode({ data }: NodeProps) {
       }}
     >
       <Handle type="target" position={Position.Left} style={{ opacity: 0, width: 1, height: 1 }} />
+      <Handle type="source" position={Position.Right} style={{ opacity: 0, width: 1, height: 1 }} />
 
       {/* Icon container */}
       <EntityAvatar
