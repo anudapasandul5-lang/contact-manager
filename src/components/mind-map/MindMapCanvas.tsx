@@ -64,12 +64,14 @@ import {
   type SearchResultKind,
 } from "./declutter";
 import {
+  buildCompanyFocusCollapsedNodeIds,
   buildManualExpandedCompanyIds,
   buildManualExpandedProjectIds,
   buildSearchExpandedCompanyIds,
   buildSearchExpandedProjectIds,
   buildViewportFocusNodeIds,
   shouldClearFocusForPaneClick,
+  type FocusSource,
 } from "./focus-view";
 import { getFilterCategoryForNode, type FilterCategory } from "./node-filters";
 import {
@@ -130,9 +132,10 @@ const COLLAPSE_STAGGER_MS = 90;
 const COLLAPSED_SCALE = 0.18;
 const COLLAPSED_OPACITY = 0;
 const FILTER_FADE_OPACITY = 0.18;
+const EMPTY_NODE_ID_SET = new Set<string>();
 
 type AnimationPhase = "idle" | "collapsing" | "expanding";
-type NeighborhoodSource = "hover" | "search" | "manual" | null;
+type NeighborhoodSource = FocusSource;
 
 const searchKindLabels: Record<SearchResultKind, string> = {
   company: "Company",
@@ -661,7 +664,7 @@ function computeFilterCollapsedPositions(
   nodes: Node[],
   current: Map<string, { x: number; y: number }>,
   expanded: Map<string, { x: number; y: number }>,
-  targets: Set<GravityTarget>,
+  selectedNodeIds: Set<string>,
 ): Map<string, { x: number; y: number }> {
   const positions = new Map<string, { x: number; y: number }>();
   const centerPosition = expanded.get("center") ?? current.get("center") ?? { x: 0, y: 0 };
@@ -672,8 +675,7 @@ function computeFilterCollapsedPositions(
   };
 
   nodes.forEach((node) => {
-    const target = getGravityTargetForNode(node);
-    if (!target || !targets.has(target)) return;
+    if (!selectedNodeIds.has(node.id)) return;
 
     const kind = nodeKind(node);
     const dims = nodeDimensions[kind] ?? nodeDimensions.contact;
@@ -690,19 +692,17 @@ function computeFilterVisuals(
   nodes: Node[],
   current: Map<string, { x: number; y: number }>,
   expanded: Map<string, { x: number; y: number }>,
-  targets: Set<GravityTarget>,
-  previousTargets: Set<GravityTarget>,
+  selectedNodeIds: Set<string>,
+  previousSelectedNodeIds: Set<string>,
 ): Map<string, NodeVisualState> {
-  const collapsedPositions = computeFilterCollapsedPositions(nodes, current, expanded, targets);
+  const collapsedPositions = computeFilterCollapsedPositions(nodes, current, expanded, selectedNodeIds);
   const targetVisuals = new Map<string, NodeVisualState>();
 
   nodes.forEach((node) => {
-    const nodeTarget = getGravityTargetForNode(node);
+    const isSelected = selectedNodeIds.has(node.id);
+    const wasSelected = previousSelectedNodeIds.has(node.id);
 
-    const isSelected = Boolean(nodeTarget && targets.has(nodeTarget));
-    const wasSelected = Boolean(nodeTarget && previousTargets.has(nodeTarget));
-
-    if (node.id === "center" || !nodeTarget) {
+    if (node.id === "center") {
       targetVisuals.set(node.id, {
         position: current.get(node.id) ?? expanded.get(node.id) ?? node.position,
         scale: 1,
@@ -779,7 +779,7 @@ function MindMapCanvasInner() {
   const layoutPositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const expandedPositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const filterExpandedPositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
-  const previousFocusTargetsRef = useRef<Set<GravityTarget>>(new Set());
+  const previousSubsetNodeIdsRef = useRef<Set<string>>(new Set());
   const [focusTargets, setFocusTargets] = useState<Set<GravityTarget>>(new Set());
 
   const companyContacts = useMemo(() => {
@@ -803,8 +803,6 @@ function MindMapCanvasInner() {
       return contact.type === "employee" || companies.some((company) => company.is_owned);
     });
   }, [networkData]);
-
-  const hasFocusedSubset = useMemo(() => focusTargets.size > 0, [focusTargets]);
 
   const syncNodePositionRefs = useCallback((nextNodes: Node[]) => {
     nodesRef.current = nextNodes;
@@ -1143,21 +1141,56 @@ function MindMapCanvasInner() {
     () => buildNeighborhoodNodeIds(activeNeighborhoodNodeId, edges),
     [activeNeighborhoodNodeId, edges],
   );
+  const companyFocusCollapsedNodeIds = useMemo(
+    () =>
+      buildCompanyFocusCollapsedNodeIds({
+        nodes,
+        neighborhoodNodeIds,
+        source: activeNeighborhoodSource,
+      }),
+    [activeNeighborhoodSource, neighborhoodNodeIds, nodes],
+  );
+  const selectedSubsetNodeIds = useMemo(() => {
+    if (companyFocusCollapsedNodeIds.size > 0) {
+      return companyFocusCollapsedNodeIds;
+    }
+
+    const next = new Set<string>();
+    nodes.forEach((node) => {
+      const target = getGravityTargetForNode(node);
+      if (target && focusTargets.has(target)) {
+        next.add(node.id);
+      }
+    });
+    return next;
+  }, [companyFocusCollapsedNodeIds, focusTargets, nodes]);
+  const hasFocusedSubset = useMemo(() => selectedSubsetNodeIds.size > 0, [selectedSubsetNodeIds]);
+  const viewportSearchExpandedCompanyIds =
+    activeNeighborhoodSource === "search" ? searchExpandedCompanyIds : EMPTY_NODE_ID_SET;
+  const viewportSearchExpandedProjectIds =
+    activeNeighborhoodSource === "search" ? searchExpandedProjectIds : EMPTY_NODE_ID_SET;
   const viewportFocusNodeIds = useMemo(
     () => buildViewportFocusNodeIds({
       activeNodeId: activeNeighborhoodNodeId,
       neighborhoodNodeIds,
-      searchExpandedCompanyIds,
-      searchExpandedProjectIds,
+      searchExpandedCompanyIds: viewportSearchExpandedCompanyIds,
+      searchExpandedProjectIds: viewportSearchExpandedProjectIds,
       source: activeNeighborhoodSource,
     }),
-    [activeNeighborhoodNodeId, activeNeighborhoodSource, neighborhoodNodeIds, searchExpandedCompanyIds, searchExpandedProjectIds],
+    [
+      activeNeighborhoodNodeId,
+      activeNeighborhoodSource,
+      neighborhoodNodeIds,
+      viewportSearchExpandedCompanyIds,
+      viewportSearchExpandedProjectIds,
+    ],
   );
 
   // Display layer: single useMemo that produces displayNodes and displayEdges
   const { displayNodes, displayEdges } = useMemo(() => {
     const hiddenNodeIds = new Set<string>();
-    const selectedFilterNodeIds = new Set<string>();
+    const selectedFilterNodeIds = new Set(selectedSubsetNodeIds);
+    const edgeFocusTargets = companyFocusCollapsedNodeIds.size > 0 ? new Set<GravityTarget>() : focusTargets;
     const searchRevealNodeIds = activeNeighborhoodSource === "search" ? neighborhoodNodeIds : new Set<string>();
 
     nodes.forEach((n) => {
@@ -1168,19 +1201,12 @@ function MindMapCanvasInner() {
       const isProjectionHidden = parentCompanyId ? effectiveCollapsedCompanies.has(parentCompanyId) : false;
       const isProjectHidden = parentProjectId ? effectiveCollapsedProjects.has(parentProjectId) : false;
       const isCollapsedByAllCompanies = companyIds.length > 0 && companyIds.every((id) => effectiveCollapsedCompanies.has(id));
-      if ((isProjectionHidden || isProjectHidden || isCollapsedByAllCompanies) && !searchRevealNodeIds.has(n.id)) {
+      // Vendor (truck-icon) nodes always tuck back into their parent container when not in the active neighborhood
+      const isVendorNotInFocus = n.type === "vendor" && (parentCompanyId !== null || parentProjectId !== null) && !neighborhoodNodeIds.has(n.id);
+      if ((isProjectionHidden || isProjectHidden || isCollapsedByAllCompanies || isVendorNotInFocus) && !searchRevealNodeIds.has(n.id)) {
         hiddenNodeIds.add(n.id);
       }
     });
-
-    if (hasFocusedSubset) {
-      nodes.forEach((node) => {
-        const target = getGravityTargetForNode(node);
-        if (target && focusTargets.has(target)) {
-          selectedFilterNodeIds.add(node.id);
-        }
-      });
-    }
 
     // Compute hidden count per company for tucked projections and shared members.
     const hiddenCountByCompany = new Map<string, number>();
@@ -1190,16 +1216,17 @@ function MindMapCanvasInner() {
       const companyIds = (n.data.companyIds ?? []) as string[];
       const parentCompanyId = typeof n.data.parentCompanyId === "string" ? n.data.parentCompanyId : null;
       const parentProjectId = typeof n.data.parentProjectId === "string" ? n.data.parentProjectId : null;
+      const isVendorNotInFocus = n.type === "vendor" && (parentCompanyId !== null || parentProjectId !== null) && !neighborhoodNodeIds.has(n.id);
 
       if (parentCompanyId) {
-        if (effectiveCollapsedCompanies.has(parentCompanyId) && !searchRevealNodeIds.has(n.id)) {
+        if ((effectiveCollapsedCompanies.has(parentCompanyId) || isVendorNotInFocus) && !searchRevealNodeIds.has(n.id)) {
           hiddenCountByCompany.set(parentCompanyId, (hiddenCountByCompany.get(parentCompanyId) ?? 0) + 1);
         }
         return;
       }
 
       if (parentProjectId) {
-        if (effectiveCollapsedProjects.has(parentProjectId) && !searchRevealNodeIds.has(n.id)) {
+        if ((effectiveCollapsedProjects.has(parentProjectId) || isVendorNotInFocus) && !searchRevealNodeIds.has(n.id)) {
           hiddenCountByProject.set(parentProjectId, (hiddenCountByProject.get(parentProjectId) ?? 0) + 1);
         }
         return;
@@ -1361,7 +1388,7 @@ function MindMapCanvasInner() {
         nodeOpacityById,
         hasFocusedSubset,
         selectedFilterNodeIds,
-        focusTargets,
+        focusTargets: edgeFocusTargets,
         hoveredNodeId,
         connectedEdgeIds,
       }),
@@ -1385,7 +1412,9 @@ function MindMapCanvasInner() {
     onCollapseProject,
     inactiveCategories,
     hasFocusedSubset,
+    companyFocusCollapsedNodeIds,
     focusTargets,
+    selectedSubsetNodeIds,
     mapCollapsed,
     animationPhase,
     effectiveCollapsedProjects,
@@ -1393,6 +1422,10 @@ function MindMapCanvasInner() {
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
+      if (isAnimatingRef.current) {
+        return;
+      }
+
       if (searchQuery.trim()) {
         setSearchFocusIndex(0);
         setSearchQuery("");
@@ -1403,11 +1436,20 @@ function MindMapCanvasInner() {
         return;
       }
 
-      setActiveNeighborhoodNodeId(node.id);
-      setActiveNeighborhoodSource("manual");
+      setHoveredNodeId(null);
 
-      if (node.type === "company" && networkData) {
-      } else if (node.type === "vendor" && networkData) {
+      if (node.type === "company") {
+        setActiveNeighborhoodNodeId(node.id);
+        setActiveNeighborhoodSource("company");
+        return;
+      }
+
+      if (activeNeighborhoodSource !== "company") {
+        setActiveNeighborhoodNodeId(node.id);
+        setActiveNeighborhoodSource("manual");
+      }
+
+      if (node.type === "vendor" && networkData) {
         const vendorId = typeof node.data?.vendorId === "string"
           ? node.data.vendorId
           : node.id.replace("vendor-", "");
@@ -1430,12 +1472,16 @@ function MindMapCanvasInner() {
         }
       }
     },
-    [networkData, searchQuery, toggleCollapse]
+    [activeNeighborhoodSource, networkData, searchQuery, toggleCollapse]
   );
 
   const onNodeMouseEnter = useCallback((_: React.MouseEvent, node: Node) => {
     setHoveredNodeId(node.id);
-    if (!currentSearchResult && activeNeighborhoodSource !== "manual" && node.type === "company") {
+    if (
+      !currentSearchResult
+      && (activeNeighborhoodSource === null || activeNeighborhoodSource === "hover")
+      && node.type === "company"
+    ) {
       setActiveNeighborhoodNodeId(node.id);
       setActiveNeighborhoodSource("hover");
     }
@@ -1497,7 +1543,7 @@ function MindMapCanvasInner() {
     const currentPositions = new Map(
       liveNodes.map((node) => [node.id, { ...node.position }]),
     );
-    if (focusTargets.size > 0 && previousFocusTargetsRef.current.size === 0) {
+    if (selectedSubsetNodeIds.size > 0 && previousSubsetNodeIdsRef.current.size === 0) {
       filterExpandedPositionsRef.current = currentPositions;
     }
 
@@ -1513,14 +1559,14 @@ function MindMapCanvasInner() {
           liveNodes,
           currentPositions,
           baselinePositions,
-          focusTargets,
-          previousFocusTargetsRef.current,
+          selectedSubsetNodeIds,
+          previousSubsetNodeIdsRef.current,
         )
       : new Map(
           liveNodes.map((node) => [
             node.id,
             {
-              position: previousFocusTargetsRef.current.size > 0
+              position: previousSubsetNodeIdsRef.current.size > 0
                 ? baselinePositions.get(node.id) ?? currentPositions.get(node.id) ?? node.position
                 : currentPositions.get(node.id) ?? node.position,
               scale: 1,
@@ -1547,7 +1593,7 @@ function MindMapCanvasInner() {
         .map((node) => node.id),
     );
 
-    previousFocusTargetsRef.current = new Set(focusTargets);
+    previousSubsetNodeIdsRef.current = new Set(selectedSubsetNodeIds);
 
     if (changedNodeIds.size === 0) {
       if (!hasFocusedSubset) {
@@ -1575,7 +1621,7 @@ function MindMapCanvasInner() {
       isAnimatingRef.current = false;
       setIsAnimating(false);
     });
-  }, [hasFocusedSubset, focusTargets, mapCollapsed, networkData, setNodes]);
+  }, [hasFocusedSubset, mapCollapsed, networkData, selectedSubsetNodeIds, setNodes]);
 
   // Context menu handlers
   const onNodeContextMenu = useCallback(
@@ -2018,7 +2064,12 @@ function MindMapCanvasInner() {
 
       <VendorModal
         open={!!editingVendor}
-        onOpenChange={(open) => !open && setEditingVendor(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingVendor(null);
+            clearManualFocus();
+          }
+        }}
         vendor={editingVendor ?? undefined}
         onSaved={() => setEditingVendor(null)}
       />
@@ -2026,7 +2077,12 @@ function MindMapCanvasInner() {
       {/* Project detail dialog */}
       <Dialog
         open={!!selectedProject}
-        onOpenChange={(open) => !open && setSelectedProject(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedProject(null);
+            clearManualFocus();
+          }
+        }}
       >
         <DialogContent className="sm:max-w-md" style={{ background: "linear-gradient(145deg, var(--clay-card), var(--clay-card-end))", borderColor: "var(--clay-border)", color: "var(--clay-text)" }}>
           <DialogHeader>

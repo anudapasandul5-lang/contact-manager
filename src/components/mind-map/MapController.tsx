@@ -9,6 +9,7 @@ import {
   shouldResetViewOnSearchChange,
 } from "./layout-memory";
 import {
+  getViewportFitConfig,
   shouldAutoFitViewportForFocus,
   type FocusSource,
 } from "./focus-view";
@@ -65,13 +66,20 @@ export function MapController({
     if (focusNodeIds.length === 0 || isAnimating || !focusSource) return;
     if (!shouldAutoFitViewportForFocus(focusSource)) return;
 
-    const isExpandedSearchCluster = focusSource === "search" && focusNodeIds.length > 1;
+    const fitConfig = getViewportFitConfig({
+      source: focusSource,
+      focusNodeCount: focusNodeIds.length,
+    });
+
+    if (!fitConfig) {
+      return;
+    }
 
     fitView({
       nodes: focusNodeIds.map((id) => ({ id })),
-      padding: isExpandedSearchCluster ? 0.9 : 1.2,
-      duration: isExpandedSearchCluster ? 560 : 500,
-      maxZoom: isExpandedSearchCluster ? 1.12 : 1.25,
+      padding: fitConfig.padding,
+      duration: fitConfig.duration,
+      maxZoom: fitConfig.maxZoom,
     });
   }, [fitView, focusNodeIds, focusSource, isAnimating]);
 

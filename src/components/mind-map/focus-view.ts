@@ -1,6 +1,12 @@
 import type { Node } from "@xyflow/react";
 
-export type FocusSource = "hover" | "search" | "manual" | null;
+export type FocusSource = "hover" | "search" | "manual" | "company" | null;
+
+interface ViewportFitConfig {
+  padding: number;
+  duration: number;
+  maxZoom: number;
+}
 
 interface BuildViewportFocusNodeIdsOptions {
   activeNodeId: string | null;
@@ -26,7 +32,7 @@ export function buildViewportFocusNodeIds({
     return [activeNodeId];
   }
 
-  if (source === "manual" || source === "hover") {
+  if (source === "manual" || source === "hover" || source === "company") {
     return neighborhoodNodeIds.size > 0 ? Array.from(neighborhoodNodeIds) : [activeNodeId];
   }
 
@@ -34,11 +40,39 @@ export function buildViewportFocusNodeIds({
 }
 
 export function shouldClearFocusForPaneClick(source: FocusSource): boolean {
-  return source === "manual" || source === "hover";
+  return source === "manual" || source === "hover" || source === "company";
 }
 
 export function shouldAutoFitViewportForFocus(source: FocusSource): boolean {
-  return source === "search";
+  return source === "search" || source === "company";
+}
+
+export function getViewportFitConfig({
+  source,
+  focusNodeCount,
+}: {
+  source: FocusSource;
+  focusNodeCount: number;
+}): ViewportFitConfig | null {
+  if (!shouldAutoFitViewportForFocus(source)) {
+    return null;
+  }
+
+  if (source === "company") {
+    return {
+      padding: 1.02,
+      duration: 440,
+      maxZoom: 1.08,
+    };
+  }
+
+  const isExpandedSearchCluster = source === "search" && focusNodeCount > 1;
+
+  return {
+    padding: isExpandedSearchCluster ? 0.9 : 1.2,
+    duration: isExpandedSearchCluster ? 560 : 500,
+    maxZoom: isExpandedSearchCluster ? 1.12 : 1.25,
+  };
 }
 
 export function buildManualExpandedCompanyIds({
@@ -50,7 +84,7 @@ export function buildManualExpandedCompanyIds({
   source: FocusSource;
   nodes: Node[];
 }) {
-  if (!activeNodeId || source !== "manual") {
+  if (!activeNodeId || (source !== "manual" && source !== "company")) {
     return new Set<string>();
   }
 
@@ -60,6 +94,26 @@ export function buildManualExpandedCompanyIds({
   }
 
   return new Set([activeNode.id.replace(/^company-/, "")]);
+}
+
+export function buildCompanyFocusCollapsedNodeIds({
+  nodes,
+  neighborhoodNodeIds,
+  source,
+}: {
+  nodes: Node[];
+  neighborhoodNodeIds: Set<string>;
+  source: FocusSource;
+}) {
+  if (source !== "company" || neighborhoodNodeIds.size === 0) {
+    return new Set<string>();
+  }
+
+  return new Set(
+    nodes
+      .filter((node) => node.id !== "center" && !neighborhoodNodeIds.has(node.id))
+      .map((node) => node.id),
+  );
 }
 
 export function buildManualExpandedProjectIds({

@@ -77,6 +77,8 @@ export function ProjectNode({ data }: NodeProps) {
         name={label}
         imageUrl={logoUrl}
         className="rounded-[11px]"
+        imageFit="contain"
+        imageInset={4}
         style={{
           width: 36,
           height: 36,
@@ -84,6 +86,13 @@ export function ProjectNode({ data }: NodeProps) {
           background: "linear-gradient(145deg, var(--clay-card-end), var(--clay-surface))",
           boxShadow: "var(--clay-inset)",
           flexShrink: 0,
+        }}
+        imageFrameStyle={{
+          width: "100%",
+          height: "100%",
+          borderRadius: 11,
+          background: "rgba(255,255,255,0.92)",
+          boxShadow: "inset 1px 1px 3px rgba(255,255,255,0.78), inset -1px -1px 2px rgba(0,0,0,0.08)",
         }}
         fallback={
           <div

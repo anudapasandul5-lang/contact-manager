@@ -210,9 +210,9 @@ export function buildCompanyClusterGraph(data: NetworkData): { nodes: Node[]; ed
           type: "default",
           style: {
             stroke: "#fb923c",
-            strokeWidth: 1.1,
+            strokeWidth: 1.8,
             strokeDasharray: "5 4",
-            opacity: 0.42,
+            opacity: 0.7,
           },
         });
       });
@@ -230,8 +230,8 @@ export function buildCompanyClusterGraph(data: NetworkData): { nodes: Node[]; ed
         type: "default",
         style: {
           stroke: "#fdba74",
-          strokeWidth: 1.2,
-          opacity: 0.42,
+          strokeWidth: 1.8,
+          opacity: 0.7,
         },
       });
 
@@ -245,9 +245,9 @@ export function buildCompanyClusterGraph(data: NetworkData): { nodes: Node[]; ed
           type: "default",
           style: {
             stroke: "#fb923c",
-            strokeWidth: 1.1,
+            strokeWidth: 1.8,
             strokeDasharray: "5 4",
-            opacity: 0.42,
+            opacity: 0.7,
           },
         });
         });
@@ -264,8 +264,8 @@ export function buildCompanyClusterGraph(data: NetworkData): { nodes: Node[]; ed
         type: "default",
         style: {
           stroke: "#fdba74",
-          strokeWidth: 1.2,
-          opacity: 0.42,
+          strokeWidth: 1.8,
+          opacity: 0.7,
         },
       });
     });

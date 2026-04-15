@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  buildCompanyFocusCollapsedNodeIds,
   buildManualExpandedCompanyIds,
   buildManualExpandedProjectIds,
+  getViewportFitConfig,
   buildSearchExpandedCompanyIds,
   buildSearchExpandedProjectIds,
   buildViewportFocusNodeIds,
@@ -16,6 +18,16 @@ test("buildViewportFocusNodeIds returns active node and manual neighborhood for 
     activeNodeId: "company-1",
     neighborhoodNodeIds: new Set(["company-1", "contact-1", "project-1"]),
     source: "manual",
+  });
+
+  assert.deepEqual(nodeIds, ["company-1", "contact-1", "project-1"]);
+});
+
+test("buildViewportFocusNodeIds returns the full neighborhood for company spotlight focus", () => {
+  const nodeIds = buildViewportFocusNodeIds({
+    activeNodeId: "company-1",
+    neighborhoodNodeIds: new Set(["company-1", "contact-1", "project-1"]),
+    source: "company",
   });
 
   assert.deepEqual(nodeIds, ["company-1", "contact-1", "project-1"]);
@@ -46,6 +58,7 @@ test("buildViewportFocusNodeIds uses the full neighborhood when search temporari
 test("pane clicks clear manual and hover focus without treating search as dismissible focus", () => {
   assert.equal(shouldClearFocusForPaneClick("manual"), true);
   assert.equal(shouldClearFocusForPaneClick("hover"), true);
+  assert.equal(shouldClearFocusForPaneClick("company"), true);
   assert.equal(shouldClearFocusForPaneClick("search"), false);
   assert.equal(shouldClearFocusForPaneClick(null), false);
 });
@@ -53,8 +66,23 @@ test("pane clicks clear manual and hover focus without treating search as dismis
 test("only search focus triggers viewport auto-fit", () => {
   assert.equal(shouldAutoFitViewportForFocus("manual"), false);
   assert.equal(shouldAutoFitViewportForFocus("hover"), false);
+  assert.equal(shouldAutoFitViewportForFocus("company"), true);
   assert.equal(shouldAutoFitViewportForFocus("search"), true);
   assert.equal(shouldAutoFitViewportForFocus(null), false);
+});
+
+test("getViewportFitConfig gives company spotlight a softer zoom profile than search clusters", () => {
+  assert.deepEqual(getViewportFitConfig({ source: "company", focusNodeCount: 4 }), {
+    padding: 1.02,
+    duration: 440,
+    maxZoom: 1.08,
+  });
+  assert.deepEqual(getViewportFitConfig({ source: "search", focusNodeCount: 4 }), {
+    padding: 0.9,
+    duration: 560,
+    maxZoom: 1.12,
+  });
+  assert.equal(getViewportFitConfig({ source: "manual", focusNodeCount: 4 }), null);
 });
 
 test("buildManualExpandedCompanyIds temporarily opens the clicked company during manual focus", () => {
@@ -75,6 +103,10 @@ test("buildManualExpandedCompanyIds temporarily opens the clicked company during
 
   assert.deepEqual(
     [...buildManualExpandedCompanyIds({ activeNodeId: "company-1", source: "manual", nodes })],
+    ["1"],
+  );
+  assert.deepEqual(
+    [...buildManualExpandedCompanyIds({ activeNodeId: "company-1", source: "company", nodes })],
     ["1"],
   );
   assert.deepEqual(
@@ -113,6 +145,34 @@ test("buildManualExpandedProjectIds temporarily opens the clicked standalone pro
   );
   assert.deepEqual(
     [...buildManualExpandedProjectIds({ activeNodeId: "project-2", source: null, nodes })],
+    [],
+  );
+});
+
+test("buildCompanyFocusCollapsedNodeIds collapses every non-neighbor except the center", () => {
+  const nodes = [
+    { id: "center", type: "center", position: { x: 0, y: 0 }, data: {} },
+    { id: "company-1", type: "company", position: { x: 0, y: 0 }, data: {} },
+    { id: "contact-1", type: "contact", position: { x: 0, y: 0 }, data: {} },
+    { id: "project-1", type: "project", position: { x: 0, y: 0 }, data: {} },
+    { id: "company-2", type: "company", position: { x: 0, y: 0 }, data: {} },
+    { id: "vendor-2", type: "vendor", position: { x: 0, y: 0 }, data: {} },
+  ] as Node[];
+
+  assert.deepEqual(
+    [...buildCompanyFocusCollapsedNodeIds({
+      nodes,
+      neighborhoodNodeIds: new Set(["company-1", "contact-1", "project-1"]),
+      source: "company",
+    })].sort(),
+    ["company-2", "vendor-2"],
+  );
+  assert.deepEqual(
+    [...buildCompanyFocusCollapsedNodeIds({
+      nodes,
+      neighborhoodNodeIds: new Set(["company-1", "contact-1", "project-1"]),
+      source: "manual",
+    })],
     [],
   );
 });

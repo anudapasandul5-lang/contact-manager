@@ -81,6 +81,8 @@ export function CompanyNode({ data }: NodeProps) {
           name={label}
           imageUrl={logoUrl}
           className="rounded-[14px]"
+          imageFit="contain"
+          imageInset={4}
           style={{
             width: 36,
             height: 36,
@@ -88,6 +90,13 @@ export function CompanyNode({ data }: NodeProps) {
             background: `linear-gradient(145deg, ${clay.icon}, ${clay.icon})`,
             color: "#ffffff",
             flexShrink: 0,
+          }}
+          imageFrameStyle={{
+            width: "100%",
+            height: "100%",
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.92)",
+            boxShadow: "inset 1px 1px 3px rgba(255,255,255,0.72), inset -1px -1px 2px rgba(0,0,0,0.08)",
           }}
           fallback={
             <div

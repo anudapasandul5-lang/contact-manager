@@ -7,6 +7,11 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 
+export const dialogCloseButtonClassName =
+  "absolute top-2 right-2 bg-white/92 text-slate-500 shadow-md ring-1 ring-black/10 backdrop-blur-sm hover:bg-white hover:text-slate-900 focus-visible:ring-slate-400/40"
+
+export const dialogCloseIconClassName = "size-4 stroke-[2.4]"
+
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
@@ -65,13 +70,12 @@ function DialogContent({
             render={
               <Button
                 variant="ghost"
-                className="absolute top-2 right-2"
+                className={dialogCloseButtonClassName}
                 size="icon-sm"
               />
             }
           >
-            <XIcon
-            />
+            <XIcon className={dialogCloseIconClassName} />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}

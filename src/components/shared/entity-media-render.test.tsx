@@ -57,6 +57,8 @@ test("CompanyNode renders an image when a company logo URL is present", () => {
   );
 
   assert.match(markup, /<img[^>]+src="https:\/\/signed\.test\/company\.png"/);
+  assert.match(markup, /object-contain/);
+  assert.match(markup, /background:rgba\(255,255,255,0\.92\)/);
 });
 
 test("ContactNode renders an image when a profile photo URL is present", () => {
@@ -94,4 +96,6 @@ test("ProjectNode renders an image when a project logo URL is present", () => {
   );
 
   assert.match(markup, /<img[^>]+src="https:\/\/signed\.test\/project\.webp"/);
+  assert.match(markup, /object-contain/);
+  assert.match(markup, /background:rgba\(255,255,255,0\.92\)/);
 });
