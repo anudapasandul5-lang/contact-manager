@@ -4,6 +4,7 @@ import {
   clearSavedCollapsedCompanies,
   createCompanyCollapseStorageKey,
   readSavedCollapsedCompanies,
+  restoreSavedCollapsedCompanies,
   resolveInitialCollapsedCompanies,
   writeSavedCollapsedCompanies,
 } from "@/components/mind-map/layout-memory";
@@ -38,6 +39,22 @@ test("resolveInitialCollapsedCompanies restores saved company collapse state whe
   assert.deepEqual([...result], ["company-2"]);
 });
 
+test("restoreSavedCollapsedCompanies rehydrates tucked company state from localStorage", () => {
+  const storage = createStorage();
+  Object.assign(globalThis, {
+    window: {
+      localStorage: storage,
+    },
+  });
+
+  const storageKey = createCompanyCollapseStorageKey("user-1");
+  writeSavedCollapsedCompanies(storageKey, new Set(["company-2"]));
+
+  const result = restoreSavedCollapsedCompanies(["company-1", "company-2"], storageKey);
+
+  assert.deepEqual([...result], ["company-2"]);
+});
+
 test("resolveInitialCollapsedCompanies supports intentional fully-collapsed saved state", () => {
   const saved = new Set(["company-1", "company-2"]);
   const result = resolveInitialCollapsedCompanies(["company-1", "company-2"], saved);
@@ -46,7 +63,7 @@ test("resolveInitialCollapsedCompanies supports intentional fully-collapsed save
 
 test("createCompanyCollapseStorageKey uses a versioned namespace for migration safety", () => {
   const storageKey = createCompanyCollapseStorageKey("user-1");
-  assert.equal(storageKey, "contact-manager:mind-map-company-collapse:v2:user-1");
+  assert.equal(storageKey, "contact-manager:mind-map-company-collapse:v3:user-1");
 });
 
 test("clearSavedCollapsedCompanies removes stale saved company collapse state", () => {

@@ -14,22 +14,13 @@ export const DENSER_RADIAL_LAYOUT = {
   overviewZoom: 0.76,
 } as const;
 
-const COLLAPSE_STORAGE_VERSION = "v2";
+const LAYOUT_STORAGE_VERSION = "v4";
+const COLLAPSE_STORAGE_VERSION = "v3";
 
 type SavedNodePosition = { x: number; y: number };
 
 function shouldPersistNodePosition(node: Node) {
-  if (node.type !== "contact") {
-    return false;
-  }
-
-  const data = (node.data ?? {}) as Record<string, unknown>;
-  const isProjection =
-    data.isCompanyProjection === true
-    || data.isProjectProjection === true
-    || node.id.includes("::");
-
-  return !isProjection;
+  return node.id !== "center";
 }
 
 function isValidSavedPosition(value: unknown): value is SavedNodePosition {
@@ -94,8 +85,7 @@ export function applySavedNodePositions(nodes: Node[], savedPositions: Map<strin
       return node;
     }
 
-    // Reject positions at the exact origin — these were saved before layout ran
-    // (e.g. from a bug in a prior session) and would pin nodes to the center.
+    // Guard against stale corrupted saves that pin nodes to map origin.
     if (savedPosition.x === 0 && savedPosition.y === 0) {
       return node;
     }
@@ -147,7 +137,7 @@ export function deriveLayoutOwnerId(data: NetworkData | null) {
 }
 
 export function createLayoutStorageKey(ownerId: string | null) {
-  return `contact-manager:mind-map-layout:${ownerId ?? "anonymous"}`;
+  return `contact-manager:mind-map-layout:${LAYOUT_STORAGE_VERSION}:${ownerId ?? "anonymous"}`;
 }
 
 export function createCompanyCollapseStorageKey(ownerId: string | null) {
@@ -232,6 +222,13 @@ export function resolveInitialCollapsedCompanies(
   return new Set(companyIds.filter((companyId) => savedCollapsedCompanies.has(companyId)));
 }
 
+export function restoreSavedCollapsedCompanies(
+  companyIds: string[],
+  storageKey: string,
+) {
+  return resolveInitialCollapsedCompanies(companyIds, readSavedCollapsedCompanies(storageKey));
+}
+
 export function resolveInitialCollapsedProjects(
   projectIds: string[],
   savedCollapsedProjects: Set<string> | null,
@@ -241,6 +238,13 @@ export function resolveInitialCollapsedProjects(
   }
 
   return new Set(projectIds.filter((projectId) => savedCollapsedProjects.has(projectId)));
+}
+
+export function restoreSavedCollapsedProjects(
+  projectIds: string[],
+  storageKey: string,
+) {
+  return resolveInitialCollapsedProjects(projectIds, readSavedCollapsedProjects(storageKey));
 }
 
 export function writeSavedNodePositions(storageKey: string, nodes: Node[]) {
@@ -258,6 +262,21 @@ export function writeSavedNodePositions(storageKey: string, nodes: Node[]) {
         y: node.position.y,
       },
     ]),
+  );
+
+  window.localStorage.setItem(storageKey, JSON.stringify(payload));
+}
+
+export function writeSavedNodePositionMap(
+  storageKey: string,
+  positions: Map<string, SavedNodePosition>,
+) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const payload = Object.fromEntries(
+    Array.from(positions.entries()).filter(([nodeId]) => nodeId !== "center"),
   );
 
   window.localStorage.setItem(storageKey, JSON.stringify(payload));

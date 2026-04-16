@@ -85,14 +85,12 @@ import {
   DENSER_RADIAL_LAYOUT,
   deriveLayoutOwnerId,
   mergeNodePositionMap,
-  readSavedCollapsedCompanies,
-  readSavedCollapsedProjects,
   readSavedNodePositions,
-  resolveInitialCollapsedCompanies,
-  resolveInitialCollapsedProjects,
+  restoreSavedCollapsedCompanies,
+  restoreSavedCollapsedProjects,
   writeSavedCollapsedCompanies,
   writeSavedCollapsedProjects,
-  writeSavedNodePositions,
+  writeSavedNodePositionMap,
 } from "./layout-memory";
 import { buildArcLayout, buildSortedRingLayout, buildTieredArcLayout, sortByLabel } from "./radial-layout";
 import { buildCompanyClusterGraph } from "./company-clusters";
@@ -834,7 +832,7 @@ function MindMapCanvasInner() {
 
     const storageKey = layoutStorageKeyRef.current;
     if (storageKey) {
-      writeSavedNodePositions(storageKey, nextNodes);
+      writeSavedNodePositionMap(storageKey, layoutPositionsRef.current);
     }
   }, []);
 
@@ -865,22 +863,20 @@ function MindMapCanvasInner() {
         companyCollapseStorageKeyRef.current = companyCollapseStorageKey;
         projectCollapseStorageKeyRef.current = projectCollapseStorageKey;
         const savedPositions = readSavedNodePositions(storageKey);
-        const savedCollapsedCompanies = readSavedCollapsedCompanies(companyCollapseStorageKey);
-        const savedCollapsedProjects = readSavedCollapsedProjects(projectCollapseStorageKey);
         const graph = buildGraph(data);
         const nextNodes = applySavedNodePositions(graph.nodes, savedPositions);
         setNodes(nextNodes);
         setEdges(graph.edges);
         setCollapsedCompanies(
-          resolveInitialCollapsedCompanies(
+          restoreSavedCollapsedCompanies(
             data.companies.map((company) => company.id),
-            savedCollapsedCompanies,
+            companyCollapseStorageKey,
           ),
         );
         setCollapsedProjects(
-          resolveInitialCollapsedProjects(
+          restoreSavedCollapsedProjects(
             data.projects.filter((project) => !project.company_id).map((project) => project.id),
-            savedCollapsedProjects,
+            projectCollapseStorageKey,
           ),
         );
         syncNodePositionRefs(nextNodes);
@@ -1217,6 +1213,7 @@ function MindMapCanvasInner() {
     const selectedFilterNodeIds = new Set(selectedSubsetNodeIds);
     const edgeFocusTargets = companyFocusCollapsedNodeIds.size > 0 ? new Set<GravityTarget>() : focusTargets;
     const searchRevealNodeIds = activeNeighborhoodSource === "search" ? neighborhoodNodeIds : new Set<string>();
+    const isCompanyFocusMode = activeNeighborhoodSource === "company";
 
     nodes.forEach((n) => {
       if (n.type !== "contact" && n.type !== "vendor") return;
@@ -1227,7 +1224,11 @@ function MindMapCanvasInner() {
       const isProjectHidden = parentProjectId ? effectiveCollapsedProjects.has(parentProjectId) : false;
       const isCollapsedByAllCompanies = companyIds.length > 0 && companyIds.every((id) => effectiveCollapsedCompanies.has(id));
       // Vendor (truck-icon) nodes always tuck back into their parent container when not in the active neighborhood
-      const isVendorNotInFocus = n.type === "vendor" && (parentCompanyId !== null || parentProjectId !== null) && !neighborhoodNodeIds.has(n.id);
+      const isVendorNotInFocus =
+        isCompanyFocusMode
+        && n.type === "vendor"
+        && (parentCompanyId !== null || parentProjectId !== null)
+        && !neighborhoodNodeIds.has(n.id);
       if ((isProjectionHidden || isProjectHidden || isCollapsedByAllCompanies || isVendorNotInFocus) && !searchRevealNodeIds.has(n.id)) {
         hiddenNodeIds.add(n.id);
       }
@@ -1241,7 +1242,11 @@ function MindMapCanvasInner() {
       const companyIds = (n.data.companyIds ?? []) as string[];
       const parentCompanyId = typeof n.data.parentCompanyId === "string" ? n.data.parentCompanyId : null;
       const parentProjectId = typeof n.data.parentProjectId === "string" ? n.data.parentProjectId : null;
-      const isVendorNotInFocus = n.type === "vendor" && (parentCompanyId !== null || parentProjectId !== null) && !neighborhoodNodeIds.has(n.id);
+      const isVendorNotInFocus =
+        isCompanyFocusMode
+        && n.type === "vendor"
+        && (parentCompanyId !== null || parentProjectId !== null)
+        && !neighborhoodNodeIds.has(n.id);
 
       if (parentCompanyId) {
         if ((effectiveCollapsedCompanies.has(parentCompanyId) || isVendorNotInFocus) && !searchRevealNodeIds.has(n.id)) {

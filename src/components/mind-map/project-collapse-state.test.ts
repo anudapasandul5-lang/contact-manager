@@ -4,6 +4,7 @@ import {
   clearSavedCollapsedProjects,
   createProjectCollapseStorageKey,
   readSavedCollapsedProjects,
+  restoreSavedCollapsedProjects,
   resolveInitialCollapsedProjects,
   writeSavedCollapsedProjects,
 } from "@/components/mind-map/layout-memory";
@@ -38,6 +39,22 @@ test("resolveInitialCollapsedProjects restores saved project collapse state when
   assert.deepEqual([...result], ["project-2"]);
 });
 
+test("restoreSavedCollapsedProjects rehydrates tucked project state from localStorage", () => {
+  const storage = createStorage();
+  Object.assign(globalThis, {
+    window: {
+      localStorage: storage,
+    },
+  });
+
+  const storageKey = createProjectCollapseStorageKey("user-1");
+  writeSavedCollapsedProjects(storageKey, new Set(["project-2"]));
+
+  const result = restoreSavedCollapsedProjects(["project-2", "project-3"], storageKey);
+
+  assert.deepEqual([...result], ["project-2"]);
+});
+
 test("resolveInitialCollapsedProjects supports intentional fully-collapsed saved state", () => {
   const saved = new Set(["project-2", "project-3"]);
   const result = resolveInitialCollapsedProjects(["project-2", "project-3"], saved);
@@ -46,7 +63,7 @@ test("resolveInitialCollapsedProjects supports intentional fully-collapsed saved
 
 test("createProjectCollapseStorageKey uses a versioned namespace for migration safety", () => {
   const storageKey = createProjectCollapseStorageKey("user-1");
-  assert.equal(storageKey, "contact-manager:mind-map-project-collapse:v2:user-1");
+  assert.equal(storageKey, "contact-manager:mind-map-project-collapse:v3:user-1");
 });
 
 test("clearSavedCollapsedProjects removes stale saved project collapse state", () => {

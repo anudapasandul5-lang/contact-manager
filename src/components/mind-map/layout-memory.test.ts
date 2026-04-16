@@ -4,9 +4,11 @@ import type { Node } from "@xyflow/react";
 import {
   DENSER_RADIAL_LAYOUT,
   applySavedNodePositions,
+  createLayoutStorageKey,
   createNodePositionMap,
   getInitialViewportTarget,
   mergeNodePositionMap,
+  writeSavedNodePositionMap,
   shouldApplyInitialViewport,
   shouldResetViewOnSearchChange,
 } from "@/components/mind-map/layout-memory";
@@ -18,6 +20,25 @@ function createNode(id: string, position: { x: number; y: number }): Node {
     position,
     data: {},
   } as Node;
+}
+
+function createStorage() {
+  const backing = new Map<string, string>();
+
+  return {
+    getItem(key: string) {
+      return backing.has(key) ? backing.get(key)! : null;
+    },
+    setItem(key: string, value: string) {
+      backing.set(key, value);
+    },
+    removeItem(key: string) {
+      backing.delete(key);
+    },
+    clear() {
+      backing.clear();
+    },
+  };
 }
 
 test("shouldResetViewOnSearchChange only resets when a non-empty search is cleared", () => {
@@ -42,7 +63,7 @@ test("applySavedNodePositions keeps dragged positions for known nodes and leaves
   assert.deepEqual(result[1]?.position, { x: 30, y: 40 });
 });
 
-test("applySavedNodePositions ignores saved positions for non-contact nodes", () => {
+test("applySavedNodePositions applies saved positions for draggable non-center nodes", () => {
   const nodes = [
     { id: "center", type: "center", position: { x: 0, y: 0 }, data: {} } as Node,
     { id: "company-1", type: "company", position: { x: 255, y: -28 }, data: {} } as Node,
@@ -58,11 +79,11 @@ test("applySavedNodePositions ignores saved positions for non-contact nodes", ()
   const result = applySavedNodePositions(nodes, savedPositions);
 
   assert.deepEqual(result[0]?.position, { x: 0, y: 0 });
-  assert.deepEqual(result[1]?.position, { x: 255, y: -28 });
+  assert.deepEqual(result[1]?.position, { x: 500, y: 500 });
   assert.deepEqual(result[2]?.position, { x: 100, y: 120 });
 });
 
-test("applySavedNodePositions ignores saved positions for projected contact nodes", () => {
+test("applySavedNodePositions applies saved positions for projected contact nodes", () => {
   const projectedNode = {
     id: "contact-1::company-1",
     type: "contact",
@@ -78,7 +99,12 @@ test("applySavedNodePositions ignores saved positions for projected contact node
   ]);
 
   const result = applySavedNodePositions([projectedNode], savedPositions);
-  assert.deepEqual(result[0]?.position, { x: 240, y: 300 });
+  assert.deepEqual(result[0]?.position, { x: 5, y: 5 });
+});
+
+test("createLayoutStorageKey uses a versioned namespace for migration safety", () => {
+  const storageKey = createLayoutStorageKey("user-1");
+  assert.equal(storageKey, "contact-manager:mind-map-layout:v4:user-1");
 });
 
 test("mergeNodePositionMap preserves collapsed node baselines while updating visible nodes", () => {
@@ -109,6 +135,37 @@ test("createNodePositionMap snapshots current node positions", () => {
 
   assert.deepEqual(result.get("contact-1"), { x: 10, y: 20 });
   assert.deepEqual(result.get("company-1"), { x: 200, y: 240 });
+});
+
+test("writeSavedNodePositionMap persists expanded baseline positions for focused nodes", () => {
+  const storage = createStorage();
+  Object.assign(globalThis, {
+    window: {
+      localStorage: storage,
+    },
+  });
+
+  const storageKey = createLayoutStorageKey("user-1");
+  const baseline = new Map([
+    ["company-1", { x: 20, y: 30 }],
+    ["contact-2", { x: 200, y: 220 }],
+  ]);
+  const currentNodes = [
+    { id: "center", type: "center", position: { x: 0, y: 0 }, data: {} } as Node,
+    { id: "company-1", type: "company", position: { x: 80, y: 95 }, data: {} } as Node,
+    createNode("contact-2", { x: 0, y: 0 }),
+    createNode("contact-3", { x: 310, y: 330 }),
+  ];
+
+  const mergedPositions = mergeNodePositionMap(baseline, currentNodes, new Set(["contact-2"]));
+
+  writeSavedNodePositionMap(storageKey, mergedPositions);
+
+  assert.deepEqual(JSON.parse(storage.getItem(storageKey) ?? "{}"), {
+    "company-1": { x: 80, y: 95 },
+    "contact-2": { x: 200, y: 220 },
+    "contact-3": { x: 310, y: 330 },
+  });
 });
 
 test("denser radial layout reduces default spacing compared with the old layout", () => {

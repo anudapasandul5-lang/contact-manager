@@ -1,6 +1,5 @@
 import "@/env";
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { FloatingAddButton } from "@/components/shared/FloatingAddButton";
 
@@ -22,11 +21,6 @@ export default function RootLayout({
       style={{ fontFamily: "var(--font-inter), ui-sans-serif, system-ui, sans-serif" }}
       suppressHydrationWarning
     >
-      <head>
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`(function(){try{var t=localStorage.getItem("theme");if(t==="dark"){document.documentElement.setAttribute("data-theme","dark")}else{document.documentElement.setAttribute("data-theme","light")}}catch(e){document.documentElement.setAttribute("data-theme","light")}})();`}
-        </Script>
-      </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         {children}
         <FloatingAddButton />

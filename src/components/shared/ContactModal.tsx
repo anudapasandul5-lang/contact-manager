@@ -63,6 +63,7 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
   const [projectIds, setProjectIds] = useState<string[]>([]);
   const [allCompanies, setAllCompanies] = useState<Company[]>([]);
   const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [loadingRelations, setLoadingRelations] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mediaUrl, setMediaUrl] = useState<string | null>(null);
@@ -78,15 +79,17 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
   const canRemoveImage = Boolean(displayedImageUrl || selectedFile || mediaUrl);
 
   useEffect(() => {
+    setLoadingRelations(true);
     Promise.all([
-      fetch("/api/companies").then((r) => r.json()),
-      fetch("/api/projects").then((r) => r.json()),
+      fetch("/api/companies").then((r) => r.ok ? r.json() : []),
+      fetch("/api/projects").then((r) => r.ok ? r.json() : []),
     ])
       .then(([companies, projects]) => {
-        setAllCompanies(companies);
-        setAllProjects(projects);
+        setAllCompanies(Array.isArray(companies) ? companies : []);
+        setAllProjects(Array.isArray(projects) ? projects : []);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoadingRelations(false));
   }, []);
 
   useEffect(() => {
@@ -314,9 +317,13 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
           </div>
 
           {/* Companies */}
-          {allCompanies.length > 0 && (
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium">Companies</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium">Companies</label>
+            {loadingRelations ? (
+              <p className="text-xs text-muted-foreground px-1">Loading...</p>
+            ) : allCompanies.length === 0 ? (
+              <p className="text-xs text-muted-foreground px-1">No companies yet — add one first.</p>
+            ) : (
               <div className="max-h-32 overflow-y-auto rounded-lg border p-2 flex flex-col gap-1">
                 {allCompanies.map((company) => (
                   <label key={company.id} className="flex items-center gap-2 cursor-pointer rounded px-1.5 py-1 hover:bg-muted text-sm">
@@ -339,13 +346,17 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
                   </label>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Projects */}
-          {allProjects.length > 0 && (
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium">Projects</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium">Projects</label>
+            {loadingRelations ? (
+              <p className="text-xs text-muted-foreground px-1">Loading...</p>
+            ) : allProjects.length === 0 ? (
+              <p className="text-xs text-muted-foreground px-1">No projects yet — add one first.</p>
+            ) : (
               <div className="max-h-28 overflow-y-auto rounded-lg border p-2 flex flex-col gap-1">
                 {allProjects.map((project) => (
                   <label key={project.id} className="flex items-center gap-2 cursor-pointer rounded px-1.5 py-1 hover:bg-muted text-sm">
@@ -362,8 +373,8 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
                   </label>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {error && <p className="text-sm text-red-500">{error}</p>}
         </div>
