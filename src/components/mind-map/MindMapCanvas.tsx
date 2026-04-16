@@ -14,6 +14,7 @@ import {
   useEdgesState,
   ReactFlowProvider,
   useReactFlow,
+  useUpdateNodeInternals,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -74,13 +75,16 @@ import {
   type FocusSource,
 } from "./focus-view";
 import { getFilterCategoryForNode, type FilterCategory } from "./node-filters";
+import { collectNodeInternalsRefreshIds } from "./node-internals";
 import {
   applySavedNodePositions,
+  createNodePositionMap,
   createCompanyCollapseStorageKey,
   createLayoutStorageKey,
   createProjectCollapseStorageKey,
   DENSER_RADIAL_LAYOUT,
   deriveLayoutOwnerId,
+  mergeNodePositionMap,
   readSavedCollapsedCompanies,
   readSavedCollapsedProjects,
   readSavedNodePositions,
@@ -365,7 +369,7 @@ function applyRadialLayout(nodes: Node[], data: NetworkData): Node[] {
 
   contactsByCompany.forEach((contactEntries, companyId) => {
     const companyPos = positionMap.get(`company-${companyId}`);
-    if (!companyPos) return;
+    if (!companyPos) { orphanContacts.push(...contactEntries); return; }
 
     const companyAngle = Math.atan2(companyPos.y, companyPos.x);
     const contactAnchorAngle = companyAngle + CONTACT_ANGLE_OFFSET;
@@ -755,7 +759,7 @@ function MindMapCanvasInner() {
   const [activeNeighborhoodNodeId, setActiveNeighborhoodNodeId] = useState<string | null>(null);
   const [activeNeighborhoodSource, setActiveNeighborhoodSource] = useState<NeighborhoodSource>(null);
   const [inactiveCategories, setInactiveCategories] = useState<Set<FilterCategory>>(new Set());
-  const [currentZoomLevel, setCurrentZoomLevel] = useState(0.7);
+  const [currentZoomLevel, setCurrentZoomLevel] = useState<number>(DENSER_RADIAL_LAYOUT.overviewZoom);
   const [selectedContact, setSelectedContact] = useState<ContactWithRelations | null>(null);
   const [editingContact, setEditingContact] = useState<ContactWithRelations | null>(null);
   const [addCompanyOpen, setAddCompanyOpen] = useState(false);
@@ -780,6 +784,7 @@ function MindMapCanvasInner() {
   const expandedPositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const filterExpandedPositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const previousSubsetNodeIdsRef = useRef<Set<string>>(new Set());
+  const selectedSubsetNodeIdsRef = useRef<Set<string>>(new Set());
   const [focusTargets, setFocusTargets] = useState<Set<GravityTarget>>(new Set());
 
   const companyContacts = useMemo(() => {
@@ -806,20 +811,32 @@ function MindMapCanvasInner() {
 
   const syncNodePositionRefs = useCallback((nextNodes: Node[]) => {
     nodesRef.current = nextNodes;
-    const positionMap = new Map(nextNodes.map((node) => [node.id, { ...node.position }]));
+    const positionMap = createNodePositionMap(nextNodes);
     layoutPositionsRef.current = positionMap;
     expandedPositionsRef.current = positionMap;
     filterExpandedPositionsRef.current = positionMap;
   }, []);
 
   const persistNodePositions = useCallback((nextNodes: Node[]) => {
-    syncNodePositionRefs(nextNodes);
+    nodesRef.current = nextNodes;
+    const positionMap = createNodePositionMap(nextNodes);
+    const selectedSubsetNodeIds = selectedSubsetNodeIdsRef.current;
+
+    if (selectedSubsetNodeIds.size > 0) {
+      layoutPositionsRef.current = mergeNodePositionMap(layoutPositionsRef.current, nextNodes, selectedSubsetNodeIds);
+      expandedPositionsRef.current = mergeNodePositionMap(expandedPositionsRef.current, nextNodes, selectedSubsetNodeIds);
+      filterExpandedPositionsRef.current = mergeNodePositionMap(filterExpandedPositionsRef.current, nextNodes, selectedSubsetNodeIds);
+    } else {
+      layoutPositionsRef.current = positionMap;
+      expandedPositionsRef.current = positionMap;
+      filterExpandedPositionsRef.current = positionMap;
+    }
 
     const storageKey = layoutStorageKeyRef.current;
     if (storageKey) {
       writeSavedNodePositions(storageKey, nextNodes);
     }
-  }, [syncNodePositionRefs]);
+  }, []);
 
   const persistCollapsedCompanies = useCallback((nextCollapsedCompanies: Set<string>) => {
     const storageKey = companyCollapseStorageKeyRef.current;
@@ -954,7 +971,9 @@ function MindMapCanvasInner() {
     setIsAnimating(true);
     setAnimationPhase(mapCollapsed ? "expanding" : "collapsing");
 
-    const liveNodes = nodes;
+    // Always use the ref so we get the latest node positions even if the
+    // React state closure is stale (React 18 concurrent mode batching).
+    const liveNodes = nodesRef.current;
     const currentVisuals = snapshotNodeVisuals(liveNodes);
 
     const isTargetedById = (n: { id: string; data: Record<string, unknown> }): boolean => {
@@ -963,9 +982,10 @@ function MindMapCanvasInner() {
     };
 
     if (!mapCollapsed) {
-      expandedPositionsRef.current = new Map(
-        liveNodes.map((node) => [node.id, { ...node.position }]),
-      );
+      // Do NOT overwrite expandedPositionsRef.current here. It is already kept
+      // up-to-date by persistNodePositions and syncNodePositionRefs, and may
+      // contain the correct layout positions for nodes that company-focus has
+      // already animated to center — overwriting would corrupt those positions.
 
       const collapsedPositions = computeCollapsedPositions(
         liveNodes,
@@ -1023,7 +1043,7 @@ function MindMapCanvasInner() {
     isAnimatingRef.current = false;
     setIsAnimating(false);
     setAnimationPhase("idle");
-  }, [mapCollapsed, setNodes, nodes]);
+  }, [mapCollapsed, setNodes]);
 
   const onToggleGravityTarget = useCallback((target: GravityTarget) => {
     setFocusTargets((prev) => {
@@ -1165,6 +1185,11 @@ function MindMapCanvasInner() {
     return next;
   }, [companyFocusCollapsedNodeIds, focusTargets, nodes]);
   const hasFocusedSubset = useMemo(() => selectedSubsetNodeIds.size > 0, [selectedSubsetNodeIds]);
+
+  useEffect(() => {
+    selectedSubsetNodeIdsRef.current = selectedSubsetNodeIds;
+  }, [selectedSubsetNodeIds]);
+
   const viewportSearchExpandedCompanyIds =
     activeNeighborhoodSource === "search" ? searchExpandedCompanyIds : EMPTY_NODE_ID_SET;
   const viewportSearchExpandedProjectIds =
@@ -1419,6 +1444,15 @@ function MindMapCanvasInner() {
     animationPhase,
     effectiveCollapsedProjects,
   ]);
+  const refreshNodeInternalIds = useMemo(
+    () => collectNodeInternalsRefreshIds(displayNodes, displayEdges),
+    [displayEdges, displayNodes],
+  );
+
+  const clearManualFocus = useCallback(() => {
+    setActiveNeighborhoodNodeId(null);
+    setActiveNeighborhoodSource(null);
+  }, []);
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
@@ -1432,7 +1466,11 @@ function MindMapCanvasInner() {
       }
 
       if (node.type === "center") {
-        toggleCollapse();
+        if (activeNeighborhoodSource === "company") {
+          clearManualFocus();
+        } else {
+          toggleCollapse();
+        }
         return;
       }
 
@@ -1472,7 +1510,7 @@ function MindMapCanvasInner() {
         }
       }
     },
-    [activeNeighborhoodSource, networkData, searchQuery, toggleCollapse]
+    [activeNeighborhoodSource, clearManualFocus, networkData, searchQuery, toggleCollapse]
   );
 
   const onNodeMouseEnter = useCallback((_: React.MouseEvent, node: Node) => {
@@ -1508,6 +1546,23 @@ function MindMapCanvasInner() {
   }, [searchResults.length]);
 
   const { fitView: rfFitView, zoomTo: rfZoomTo } = useReactFlow();
+  const updateNodeInternals = useUpdateNodeInternals();
+
+  useEffect(() => {
+    if (refreshNodeInternalIds.length === 0) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      refreshNodeInternalIds.forEach((nodeId) => {
+        updateNodeInternals(nodeId);
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [refreshNodeInternalIds, updateNodeInternals]);
 
   const handleSearchQueryChange = useCallback((value: string) => {
     setSearchFocusIndex(0);
@@ -1518,11 +1573,6 @@ function MindMapCanvasInner() {
       setActiveNeighborhoodSource(null);
     }
   }, [activeNeighborhoodSource]);
-
-  const clearManualFocus = useCallback(() => {
-    setActiveNeighborhoodNodeId(null);
-    setActiveNeighborhoodSource(null);
-  }, []);
 
   const onToggleFilterCategory = useCallback((category: FilterCategory) => {
     setInactiveCategories((prev) => {
@@ -1718,6 +1768,7 @@ function MindMapCanvasInner() {
   return (
     <div style={{ position: "absolute", inset: 0, background: "#f5f0eb" }}>
       <ReactFlow
+        onInit={(instance) => setCurrentZoomLevel(instance.getViewport().zoom)}
         nodes={displayNodes}
         edges={displayEdges}
         onNodesChange={guardedOnNodesChange}

@@ -14,10 +14,22 @@ export const DENSER_RADIAL_LAYOUT = {
   overviewZoom: 0.76,
 } as const;
 
+const COLLAPSE_STORAGE_VERSION = "v2";
+
 type SavedNodePosition = { x: number; y: number };
 
 function shouldPersistNodePosition(node: Node) {
-  return node.type === "contact";
+  if (node.type !== "contact") {
+    return false;
+  }
+
+  const data = (node.data ?? {}) as Record<string, unknown>;
+  const isProjection =
+    data.isCompanyProjection === true
+    || data.isProjectProjection === true
+    || node.id.includes("::");
+
+  return !isProjection;
 }
 
 function isValidSavedPosition(value: unknown): value is SavedNodePosition {
@@ -82,11 +94,42 @@ export function applySavedNodePositions(nodes: Node[], savedPositions: Map<strin
       return node;
     }
 
+    // Reject positions at the exact origin — these were saved before layout ran
+    // (e.g. from a bug in a prior session) and would pin nodes to the center.
+    if (savedPosition.x === 0 && savedPosition.y === 0) {
+      return node;
+    }
+
     return {
       ...node,
       position: { ...savedPosition },
     };
   });
+}
+
+export function createNodePositionMap(nodes: Node[]) {
+  return new Map(nodes.map((node) => [node.id, { ...node.position }]));
+}
+
+export function mergeNodePositionMap(
+  basePositions: Map<string, SavedNodePosition>,
+  nodes: Node[],
+  preservedNodeIds: Set<string> = new Set(),
+) {
+  const merged = new Map(basePositions);
+
+  nodes.forEach((node) => {
+    if (preservedNodeIds.has(node.id)) {
+      if (!merged.has(node.id)) {
+        merged.set(node.id, { ...node.position });
+      }
+      return;
+    }
+
+    merged.set(node.id, { ...node.position });
+  });
+
+  return merged;
 }
 
 export function deriveLayoutOwnerId(data: NetworkData | null) {
@@ -108,11 +151,11 @@ export function createLayoutStorageKey(ownerId: string | null) {
 }
 
 export function createCompanyCollapseStorageKey(ownerId: string | null) {
-  return `contact-manager:mind-map-company-collapse:${ownerId ?? "anonymous"}`;
+  return `contact-manager:mind-map-company-collapse:${COLLAPSE_STORAGE_VERSION}:${ownerId ?? "anonymous"}`;
 }
 
 export function createProjectCollapseStorageKey(ownerId: string | null) {
-  return `contact-manager:mind-map-project-collapse:${ownerId ?? "anonymous"}`;
+  return `contact-manager:mind-map-project-collapse:${COLLAPSE_STORAGE_VERSION}:${ownerId ?? "anonymous"}`;
 }
 
 export function readSavedNodePositions(storageKey: string): Map<string, SavedNodePosition> {
@@ -183,7 +226,7 @@ export function resolveInitialCollapsedCompanies(
   savedCollapsedCompanies: Set<string> | null,
 ) {
   if (!savedCollapsedCompanies) {
-    return new Set(companyIds);
+    return new Set<string>();
   }
 
   return new Set(companyIds.filter((companyId) => savedCollapsedCompanies.has(companyId)));
@@ -194,7 +237,7 @@ export function resolveInitialCollapsedProjects(
   savedCollapsedProjects: Set<string> | null,
 ) {
   if (!savedCollapsedProjects) {
-    return new Set(projectIds);
+    return new Set<string>();
   }
 
   return new Set(projectIds.filter((projectId) => savedCollapsedProjects.has(projectId)));
@@ -234,4 +277,20 @@ export function writeSavedCollapsedProjects(storageKey: string, collapsedProject
   }
 
   window.localStorage.setItem(storageKey, JSON.stringify([...collapsedProjects]));
+}
+
+export function clearSavedCollapsedCompanies(storageKey: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(storageKey);
+}
+
+export function clearSavedCollapsedProjects(storageKey: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(storageKey);
 }

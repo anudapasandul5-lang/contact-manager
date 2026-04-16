@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  clearSavedCollapsedCompanies,
   createCompanyCollapseStorageKey,
   readSavedCollapsedCompanies,
   resolveInitialCollapsedCompanies,
@@ -26,18 +27,29 @@ function createStorage() {
   };
 }
 
-test("resolveInitialCollapsedCompanies defaults first load to every company collapsed", () => {
+test("resolveInitialCollapsedCompanies defaults first load to expanded companies", () => {
   const result = resolveInitialCollapsedCompanies(["company-1", "company-2"], null);
-  assert.deepEqual([...result].sort(), ["company-1", "company-2"]);
+  assert.deepEqual([...result], []);
 });
 
-test("resolveInitialCollapsedCompanies restores the saved company collapse set when present", () => {
+test("resolveInitialCollapsedCompanies restores saved company collapse state when present", () => {
   const saved = new Set(["company-2"]);
   const result = resolveInitialCollapsedCompanies(["company-1", "company-2"], saved);
   assert.deepEqual([...result], ["company-2"]);
 });
 
-test("saved collapsed company ids round-trip through local storage", () => {
+test("resolveInitialCollapsedCompanies supports intentional fully-collapsed saved state", () => {
+  const saved = new Set(["company-1", "company-2"]);
+  const result = resolveInitialCollapsedCompanies(["company-1", "company-2"], saved);
+  assert.deepEqual([...result], ["company-1", "company-2"]);
+});
+
+test("createCompanyCollapseStorageKey uses a versioned namespace for migration safety", () => {
+  const storageKey = createCompanyCollapseStorageKey("user-1");
+  assert.equal(storageKey, "contact-manager:mind-map-company-collapse:v2:user-1");
+});
+
+test("clearSavedCollapsedCompanies removes stale saved company collapse state", () => {
   const storage = createStorage();
   Object.assign(globalThis, {
     window: {
@@ -47,8 +59,9 @@ test("saved collapsed company ids round-trip through local storage", () => {
 
   const storageKey = createCompanyCollapseStorageKey("user-1");
   writeSavedCollapsedCompanies(storageKey, new Set(["company-1", "company-3"]));
+  clearSavedCollapsedCompanies(storageKey);
 
   const restored = readSavedCollapsedCompanies(storageKey);
 
-  assert.deepEqual(restored ? [...restored].sort() : null, ["company-1", "company-3"]);
+  assert.equal(restored, null);
 });

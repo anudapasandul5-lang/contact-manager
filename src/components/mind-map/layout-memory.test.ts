@@ -4,7 +4,9 @@ import type { Node } from "@xyflow/react";
 import {
   DENSER_RADIAL_LAYOUT,
   applySavedNodePositions,
+  createNodePositionMap,
   getInitialViewportTarget,
+  mergeNodePositionMap,
   shouldApplyInitialViewport,
   shouldResetViewOnSearchChange,
 } from "@/components/mind-map/layout-memory";
@@ -58,6 +60,55 @@ test("applySavedNodePositions ignores saved positions for non-contact nodes", ()
   assert.deepEqual(result[0]?.position, { x: 0, y: 0 });
   assert.deepEqual(result[1]?.position, { x: 255, y: -28 });
   assert.deepEqual(result[2]?.position, { x: 100, y: 120 });
+});
+
+test("applySavedNodePositions ignores saved positions for projected contact nodes", () => {
+  const projectedNode = {
+    id: "contact-1::company-1",
+    type: "contact",
+    position: { x: 240, y: 300 },
+    data: {
+      isCompanyProjection: true,
+      parentCompanyId: "1",
+    },
+  } as Node;
+
+  const savedPositions = new Map([
+    ["contact-1::company-1", { x: 5, y: 5 }],
+  ]);
+
+  const result = applySavedNodePositions([projectedNode], savedPositions);
+  assert.deepEqual(result[0]?.position, { x: 240, y: 300 });
+});
+
+test("mergeNodePositionMap preserves collapsed node baselines while updating visible nodes", () => {
+  const baseline = new Map([
+    ["company-1", { x: 20, y: 30 }],
+    ["contact-2", { x: 200, y: 220 }],
+  ]);
+  const nextNodes = [
+    { id: "company-1", type: "company", position: { x: 80, y: 95 }, data: {} } as Node,
+    createNode("contact-2", { x: 0, y: 0 }),
+    createNode("contact-3", { x: 310, y: 330 }),
+  ];
+
+  const result = mergeNodePositionMap(baseline, nextNodes, new Set(["contact-2"]));
+
+  assert.deepEqual(result.get("company-1"), { x: 80, y: 95 });
+  assert.deepEqual(result.get("contact-2"), { x: 200, y: 220 });
+  assert.deepEqual(result.get("contact-3"), { x: 310, y: 330 });
+});
+
+test("createNodePositionMap snapshots current node positions", () => {
+  const nodes = [
+    createNode("contact-1", { x: 10, y: 20 }),
+    { id: "company-1", type: "company", position: { x: 200, y: 240 }, data: {} } as Node,
+  ];
+
+  const result = createNodePositionMap(nodes);
+
+  assert.deepEqual(result.get("contact-1"), { x: 10, y: 20 });
+  assert.deepEqual(result.get("company-1"), { x: 200, y: 240 });
 });
 
 test("denser radial layout reduces default spacing compared with the old layout", () => {
