@@ -2116,6 +2116,12 @@ function MindMapCanvasInner() {
         onOpenChange={(open) => !open && setEditingCompany(null)}
         company={editingCompany ?? undefined}
         onSaved={() => setEditingCompany(null)}
+        onDeleted={(companyId) => {
+          const nodeId = `company-${companyId}`;
+          setNodes((prev) => prev.filter((n) => n.id !== nodeId));
+          setEdges((prev) => prev.filter((e) => e.source !== nodeId && e.target !== nodeId));
+          setEditingCompany(null);
+        }}
       />
 
       <VendorModal

@@ -43,8 +43,11 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   const { id } = await params;
   const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
-  await deleteEntityMedia(supabase as never, auth.user.id, "company", id).catch(() => {});
+  // Delete the row first — media cleanup is best-effort and runs without blocking
   const { error } = await supabase.from("companies").delete().eq("id", id).eq("user_id", auth.user.id);
+  if (!error) {
+    deleteEntityMedia(supabase as never, auth.user.id, "company", id).catch(() => {});
+  }
   const response = error
     ? NextResponse.json({ error: error.message }, { status: 500 })
     : NextResponse.json({ success: true });

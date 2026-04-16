@@ -55,9 +55,10 @@ interface CompanyModalProps {
   onOpenChange: (open: boolean) => void;
   company?: Company;
   onSaved: () => void;
+  onDeleted?: (companyId: string) => void;
 }
 
-export function CompanyModal({ open, onOpenChange, company, onSaved }: CompanyModalProps) {
+export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }: CompanyModalProps) {
   const existingCompanyId = company?.id ?? null;
   const [name, setName] = useState("");
   const [industry, setIndustry] = useState("");
@@ -68,7 +69,6 @@ export function CompanyModal({ open, onOpenChange, company, onSaved }: CompanyMo
   const [contactSearch, setContactSearch] = useState("");
   const [draftPeople, setDraftPeople] = useState<DraftPerson[]>([]);
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mediaUrl, setMediaUrl] = useState<string | null>(null);
@@ -209,26 +209,28 @@ export function CompanyModal({ open, onOpenChange, company, onSaved }: CompanyMo
     }
   }
 
-  async function handleDelete() {
+  function handleDelete() {
     if (!company) return;
-    setDeleting(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/companies/${company.id}`, { method: "DELETE" });
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || "Failed to delete.");
-        return;
-      }
-      window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
-      onSaved();
-      onOpenChange(false);
-    } catch {
-      setError("Network error.");
-    } finally {
-      setDeleting(false);
-      setConfirmDelete(false);
-    }
+    const companyId = company.id;
+
+    // Close immediately for instant UX
+    onDeleted?.(companyId);
+    onSaved();
+    onOpenChange(false);
+
+    // Fire API in background; dispatch data-changed when settled
+    fetch(`/api/companies/${companyId}`, { method: "DELETE" })
+      .then((res) => {
+        if (!res.ok) {
+          // Delete failed — reload to restore the node
+          window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+        } else {
+          window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+        }
+      })
+      .catch(() => {
+        window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+      });
   }
 
   async function handleSubmit() {
@@ -434,7 +436,7 @@ export function CompanyModal({ open, onOpenChange, company, onSaved }: CompanyMo
             status={mediaStatus}
             error={mediaError}
             canRemove={canRemoveImage}
-            disabled={saving || deleting}
+            disabled={saving}
             onFileSelect={handleFileSelect}
             onRemove={handleRemoveImage}
             fallback={
@@ -613,8 +615,8 @@ export function CompanyModal({ open, onOpenChange, company, onSaved }: CompanyMo
             confirmDelete ? (
               <div className="flex items-center gap-2 mr-auto">
                 <span className="text-sm text-red-500">Delete this company?</span>
-                <Button variant="destructive" size="sm" onClick={handleDelete} disabled={deleting}>
-                  {deleting ? "Deleting..." : "Yes, delete"}
+                <Button variant="destructive" size="sm" onClick={handleDelete}>
+                  Yes, delete
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setConfirmDelete(false)}>
                   No
