@@ -82,7 +82,7 @@ export const projects = pgTable("projects", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   status: projectStatusEnum("status").notNull().default("planning"),
-  company_id: text("company_id").references(() => companies.id),
+  company_id: text("company_id").references(() => companies.id, { onDelete: "set null" }),
   user_id: text("user_id"),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
