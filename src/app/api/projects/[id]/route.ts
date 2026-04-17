@@ -43,11 +43,14 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   const { id } = await params;
   const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
-  await deleteEntityMedia(supabase as never, auth.user.id, "project", id).catch(() => {});
   const { error } = await supabase.from("projects").delete().eq("id", id).eq("user_id", auth.user.id);
-  const response = error
-    ? NextResponse.json({ error: error.message }, { status: 500 })
-    : NextResponse.json({ success: true });
+  if (error) {
+    const response = NextResponse.json({ error: error.message }, { status: 500 });
+    applySessionCookies(response, auth.resolved);
+    return response;
+  }
+  deleteEntityMedia(supabase as never, auth.user.id, "project", id).catch(() => {});
+  const response = NextResponse.json({ success: true });
   applySessionCookies(response, auth.resolved);
   return response;
 }

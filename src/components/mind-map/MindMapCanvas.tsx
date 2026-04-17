@@ -25,7 +25,9 @@ import type {
   Company,
   ContactWithRelations,
   VendorWithRelations,
+  Project,
 } from "@/lib/supabase/types";
+import type { MindMapFollowUp } from "./follow-up-helpers";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +40,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Mail, Phone, Briefcase, Pencil, FolderOpen } from "lucide-react";
 import { EntityAvatar } from "@/components/shared/EntityAvatar";
+import { toast } from "sonner";
 import { CenterNode } from "./CenterNode";
 import { CompanyNode } from "./CompanyNode";
 import { ContactNode } from "./ContactNode";
@@ -1939,22 +1942,34 @@ function MindMapCanvasInner() {
           onDelete={async () => {
             if (!contextMenu.nodeId) return;
             const type = contextMenu.nodeType;
-            const rawId = contextMenu.entityId ?? contextMenu.nodeId.replace(/^(contact|company|project)-/, "");
+            const nodeId = contextMenu.nodeId;
+            const rawId = contextMenu.entityId ?? nodeId.replace(/^(contact|company|project)-/, "");
             const confirmed = window.confirm(`Delete this ${type}?`);
             if (!confirmed) return;
+
+            // Snapshot for rollback
+            const prevNodes = [...nodesRef.current];
+            const prevEdges = [...edges];
+
+            // Optimistic: remove node + connected edges immediately
+            setContextMenu(null);
+            setNodes(prev => prev.filter(n => n.id !== nodeId));
+            setEdges(prev => prev.filter(e => e.source !== rawId && e.target !== rawId));
+
+            const endpoint = type === "contact" ? "contacts"
+              : type === "company" ? "companies"
+              : type === "vendor" ? "vendors"
+              : "projects";
+
             try {
-              const endpoint = type === "contact"
-                ? "contacts"
-                : type === "company"
-                  ? "companies"
-                  : type === "vendor"
-                    ? "vendors"
-                    : "projects";
               const res = await fetch(`/api/${endpoint}/${rawId}`, { method: "DELETE" });
-              if (res.ok) {
-                window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
-              }
-            } catch { /* ignore */ }
+              if (!res.ok) throw new Error("Delete failed");
+              loadData(); // background sync — position-preserving, no visible change
+            } catch {
+              setNodes(prevNodes);
+              setEdges(prevEdges);
+              toast.error("Delete failed — changes reverted");
+            }
           }}
           onCollapseContacts={
             contextMenu.nodeType === "company" && contextMenu.nodeId
@@ -1972,20 +1987,38 @@ function MindMapCanvasInner() {
       {/* Contact side panel */}
       <ContactSidePanel
         contact={selectedContact}
+        contacts={networkData?.contacts ?? []}
         directContacts={linkableContacts}
+        companies={networkData?.companies ?? []}
+        projects={(networkData?.projects ?? []) as Project[]}
+        followUps={[] as MindMapFollowUp[]}
         relationships={networkData?.relationships ?? []}
         savingRelationship={relationshipSaving}
-        onClose={() => {
+        isCompactViewport={false}
+        isVisible={selectedContact !== null}
+        followUpPendingId={null}
+        followUpNotice={null}
+        onCloseSelectedContact={() => {
           setSelectedContact(null);
           if (activeNeighborhoodSource === "manual" && activeNeighborhoodNodeId?.startsWith("contact-")) {
             clearManualFocus();
           }
         }}
+        onCloseRail={() => {
+          setSelectedContact(null);
+          if (activeNeighborhoodSource === "manual" && activeNeighborhoodNodeId?.startsWith("contact-")) {
+            clearManualFocus();
+          }
+        }}
+        onDismissFollowUpNotice={() => {}}
+        onSelectContact={(contact) => setSelectedContact(contact)}
         onEdit={(contact) => {
           setEditingContact(contact);
           setSelectedContact(null);
         }}
         onRelationshipSaved={saveRelationship}
+        onFollowUpUpdate={async () => {}}
+        onFollowUpComplete={async () => {}}
       />
 
       {/* Contact edit modal (from side panel) */}
