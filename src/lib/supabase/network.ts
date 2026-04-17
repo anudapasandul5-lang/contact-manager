@@ -7,6 +7,7 @@ import {
 import type {
   Company,
   ContactWithRelations,
+  FollowUp,
   IntroRequest,
   NetworkData,
   PersonRelationship,
@@ -67,7 +68,7 @@ export async function fetchSupabaseNetworkData(
 ): Promise<NetworkData> {
   const supabase = resolveSupabaseClient(accessTokenOrClient);
 
-  const [contactsRes, companiesRes, projectsRes, relationshipsRes, introRequestsRes] = await Promise.all([
+  const [contactsRes, companiesRes, projectsRes, relationshipsRes, introRequestsRes, followUpsRes] = await Promise.all([
     supabase
       .from("contacts")
       .select("*, contact_companies(companies(*)), contact_projects(projects(*))")
@@ -77,19 +78,22 @@ export async function fetchSupabaseNetworkData(
     supabase.from("projects").select("*").eq("user_id", userId).order("name"),
     supabase.from("person_relationships").select("*").eq("user_id", userId).order("updated_at", { ascending: false }),
     supabase.from("intro_requests").select("*").eq("user_id", userId).order("updated_at", { ascending: false }),
+    supabase.from("follow_ups").select("*").eq("user_id", userId).order("scheduled_for"),
   ]);
 
   if (
     contactsRes.error ||
     companiesRes.error ||
     projectsRes.error ||
-    (introRequestsRes.error && !isMissingTableError(introRequestsRes.error))
+    (introRequestsRes.error && !isMissingTableError(introRequestsRes.error)) ||
+    (followUpsRes.error && !isMissingTableError(followUpsRes.error))
   ) {
     throw new Error(
       contactsRes.error?.message ??
       companiesRes.error?.message ??
       projectsRes.error?.message ??
       introRequestsRes.error?.message ??
+      followUpsRes.error?.message ??
       "Failed to load network data.",
     );
   }
@@ -110,6 +114,9 @@ export async function fetchSupabaseNetworkData(
   const introRequests = isMissingTableError(introRequestsRes.error)
     ? []
     : ((introRequestsRes.data as IntroRequest[] | null) ?? []);
+  const followUps = isMissingTableError(followUpsRes.error)
+    ? []
+    : ((followUpsRes.data as FollowUp[] | null) ?? []);
 
   const vendors = await fetchVendorsWithRelations(supabase as never, userId);
 
@@ -132,5 +139,6 @@ export async function fetchSupabaseNetworkData(
     projects,
     relationships: explicitRelationships,
     introRequests,
+    followUps,
   };
 }

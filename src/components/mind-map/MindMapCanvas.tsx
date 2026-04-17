@@ -27,7 +27,7 @@ import type {
   VendorWithRelations,
   Project,
 } from "@/lib/supabase/types";
-import type { MindMapFollowUp } from "./follow-up-helpers";
+import { normalizeFollowUps, type MindMapFollowUp } from "./follow-up-helpers";
 import {
   Dialog,
   DialogContent,
@@ -138,9 +138,12 @@ const COLLAPSED_SCALE = 0.18;
 const COLLAPSED_OPACITY = 0;
 const FILTER_FADE_OPACITY = 0.18;
 const EMPTY_NODE_ID_SET = new Set<string>();
+const COMPACT_CONTACT_RAIL_QUERY = "(max-width: 1080px)";
 
 type AnimationPhase = "idle" | "collapsing" | "expanding";
 type NeighborhoodSource = FocusSource;
+type FollowUpNotice = { tone: "error" | "success"; message: string };
+type NetworkDataWithFollowUps = NetworkData & { followUps?: unknown };
 
 const searchKindLabels: Record<SearchResultKind, string> = {
   company: "Company",
@@ -770,12 +773,18 @@ function MindMapCanvasInner() {
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [relationshipSaving, setRelationshipSaving] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [followUps, setFollowUps] = useState<MindMapFollowUp[]>([]);
+  const [followUpPendingId, setFollowUpPendingId] = useState<string | null>(null);
+  const [followUpNotice, setFollowUpNotice] = useState<FollowUpNotice | null>(null);
+  const [isCompactContactRail, setIsCompactContactRail] = useState(false);
+  const [isCompactContactRailOpen, setIsCompactContactRailOpen] = useState(false);
   const { toggleTheme } = useTheme();
 
   // Gravity collapse/expand state
   const [mapCollapsed, setMapCollapsed] = useState(false);
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("idle");
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isReorganizing, setIsReorganizing] = useState(false);
   const isAnimatingRef = useRef(false);
   const nodesRef = useRef<Node[]>([]);
   const layoutStorageKeyRef = useRef<string | null>(null);
@@ -809,6 +818,12 @@ function MindMapCanvasInner() {
       return contact.type === "employee" || companies.some((company) => company.is_owned);
     });
   }, [networkData]);
+
+  const openFollowUpCount = useMemo(
+    () => followUps.reduce((total, followUp) => total + (followUp.completed_at === null ? 1 : 0), 0),
+    [followUps],
+  );
+  const isContactRailVisible = !isCompactContactRail || isCompactContactRailOpen || selectedContact !== null;
 
   const syncNodePositionRefs = useCallback((nextNodes: Node[]) => {
     nodesRef.current = nextNodes;
@@ -858,6 +873,7 @@ function MindMapCanvasInner() {
     fetchAllNetworkData()
       .then((data) => {
         setNetworkData(data);
+        setFollowUps(normalizeFollowUps((data as NetworkDataWithFollowUps).followUps));
         const layoutOwnerId = deriveLayoutOwnerId(data);
         const storageKey = createLayoutStorageKey(layoutOwnerId);
         const companyCollapseStorageKey = createCompanyCollapseStorageKey(layoutOwnerId);
@@ -890,6 +906,7 @@ function MindMapCanvasInner() {
       .catch((err) => {
         console.error("Failed to fetch network data:", err);
         setError("Failed to load network data. Check your Supabase connection.");
+        setFollowUps([]);
       })
       .finally(() => setLoading(false));
   }, [setNodes, setEdges, syncNodePositionRefs]);
@@ -903,6 +920,28 @@ function MindMapCanvasInner() {
     window.addEventListener("contact-manager:data-changed", handler);
     return () => window.removeEventListener("contact-manager:data-changed", handler);
   }, [loadData]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(COMPACT_CONTACT_RAIL_QUERY);
+    const syncViewport = () => setIsCompactContactRail(mediaQuery.matches);
+
+    syncViewport();
+    mediaQuery.addEventListener("change", syncViewport);
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncViewport);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedContact) {
+      setIsCompactContactRailOpen(true);
+    }
+  }, [selectedContact]);
+
+  useEffect(() => {
+    setFollowUpNotice(null);
+  }, [selectedContact?.id]);
 
   useEffect(() => {
     nodesRef.current = nodes;
@@ -942,6 +981,97 @@ function MindMapCanvasInner() {
       setRelationshipSaving(false);
     }
   }, [loadData]);
+
+  const updateFollowUp = useCallback(async (
+    followUp: MindMapFollowUp,
+    patch: {
+      objective?: string;
+      notes?: string | null;
+      scheduled_for?: string;
+      company_id?: string | null;
+      project_id?: string | null;
+    },
+  ) => {
+    setFollowUpPendingId(followUp.id);
+    setFollowUpNotice(null);
+
+    try {
+      const response = await fetch(`/api/follow-ups/${followUp.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(patch),
+      });
+
+      const result = await response.json().catch(() => null) as { error?: string } | null;
+      if (!response.ok) {
+        setFollowUpNotice({ tone: "error", message: result?.error ?? "Couldn't update this follow-up right now." });
+        return;
+      }
+
+      const updatedFollowUp = normalizeFollowUps([
+        {
+          ...followUp,
+          ...patch,
+          updated_at: new Date().toISOString(),
+        },
+      ])[0];
+
+      if (updatedFollowUp) {
+        setFollowUps((current) => current.map((entry) => entry.id === followUp.id ? updatedFollowUp : entry));
+      }
+
+      setFollowUpNotice({ tone: "success", message: "Follow-up updated." });
+    } catch (followUpError) {
+      setFollowUpNotice({
+        tone: "error",
+        message: followUpError instanceof Error ? followUpError.message : "Couldn't update this follow-up right now.",
+      });
+    } finally {
+      setFollowUpPendingId(null);
+    }
+  }, []);
+
+  const completeFollowUp = useCallback(async (followUp: MindMapFollowUp) => {
+    setFollowUpPendingId(followUp.id);
+    setFollowUpNotice(null);
+
+    try {
+      const response = await fetch(`/api/follow-ups/${followUp.id}/complete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({}),
+      });
+
+      const result = await response.json().catch(() => null) as { error?: string } | null;
+      if (!response.ok) {
+        setFollowUpNotice({ tone: "error", message: result?.error ?? "Couldn't mark this follow-up done." });
+        return;
+      }
+
+      const completedFollowUp = normalizeFollowUps([
+        {
+          ...followUp,
+          completed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ])[0];
+
+      if (completedFollowUp) {
+        setFollowUps((current) => current.map((entry) => entry.id === followUp.id ? completedFollowUp : entry));
+      }
+
+      setFollowUpNotice({ tone: "success", message: "Follow-up marked done." });
+    } catch (followUpError) {
+      setFollowUpNotice({
+        tone: "error",
+        message: followUpError instanceof Error ? followUpError.message : "Couldn't mark this follow-up done.",
+      });
+    } finally {
+      setFollowUpPendingId(null);
+    }
+  }, []);
 
   const onCollapseCompany = useCallback((companyId: string) => {
     setCollapsedCompanies((prev) => {
@@ -1462,6 +1592,36 @@ function MindMapCanvasInner() {
     setActiveNeighborhoodSource(null);
   }, []);
 
+  const handleReorganize = useCallback(() => {
+    if (isAnimatingRef.current || !networkData) return;
+    const storageKey = layoutStorageKeyRef.current;
+    if (storageKey) {
+      window.localStorage.removeItem(storageKey);
+    }
+    layoutPositionsRef.current = new Map();
+    expandedPositionsRef.current = new Map();
+    filterExpandedPositionsRef.current = new Map();
+    const graph = buildGraph(networkData);
+    setNodes(graph.nodes);
+    setEdges(graph.edges);
+    setIsReorganizing(true);
+    setTimeout(() => setIsReorganizing(false), 400);
+  }, [networkData, setNodes, setEdges]);
+
+  const closeSelectedContact = useCallback(() => {
+    setSelectedContact(null);
+    if (activeNeighborhoodSource === "manual" && activeNeighborhoodNodeId?.startsWith("contact-")) {
+      clearManualFocus();
+    }
+  }, [activeNeighborhoodNodeId, activeNeighborhoodSource, clearManualFocus]);
+
+  const closeContactRail = useCallback(() => {
+    closeSelectedContact();
+    if (isCompactContactRail) {
+      setIsCompactContactRailOpen(false);
+    }
+  }, [closeSelectedContact, isCompactContactRail]);
+
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
       if (isAnimatingRef.current) {
@@ -1712,12 +1872,12 @@ function MindMapCanvasInner() {
     setContextMenu(null);
     setHoveredNodeId(null);
     if (selectedContact) {
-      setSelectedContact(null);
+      closeSelectedContact();
     }
     if (shouldClearFocusForPaneClick(activeNeighborhoodSource)) {
       clearManualFocus();
     }
-  }, [activeNeighborhoodSource, clearManualFocus, selectedContact]);
+  }, [activeNeighborhoodSource, clearManualFocus, closeSelectedContact, selectedContact]);
 
   const onNodeDragStop = useCallback((_: React.MouseEvent, draggedNode: Node) => {
     if (isAnimatingRef.current) {
@@ -1845,6 +2005,35 @@ function MindMapCanvasInner() {
         onToggle={onToggleFilterCategory}
       />
 
+      {/* Re-organize button — bottom right, above Controls */}
+      <button
+        type="button"
+        onClick={handleReorganize}
+        disabled={isAnimating || isReorganizing}
+        style={{
+          position: "absolute",
+          bottom: "108px",
+          right: "12px",
+          background: "var(--clay-card)",
+          border: "1.5px solid #c7c8f9",
+          borderRadius: "20px",
+          padding: "6px 14px",
+          fontSize: "12px",
+          fontWeight: 700,
+          color: (isAnimating || isReorganizing) ? "#a5b4fc" : "#6366f1",
+          boxShadow: "0 2px 8px rgba(99,102,241,0.18)",
+          cursor: (isAnimating || isReorganizing) ? "default" : "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: "5px",
+          zIndex: 5,
+          whiteSpace: "nowrap",
+          transition: "color 0.15s",
+        }}
+      >
+        {isReorganizing ? "↻ Organizing…" : "✦ Re-organize"}
+      </button>
+
       {/* Search overlay — top center */}
       <SearchOverlay
         query={searchQuery}
@@ -1856,6 +2045,50 @@ function MindMapCanvasInner() {
         activeResultLabel={currentSearchResult?.label ?? null}
         activeResultKind={currentSearchResult ? searchKindLabels[currentSearchResult.kind] : null}
       />
+
+      {isCompactContactRail && !isContactRailVisible && (
+        <button
+          type="button"
+          onClick={() => setIsCompactContactRailOpen(true)}
+          style={{
+            position: "absolute",
+            right: 16,
+            bottom: actionMessage ? 92 : 16,
+            zIndex: 27,
+            border: "1px solid rgba(15,23,42,0.08)",
+            borderRadius: 16,
+            padding: "12px 14px",
+            background: "linear-gradient(155deg, rgba(255,255,255,0.96), rgba(245,240,235,0.94))",
+            color: "var(--clay-text)",
+            boxShadow: "0 14px 28px rgba(15,23,42,0.12)",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            cursor: "pointer",
+          }}
+          aria-label="Open follow-up queue"
+        >
+          <span
+            style={{
+              minWidth: 24,
+              height: 24,
+              borderRadius: 999,
+              background: openFollowUpCount > 0 ? "rgba(37,99,235,0.12)" : "rgba(148,163,184,0.16)",
+              color: openFollowUpCount > 0 ? "#1d4ed8" : "#64748b",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 11,
+              fontWeight: 700,
+            }}
+          >
+            {openFollowUpCount}
+          </span>
+          <span style={{ fontSize: 12, fontWeight: 700 }}>
+            Follow-ups
+          </span>
+        </button>
+      )}
 
       {actionMessage && (
         <div
@@ -1991,34 +2224,27 @@ function MindMapCanvasInner() {
         directContacts={linkableContacts}
         companies={networkData?.companies ?? []}
         projects={(networkData?.projects ?? []) as Project[]}
-        followUps={[] as MindMapFollowUp[]}
+        followUps={followUps}
         relationships={networkData?.relationships ?? []}
         savingRelationship={relationshipSaving}
-        isCompactViewport={false}
-        isVisible={selectedContact !== null}
-        followUpPendingId={null}
-        followUpNotice={null}
-        onCloseSelectedContact={() => {
-          setSelectedContact(null);
-          if (activeNeighborhoodSource === "manual" && activeNeighborhoodNodeId?.startsWith("contact-")) {
-            clearManualFocus();
-          }
+        isCompactViewport={isCompactContactRail}
+        isVisible={isContactRailVisible}
+        followUpPendingId={followUpPendingId}
+        followUpNotice={followUpNotice}
+        onCloseSelectedContact={closeSelectedContact}
+        onCloseRail={closeContactRail}
+        onDismissFollowUpNotice={() => setFollowUpNotice(null)}
+        onSelectContact={(contact) => {
+          setSelectedContact(contact);
+          setFollowUpNotice(null);
         }}
-        onCloseRail={() => {
-          setSelectedContact(null);
-          if (activeNeighborhoodSource === "manual" && activeNeighborhoodNodeId?.startsWith("contact-")) {
-            clearManualFocus();
-          }
-        }}
-        onDismissFollowUpNotice={() => {}}
-        onSelectContact={(contact) => setSelectedContact(contact)}
         onEdit={(contact) => {
           setEditingContact(contact);
           setSelectedContact(null);
         }}
         onRelationshipSaved={saveRelationship}
-        onFollowUpUpdate={async () => {}}
-        onFollowUpComplete={async () => {}}
+        onFollowUpUpdate={updateFollowUp}
+        onFollowUpComplete={completeFollowUp}
       />
 
       {/* Contact edit modal (from side panel) */}

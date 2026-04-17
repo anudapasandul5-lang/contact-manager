@@ -33,6 +33,7 @@ export function MapController({
   const nodesInitialized = useNodesInitialized();
   const hasInitialized = useRef(false);
   const previousSearchQuery = useRef(searchQuery);
+  const prevFocusSourceRef = useRef<FocusSource>(null);
 
   // One-time initial fit when nodes first load
   useEffect(() => {
@@ -82,6 +83,15 @@ export function MapController({
       maxZoom: fitConfig.maxZoom,
     });
   }, [fitView, focusNodeIds, focusSource, isAnimating]);
+
+  useEffect(() => {
+    const prev = prevFocusSourceRef.current;
+    prevFocusSourceRef.current = focusSource;
+
+    if (prev === "company" && focusSource === null && !isAnimating) {
+      fitView({ padding: DENSER_RADIAL_LAYOUT.fitPadding, duration: 400 });
+    }
+  }, [fitView, focusSource, isAnimating]);
 
   useEffect(() => {
     const previousQuery = previousSearchQuery.current;

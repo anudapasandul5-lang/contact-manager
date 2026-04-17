@@ -49,6 +49,7 @@ test("fetchSupabaseNetworkData scopes base queries to the authenticated user", a
   const projects = createOrderedResult([]);
   const relationships = createOrderedResult([]);
   const introRequests = createOrderedResult([]);
+  const followUps = createOrderedResult([]);
   const vendors = createOrderedResult([]);
 
   const supabase = createSupabaseStub({
@@ -57,6 +58,7 @@ test("fetchSupabaseNetworkData scopes base queries to the authenticated user", a
     projects,
     person_relationships: relationships,
     intro_requests: introRequests,
+    follow_ups: followUps,
     vendors,
   });
 
@@ -68,6 +70,7 @@ test("fetchSupabaseNetworkData scopes base queries to the authenticated user", a
     ["projects", projects.queryCall],
     ["person_relationships", relationships.queryCall],
     ["intro_requests", introRequests.queryCall],
+    ["follow_ups", followUps.queryCall],
   ] as const) {
     assert.deepEqual(call.eqCalls, [{ column: "user_id", value: "user-123" }], `Expected ${table} to filter by user_id`);
   }
@@ -94,6 +97,7 @@ test("fetchSupabaseNetworkData normalizes legacy service providers into vendor c
   const projects = createOrderedResult([]);
   const relationships = createOrderedResult([]);
   const introRequests = createOrderedResult([]);
+  const followUps = createOrderedResult([]);
   const vendors = createOrderedResult([]);
 
   const supabase = createSupabaseStub({
@@ -102,6 +106,7 @@ test("fetchSupabaseNetworkData normalizes legacy service providers into vendor c
     projects,
     person_relationships: relationships,
     intro_requests: introRequests,
+    follow_ups: followUps,
     vendors,
   });
 
@@ -179,6 +184,7 @@ test("fetchSupabaseNetworkData attaches signed media URLs to top-level and relat
   ]);
   const relationships = createOrderedResult([]);
   const introRequests = createOrderedResult([]);
+  const followUps = createOrderedResult([]);
   const vendors = createOrderedResult([]);
 
   const supabase = createSupabaseStub({
@@ -187,6 +193,7 @@ test("fetchSupabaseNetworkData attaches signed media URLs to top-level and relat
     projects,
     person_relationships: relationships,
     intro_requests: introRequests,
+    follow_ups: followUps,
     vendors,
   });
 
@@ -203,4 +210,58 @@ test("fetchSupabaseNetworkData attaches signed media URLs to top-level and relat
     result.contacts[0]?.contact_projects[0]?.projects.logo_url,
     "https://signed.test/user-123/projects/project-1/logo.webp",
   );
+});
+
+test("fetchSupabaseNetworkData returns follow-ups ordered alongside the network payload", async () => {
+  const contacts = createOrderedResult([]);
+  const companies = createOrderedResult([]);
+  const projects = createOrderedResult([]);
+  const relationships = createOrderedResult([]);
+  const introRequests = createOrderedResult([]);
+  const followUps = createOrderedResult([
+    {
+      id: "follow-up-1",
+      user_id: "user-123",
+      contact_id: "contact-1",
+      company_id: "company-1",
+      project_id: null,
+      objective: "Reconnect about roadmap timing",
+      notes: "Share the updated milestone plan",
+      scheduled_for: "2026-04-22T09:00:00.000Z",
+      completed_at: null,
+      completion_note: null,
+      created_at: "2026-04-17T08:00:00.000Z",
+      updated_at: "2026-04-17T08:00:00.000Z",
+    },
+  ]);
+  const vendors = createOrderedResult([]);
+
+  const supabase = createSupabaseStub({
+    contacts,
+    companies,
+    projects,
+    person_relationships: relationships,
+    intro_requests: introRequests,
+    follow_ups: followUps,
+    vendors,
+  });
+
+  const result = await fetchSupabaseNetworkData("user-123", supabase as never);
+
+  assert.deepEqual(result.followUps, [
+    {
+      id: "follow-up-1",
+      user_id: "user-123",
+      contact_id: "contact-1",
+      company_id: "company-1",
+      project_id: null,
+      objective: "Reconnect about roadmap timing",
+      notes: "Share the updated milestone plan",
+      scheduled_for: "2026-04-22T09:00:00.000Z",
+      completed_at: null,
+      completion_note: null,
+      created_at: "2026-04-17T08:00:00.000Z",
+      updated_at: "2026-04-17T08:00:00.000Z",
+    },
+  ]);
 });

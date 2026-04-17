@@ -3,6 +3,7 @@ import { buildInferredRelationships } from "@/lib/intro/graph";
 import type {
   Company,
   ContactWithRelations,
+  FollowUp,
   IntroRequest,
   NetworkData,
   PersonRelationship,
@@ -57,7 +58,7 @@ function hydrateRelationship(row: Record<string, unknown>): PersonRelationship {
   };
 }
 
-export async function fetchNetworkData(): Promise<NetworkData> {
+export async function fetchNetworkData(userId: string): Promise<NetworkData> {
   const pool = getDbPool();
   const client = await pool.connect();
 
@@ -67,25 +68,36 @@ export async function fetchNetworkData(): Promise<NetworkData> {
       companiesResult,
       projectsResult,
       vendorsResult,
+      relationshipsResult,
+      introRequestsResult,
+      followUpsResult,
+    ] = await Promise.all([
+      client.query("SELECT * FROM contacts WHERE user_id = $1 ORDER BY name", [userId]),
+      client.query("SELECT * FROM companies WHERE user_id = $1 ORDER BY name", [userId]),
+      client.query("SELECT * FROM projects WHERE user_id = $1 ORDER BY name", [userId]),
+      client.query("SELECT * FROM vendors WHERE user_id = $1 ORDER BY name", [userId]),
+      client.query("SELECT * FROM person_relationships WHERE user_id = $1 ORDER BY updated_at DESC", [userId]),
+      client.query("SELECT * FROM intro_requests WHERE user_id = $1 ORDER BY updated_at DESC", [userId]),
+      client.query("SELECT * FROM follow_ups WHERE user_id = $1 ORDER BY scheduled_for ASC, created_at ASC", [userId]),
+    ]);
+
+    const contactIds = (contactsResult.rows as ContactRow[]).map((contact) => contact.id);
+    const companyIds = (companiesResult.rows as CompanyRow[]).map((company) => company.id);
+    const projectIds = (projectsResult.rows as ProjectRow[]).map((project) => project.id);
+    const vendorIds = (vendorsResult.rows as VendorRow[]).map((vendor) => vendor.id);
+
+    const [
       vendorPeopleResult,
       contactCompaniesResult,
       contactProjectsResult,
       vendorCompaniesResult,
       vendorProjectsResult,
-      relationshipsResult,
-      introRequestsResult,
     ] = await Promise.all([
-      client.query("SELECT * FROM contacts ORDER BY name"),
-      client.query("SELECT * FROM companies ORDER BY name"),
-      client.query("SELECT * FROM projects ORDER BY name"),
-      client.query("SELECT * FROM vendors ORDER BY name"),
-      client.query("SELECT * FROM vendor_people ORDER BY name"),
-      client.query("SELECT contact_id, company_id FROM contact_companies"),
-      client.query("SELECT contact_id, project_id FROM contact_projects"),
-      client.query("SELECT vendor_id, company_id FROM vendor_companies"),
-      client.query("SELECT vendor_id, project_id FROM vendor_projects"),
-      client.query("SELECT * FROM person_relationships ORDER BY updated_at DESC"),
-      client.query("SELECT * FROM intro_requests ORDER BY updated_at DESC"),
+      client.query("SELECT * FROM vendor_people WHERE vendor_id = ANY($1::text[]) ORDER BY name", [vendorIds]),
+      client.query("SELECT contact_id, company_id FROM contact_companies WHERE contact_id = ANY($1::text[])", [contactIds]),
+      client.query("SELECT contact_id, project_id FROM contact_projects WHERE contact_id = ANY($1::text[])", [contactIds]),
+      client.query("SELECT vendor_id, company_id FROM vendor_companies WHERE vendor_id = ANY($1::text[])", [vendorIds]),
+      client.query("SELECT vendor_id, project_id FROM vendor_projects WHERE vendor_id = ANY($1::text[])", [vendorIds]),
     ]);
 
     const companies = (companiesResult.rows as CompanyRow[]).map((company) => ({
@@ -186,6 +198,20 @@ export async function fetchNetworkData(): Promise<NetworkData> {
       created_at: asIso(row.created_at as Date | string)!,
       updated_at: asIso(row.updated_at as Date | string)!,
     }));
+    const followUps: FollowUp[] = (followUpsResult.rows as Record<string, unknown>[]).map((row) => ({
+      id: String(row.id),
+      user_id: String(row.user_id),
+      contact_id: String(row.contact_id),
+      company_id: (row.company_id as string | null) ?? null,
+      project_id: (row.project_id as string | null) ?? null,
+      objective: String(row.objective),
+      notes: (row.notes as string | null) ?? null,
+      scheduled_for: asIso(row.scheduled_for as Date | string)!,
+      completed_at: asIso(row.completed_at as Date | string | null),
+      completion_note: (row.completion_note as string | null) ?? null,
+      created_at: asIso(row.created_at as Date | string)!,
+      updated_at: asIso(row.updated_at as Date | string)!,
+    }));
 
     return {
       contacts,
@@ -201,6 +227,7 @@ export async function fetchNetworkData(): Promise<NetworkData> {
       projects,
       relationships: [...explicitRelationships, ...buildInferredRelationships(contacts, explicitRelationships)],
       introRequests,
+      followUps,
     };
   } finally {
     client.release();

@@ -1,5 +1,6 @@
 import type {
   ContactType,
+  FollowUp,
   IntroRequestStatus,
   ProjectStatus,
   RelationshipEvidenceType,
@@ -34,6 +35,15 @@ function normalizeOptionalDateString(value: unknown) {
   }
 
   return new Date(parsed).toISOString();
+}
+
+function normalizeRequiredDateString(value: unknown, message: string) {
+  const normalized = normalizeOptionalDateString(value);
+  if (!normalized) {
+    throw new Error(message);
+  }
+
+  return normalized;
 }
 
 function normalizeIdArray(value: unknown) {
@@ -189,5 +199,59 @@ export function parseIntroRequestPayload(body: unknown) {
     requested_at: normalizeOptionalDateString((body as { requested_at?: unknown })?.requested_at),
     resolved_at: normalizeOptionalDateString((body as { resolved_at?: unknown })?.resolved_at),
     outcome_notes: normalizeOptionalString((body as { outcome_notes?: unknown })?.outcome_notes),
+  };
+}
+
+type FollowUpEditablePayload = Pick<
+  FollowUp,
+  "company_id" | "project_id" | "objective" | "notes" | "scheduled_for"
+>;
+
+export function parseFollowUpCreatePayload(body: unknown) {
+  const contactId = normalizeString((body as { contact_id?: unknown })?.contact_id);
+  const objective = normalizeString((body as { objective?: unknown })?.objective);
+
+  if (!contactId || !objective || !normalizeOptionalString((body as { scheduled_for?: unknown })?.scheduled_for)) {
+    throw new Error("Contact, objective and scheduled follow-up date are required.");
+  }
+
+  return {
+    contact_id: contactId,
+    company_id: normalizeOptionalString((body as { company_id?: unknown })?.company_id),
+    project_id: normalizeOptionalString((body as { project_id?: unknown })?.project_id),
+    objective,
+    notes: normalizeOptionalString((body as { notes?: unknown })?.notes),
+    scheduled_for: normalizeRequiredDateString(
+      (body as { scheduled_for?: unknown })?.scheduled_for,
+      "Contact, objective and scheduled follow-up date are required.",
+    ),
+  };
+}
+
+export function parseFollowUpPatchPayload(body: unknown): FollowUpEditablePayload {
+  const objective = normalizeString((body as { objective?: unknown })?.objective);
+
+  if (!objective || !normalizeOptionalString((body as { scheduled_for?: unknown })?.scheduled_for)) {
+    throw new Error("Objective and scheduled follow-up date are required.");
+  }
+
+  return {
+    company_id: normalizeOptionalString((body as { company_id?: unknown })?.company_id),
+    project_id: normalizeOptionalString((body as { project_id?: unknown })?.project_id),
+    objective,
+    notes: normalizeOptionalString((body as { notes?: unknown })?.notes),
+    scheduled_for: normalizeRequiredDateString(
+      (body as { scheduled_for?: unknown })?.scheduled_for,
+      "Objective and scheduled follow-up date are required.",
+    ),
+  };
+}
+
+export function parseFollowUpCompletionPayload(body: unknown) {
+  const nextBody = (body as { next?: unknown })?.next;
+
+  return {
+    completion_note: normalizeOptionalString((body as { completion_note?: unknown })?.completion_note),
+    next: nextBody == null ? null : parseFollowUpCreatePayload(nextBody),
   };
 }

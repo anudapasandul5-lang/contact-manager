@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, pgEnum, primaryKey, boolean, uniqueIndex } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { pgTable, text, timestamp, pgEnum, primaryKey, boolean, uniqueIndex, index } from "drizzle-orm/pg-core";
 
 export const contactTypeEnum = pgEnum("contact_type", [
   "employee",
@@ -146,6 +147,7 @@ export const personRelationships = pgTable("person_relationships", {
 
 export const introRequests = pgTable("intro_requests", {
   id: text("id").primaryKey(),
+  user_id: text("user_id"),
   requester_contact_id: text("requester_contact_id").references(() => contacts.id, { onDelete: "set null" }),
   connector_contact_id: text("connector_contact_id")
     .notNull()
@@ -161,3 +163,25 @@ export const introRequests = pgTable("intro_requests", {
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const followUps = pgTable("follow_ups", {
+  id: text("id").primaryKey(),
+  user_id: text("user_id").notNull(),
+  contact_id: text("contact_id")
+    .notNull()
+    .references(() => contacts.id, { onDelete: "cascade" }),
+  company_id: text("company_id").references(() => companies.id, { onDelete: "set null" }),
+  project_id: text("project_id").references(() => projects.id, { onDelete: "set null" }),
+  objective: text("objective").notNull(),
+  notes: text("notes"),
+  scheduled_for: timestamp("scheduled_for", { withTimezone: true }).notNull(),
+  completed_at: timestamp("completed_at", { withTimezone: true }),
+  completion_note: text("completion_note"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+}, (t) => [
+  uniqueIndex("follow_ups_one_open_per_contact_idx")
+    .on(t.user_id, t.contact_id)
+    .where(sql`${t.completed_at} IS NULL`),
+  index("follow_ups_user_scheduled_idx").on(t.user_id, t.scheduled_for),
+]);

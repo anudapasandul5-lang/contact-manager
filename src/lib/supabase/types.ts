@@ -99,6 +99,21 @@ export interface IntroRequest {
   updated_at: string;
 }
 
+export interface FollowUp {
+  id: string;
+  user_id: string;
+  contact_id: string;
+  company_id: string | null;
+  project_id: string | null;
+  objective: string;
+  notes: string | null;
+  scheduled_for: string;
+  completed_at: string | null;
+  completion_note: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ContactWithRelations extends Contact {
   contact_companies: { companies: Company }[];
   contact_projects: { projects: Project }[];
@@ -130,4 +145,5 @@ export interface NetworkData {
   projects: Project[];
   relationships: PersonRelationship[];
   introRequests: IntroRequest[];
+  followUps?: FollowUp[];
 }
