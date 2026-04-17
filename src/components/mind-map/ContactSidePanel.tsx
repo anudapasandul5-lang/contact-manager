@@ -158,6 +158,17 @@ function toDateTimeLocalValue(value: string) {
   return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
 }
 
+function createFollowUpDraft(contact: ContactWithRelations | null) {
+  const defaultDate = new Date(Date.now() + 86_400_000);
+  return {
+    objective: "",
+    notes: "",
+    scheduledFor: toDateTimeLocalValue(defaultDate.toISOString()),
+    companyId: contact?.contact_companies[0]?.companies.id ?? "",
+    projectId: contact?.contact_projects[0]?.projects.id ?? "",
+  };
+}
+
 function addDaysToFollowUp(value: string, days: number) {
   const scheduledAt = new Date(value);
   const baseDate = Number.isNaN(scheduledAt.getTime()) || scheduledAt.getTime() < Date.now()
@@ -228,6 +239,12 @@ export function ContactSidePanel({
     scheduledFor: string;
   } | null>(null);
   const [snoozeFollowUpId, setSnoozeFollowUpId] = useState<string | null>(null);
+  const [localNotice, setLocalNotice] = useState<FollowUpNotice | null>(null);
+  const [localPendingId, setLocalPendingId] = useState<string | null>(null);
+  const [createDraft, setCreateDraft] = useState(() => createFollowUpDraft(contact));
+  const [completionNote, setCompletionNote] = useState("");
+  const [showNextDraft, setShowNextDraft] = useState(false);
+  const [nextDraft, setNextDraft] = useState(() => createFollowUpDraft(contact));
 
   useEffect(() => {
     document.body.setAttribute("data-contact-panel-open", shouldHideFloatingActions ? "true" : "false");
@@ -235,6 +252,15 @@ export function ContactSidePanel({
       document.body.setAttribute("data-contact-panel-open", "false");
     };
   }, [shouldHideFloatingActions]);
+
+  useEffect(() => {
+    setCreateDraft(createFollowUpDraft(contact));
+    setNextDraft(createFollowUpDraft(contact));
+    setCompletionNote("");
+    setShowNextDraft(false);
+    setLocalPendingId(null);
+    setLocalNotice(null);
+  }, [contact]);
 
   if (!shouldRenderPanel) {
     return null;
@@ -258,12 +284,121 @@ export function ContactSidePanel({
       objective: trimmedObjective,
       notes: editDraft.notes.trim() ? editDraft.notes.trim() : null,
       scheduled_for: nextScheduledFor,
+      company_id: selectedFollowUp.company_id,
+      project_id: selectedFollowUp.project_id,
     });
     setEditDraft(null);
   }
 
+  async function handleCreateFollowUp() {
+    if (!contact) {
+      return;
+    }
+
+    const objective = createDraft.objective.trim();
+    const scheduledFor = createDraft.scheduledFor ? new Date(createDraft.scheduledFor).toISOString() : "";
+    if (!objective || !scheduledFor || Number.isNaN(new Date(scheduledFor).getTime())) {
+      setLocalNotice({ tone: "error", message: "Add an objective and schedule to create the next touch." });
+      return;
+    }
+
+    setLocalPendingId("create");
+    setLocalNotice(null);
+    onDismissFollowUpNotice();
+
+    try {
+      const response = await fetch("/api/follow-ups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          contact_id: contact.id,
+          company_id: createDraft.companyId || null,
+          project_id: createDraft.projectId || null,
+          objective,
+          notes: createDraft.notes.trim() ? createDraft.notes.trim() : null,
+          scheduled_for: scheduledFor,
+        }),
+      });
+
+      const result = await response.json().catch(() => null) as { error?: string } | null;
+      if (!response.ok) {
+        setLocalNotice({ tone: "error", message: result?.error ?? "Couldn't create this follow-up right now." });
+        return;
+      }
+
+      setCreateDraft(createFollowUpDraft(contact));
+      setLocalNotice({ tone: "success", message: "Next touch created." });
+      window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+    } catch (error) {
+      setLocalNotice({
+        tone: "error",
+        message: error instanceof Error ? error.message : "Couldn't create this follow-up right now.",
+      });
+    } finally {
+      setLocalPendingId(null);
+    }
+  }
+
+  async function handleCompleteWithNext(followUp: MindMapFollowUp) {
+    if (!contact) {
+      return;
+    }
+
+    const objective = nextDraft.objective.trim();
+    const scheduledFor = nextDraft.scheduledFor ? new Date(nextDraft.scheduledFor).toISOString() : "";
+    if (!objective || !scheduledFor || Number.isNaN(new Date(scheduledFor).getTime())) {
+      setLocalNotice({ tone: "error", message: "Add an objective and schedule for the next touch before completing." });
+      return;
+    }
+
+    setLocalPendingId(followUp.id);
+    setLocalNotice(null);
+    onDismissFollowUpNotice();
+
+    try {
+      const response = await fetch(`/api/follow-ups/${followUp.id}/complete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          completion_note: completionNote.trim() ? completionNote.trim() : null,
+          next: {
+            contact_id: contact.id,
+            company_id: nextDraft.companyId || null,
+            project_id: nextDraft.projectId || null,
+            objective,
+            notes: nextDraft.notes.trim() ? nextDraft.notes.trim() : null,
+            scheduled_for: scheduledFor,
+          },
+        }),
+      });
+
+      const result = await response.json().catch(() => null) as { error?: string } | null;
+      if (!response.ok) {
+        setLocalNotice({ tone: "error", message: result?.error ?? "Couldn't complete and schedule the next touch." });
+        return;
+      }
+
+      setCompletionNote("");
+      setNextDraft(createFollowUpDraft(contact));
+      setShowNextDraft(false);
+      setLocalNotice({ tone: "success", message: "Follow-up completed and next touch scheduled." });
+      window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+    } catch (error) {
+      setLocalNotice({
+        tone: "error",
+        message: error instanceof Error ? error.message : "Couldn't complete and schedule the next touch.",
+      });
+    } finally {
+      setLocalPendingId(null);
+    }
+  }
+
   function renderNotice() {
-    if (!followUpNotice) {
+    const activeNotice = localNotice ?? followUpNotice;
+
+    if (!activeNotice) {
       return null;
     }
 
@@ -271,19 +406,22 @@ export function ContactSidePanel({
       <div
         style={{
           borderRadius: 14,
-          border: `1px solid ${followUpNotice.tone === "error" ? "rgba(220,38,38,0.16)" : "rgba(22,163,74,0.16)"}`,
-          background: followUpNotice.tone === "error" ? "rgba(254,242,242,0.94)" : "rgba(240,253,244,0.94)",
-          color: followUpNotice.tone === "error" ? "#b91c1c" : "#166534",
+          border: `1px solid ${activeNotice.tone === "error" ? "rgba(220,38,38,0.16)" : "rgba(22,163,74,0.16)"}`,
+          background: activeNotice.tone === "error" ? "rgba(254,242,242,0.94)" : "rgba(240,253,244,0.94)",
+          color: activeNotice.tone === "error" ? "#b91c1c" : "#166534",
           padding: "10px 12px",
           display: "flex",
           gap: 10,
           alignItems: "flex-start",
         }}
       >
-        <div style={{ flex: 1, fontSize: 12, lineHeight: 1.45 }}>{followUpNotice.message}</div>
+        <div style={{ flex: 1, fontSize: 12, lineHeight: 1.45 }}>{activeNotice.message}</div>
         <button
           type="button"
-          onClick={onDismissFollowUpNotice}
+          onClick={() => {
+            setLocalNotice(null);
+            onDismissFollowUpNotice();
+          }}
           style={{
             border: "none",
             background: "transparent",
@@ -306,6 +444,10 @@ export function ContactSidePanel({
     }
 
     if (!selectedFollowUp) {
+      const isCreating = localPendingId === "create";
+      const companyOptions = contact.contact_companies.map(({ companies: company }) => company);
+      const projectOptions = contact.contact_projects.map(({ projects: project }) => project);
+
       return (
         <div
           style={{
@@ -326,14 +468,77 @@ export function ContactSidePanel({
             No open follow-up for this contact yet.
           </div>
           <div style={{ fontSize: 12, lineHeight: 1.6, color: "var(--clay-text-secondary)" }}>
-            Relationship editing stays available below so you can keep working this thread even before the follow-up API lands.
+            Create the next touch so this person appears in the queue and can move through your follow-up flow.
           </div>
+          <input
+            value={createDraft.objective}
+            onChange={(event) => setCreateDraft((current) => ({ ...current, objective: event.target.value }))}
+            placeholder="What do you want to move forward?"
+            style={fieldStyle}
+          />
+          <textarea
+            value={createDraft.notes}
+            onChange={(event) => setCreateDraft((current) => ({ ...current, notes: event.target.value }))}
+            rows={3}
+            placeholder="Prep notes or reminders"
+            style={{
+              ...fieldStyle,
+              resize: "vertical",
+            }}
+          />
+          <input
+            type="datetime-local"
+            value={createDraft.scheduledFor}
+            onChange={(event) => setCreateDraft((current) => ({ ...current, scheduledFor: event.target.value }))}
+            style={fieldStyle}
+          />
+          {(companyOptions.length > 0 || projectOptions.length > 0) && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+              <select
+                value={createDraft.companyId}
+                onChange={(event) => setCreateDraft((current) => ({ ...current, companyId: event.target.value }))}
+                style={fieldStyle}
+              >
+                <option value="">No company</option>
+                {companyOptions.map((company) => (
+                  <option key={company.id} value={company.id}>{company.name}</option>
+                ))}
+              </select>
+              <select
+                value={createDraft.projectId}
+                onChange={(event) => setCreateDraft((current) => ({ ...current, projectId: event.target.value }))}
+                style={fieldStyle}
+              >
+                <option value="">No project</option>
+                {projectOptions.map((project) => (
+                  <option key={project.id} value={project.id}>{project.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          <button
+            type="button"
+            disabled={isCreating}
+            onClick={() => void handleCreateFollowUp()}
+            style={{
+              borderRadius: 12,
+              border: "none",
+              padding: "10px 12px",
+              background: isCreating ? "rgba(37,99,235,0.35)" : "#2563eb",
+              color: "#fff",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: isCreating ? "default" : "pointer",
+            }}
+          >
+            {isCreating ? "Creating..." : "Create next touch"}
+          </button>
         </div>
       );
     }
 
     const referenceLabel = buildReferenceLabel(selectedFollowUp, companyById, projectById);
-    const isPending = followUpPendingId === selectedFollowUp.id;
+    const isPending = followUpPendingId === selectedFollowUp.id || localPendingId === selectedFollowUp.id;
     const isEditingSelectedFollowUp = editDraft?.followUpId === selectedFollowUp.id;
     const isSnoozeOpen = snoozeFollowUpId === selectedFollowUp.id;
     const saveDisabled = isPending
@@ -479,7 +684,11 @@ export function ContactSidePanel({
                 disabled={isPending}
                 onClick={async () => {
                   await onFollowUpUpdate(selectedFollowUp, {
+                    objective: selectedFollowUp.objective,
+                    notes: selectedFollowUp.notes,
                     scheduled_for: addDaysToFollowUp(selectedFollowUp.scheduled_for, option.days),
+                    company_id: selectedFollowUp.company_id,
+                    project_id: selectedFollowUp.project_id,
                   });
                   setSnoozeFollowUpId(null);
                 }}
@@ -569,6 +778,129 @@ export function ContactSidePanel({
             </div>
           </div>
         )}
+
+        <div
+          style={{
+            borderTop: "1px solid rgba(15,23,42,0.08)",
+            paddingTop: 10,
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+          }}
+        >
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => setShowNextDraft((current) => !current)}
+            style={{
+              borderRadius: 12,
+              border: "1px solid rgba(15,23,42,0.08)",
+              padding: "10px 12px",
+              background: "rgba(0,0,0,0.03)",
+              color: "var(--clay-text)",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: isPending ? "default" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 8,
+            }}
+          >
+            <span>Completion note and next touch</span>
+            <ChevronRight
+              style={{
+                width: 14,
+                height: 14,
+                transform: showNextDraft ? "rotate(90deg)" : "rotate(0deg)",
+                transition: "transform 0.18s ease",
+              }}
+            />
+          </button>
+
+          {showNextDraft && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                padding: "4px 0 0",
+              }}
+            >
+              <textarea
+                value={completionNote}
+                onChange={(event) => setCompletionNote(event.target.value)}
+                rows={2}
+                placeholder="What happened on this touch?"
+                style={{
+                  ...fieldStyle,
+                  resize: "vertical",
+                }}
+              />
+              <input
+                value={nextDraft.objective}
+                onChange={(event) => setNextDraft((current) => ({ ...current, objective: event.target.value }))}
+                placeholder="Next follow-up objective"
+                style={fieldStyle}
+              />
+              <textarea
+                value={nextDraft.notes}
+                onChange={(event) => setNextDraft((current) => ({ ...current, notes: event.target.value }))}
+                rows={2}
+                placeholder="Optional notes for the next touch"
+                style={{
+                  ...fieldStyle,
+                  resize: "vertical",
+                }}
+              />
+              <input
+                type="datetime-local"
+                value={nextDraft.scheduledFor}
+                onChange={(event) => setNextDraft((current) => ({ ...current, scheduledFor: event.target.value }))}
+                style={fieldStyle}
+              />
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                <select
+                  value={nextDraft.companyId}
+                  onChange={(event) => setNextDraft((current) => ({ ...current, companyId: event.target.value }))}
+                  style={fieldStyle}
+                >
+                  <option value="">No company</option>
+                  {contact.contact_companies.map(({ companies: company }) => (
+                    <option key={company.id} value={company.id}>{company.name}</option>
+                  ))}
+                </select>
+                <select
+                  value={nextDraft.projectId}
+                  onChange={(event) => setNextDraft((current) => ({ ...current, projectId: event.target.value }))}
+                  style={fieldStyle}
+                >
+                  <option value="">No project</option>
+                  {contact.contact_projects.map(({ projects: project }) => (
+                    <option key={project.id} value={project.id}>{project.name}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => void handleCompleteWithNext(selectedFollowUp)}
+                style={{
+                  borderRadius: 12,
+                  border: "none",
+                  padding: "10px 12px",
+                  background: isPending ? "rgba(22,163,74,0.35)" : "#0f766e",
+                  color: "#fff",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: isPending ? "default" : "pointer",
+                }}
+              >
+                Done and schedule next
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
