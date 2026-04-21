@@ -57,15 +57,27 @@ function normalizeIdArray(value: unknown) {
     .filter(Boolean);
 }
 
+function normalizeEditableContactType(value: unknown): ContactType | null {
+  const normalized = normalizeString(value);
+
+  if (normalized === "service_provider") {
+    return "vendor";
+  }
+
+  return EDITABLE_CONTACT_TYPES.includes(normalized as ContactType)
+    ? (normalized as ContactType)
+    : null;
+}
+
 export function parseContactPayload(body: unknown) {
   const name = normalizeString((body as { name?: unknown })?.name);
-  const type = normalizeString((body as { type?: unknown })?.type) as ContactType;
+  const type = normalizeEditableContactType((body as { type?: unknown })?.type);
 
   if (!name) {
     throw new Error("Name is required.");
   }
 
-  if (!EDITABLE_CONTACT_TYPES.includes(type)) {
+  if (!type) {
     throw new Error("A valid contact type is required.");
   }
 

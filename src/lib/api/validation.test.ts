@@ -20,15 +20,13 @@ test("parseContactPayload accepts vendor contacts after the provider merge", () 
   assert.deepEqual(payload.projectIds, ["project-1"]);
 });
 
-test("parseContactPayload rejects the removed service_provider type", () => {
-  assert.throws(
-    () =>
-      parseContactPayload({
-        name: "Priya Provider",
-        type: "service_provider",
-      }),
-    /valid contact type/i,
-  );
+test("parseContactPayload normalizes the removed service_provider type to vendor", () => {
+  const payload = parseContactPayload({
+    name: "Priya Provider",
+    type: "service_provider",
+  });
+
+  assert.equal(payload.type, "vendor");
 });
 
 test("parseFollowUpCreatePayload requires objective and scheduled_for while normalizing optional links", () => {
