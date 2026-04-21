@@ -68,6 +68,8 @@ interface ContactSidePanelProps {
     },
   ) => Promise<void>;
   onFollowUpComplete: (followUp: MindMapFollowUp) => Promise<void>;
+  isRailCollapsed?: boolean;
+  onToggleRailCollapsed?: () => void;
 }
 
 const typeConfig: Record<ContactType, { label: string; color: string; bg: string; border: string }> = {
@@ -216,6 +218,7 @@ export function ContactSidePanel({
   onRelationshipSaved,
   onFollowUpUpdate,
   onFollowUpComplete,
+  onToggleRailCollapsed,
 }: ContactSidePanelProps) {
   const shouldRenderPanel = isCompactViewport ? isVisible : true;
   const isSelectedMode = !!contact;
@@ -1268,7 +1271,7 @@ export function ContactSidePanel({
         >
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#64748b" }}>
-              Hybrid rail
+              Daily Reminders
             </div>
             <h3
               style={{
@@ -1288,29 +1291,30 @@ export function ContactSidePanel({
             </p>
           </div>
 
-          {isCompactViewport && (
-            <button
-              type="button"
-              onClick={onCloseRail}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 10,
-                border: "1px solid rgba(0,0,0,0.1)",
-                background: "linear-gradient(145deg, #ffffff, #ede9e3)",
-                boxShadow: "2px 2px 6px rgba(0,0,0,0.08), -1px -1px 3px rgba(255,255,255,0.9)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-                color: "var(--clay-text)",
-              }}
-              aria-label="Close queue"
-            >
-              <X style={{ width: 15, height: 15 }} />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={isCompactViewport ? onCloseRail : onToggleRailCollapsed}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 10,
+              border: "1px solid rgba(0,0,0,0.1)",
+              background: "linear-gradient(145deg, #ffffff, #ede9e3)",
+              boxShadow: "2px 2px 6px rgba(0,0,0,0.08), -1px -1px 3px rgba(255,255,255,0.9)",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              color: "var(--clay-text)",
+            }}
+            aria-label={isCompactViewport ? "Close queue" : "Collapse daily reminders"}
+          >
+            {isCompactViewport
+              ? <X style={{ width: 15, height: 15 }} />
+              : <ChevronRight style={{ width: 15, height: 15 }} />
+            }
+          </button>
         </div>
 
         <div
@@ -1520,8 +1524,8 @@ export function ContactSidePanel({
           width: isCompactViewport ? "auto" : "min(380px, calc(100vw - 32px))",
           maxHeight: isCompactViewport ? "calc(100dvh - 92px)" : "none",
           zIndex: 45,
-          pointerEvents: shouldRenderPanel ? "all" : "none",
-          transform: shouldRenderPanel
+          pointerEvents: isVisible ? "all" : "none",
+          transform: isVisible
             ? "translate3d(0, 0, 0)"
             : isCompactViewport
               ? "translate3d(0, calc(100% + 24px), 0)"

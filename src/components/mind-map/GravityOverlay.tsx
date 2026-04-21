@@ -8,6 +8,7 @@ export type GravityTarget = "company" | "employee" | "vendor" | "project";
 interface GravityOverlayProps {
   targets: Set<GravityTarget>;
   onToggle: (target: GravityTarget) => void;
+  rightOffset?: number;
 }
 
 const chips: { target: GravityTarget; label: string; activeColor: string; activeBg: string }[] = [
@@ -17,7 +18,7 @@ const chips: { target: GravityTarget; label: string; activeColor: string; active
   { target: "project", label: "Projects", activeColor: "#475569", activeBg: "rgba(71,85,105,0.15)" },
 ];
 
-export function GravityOverlay({ targets, onToggle }: GravityOverlayProps) {
+export function GravityOverlay({ targets, onToggle, rightOffset = 0 }: GravityOverlayProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -25,7 +26,7 @@ export function GravityOverlay({ targets, onToggle }: GravityOverlayProps) {
       style={{
         position: "absolute",
         bottom: 60,
-        right: 16,
+        right: rightOffset + 16,
         display: "flex",
         alignItems: "center",
         gap: 6,

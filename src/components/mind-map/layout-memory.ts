@@ -2,19 +2,19 @@ import type { Node } from "@xyflow/react";
 import type { NetworkData } from "@/lib/supabase/types";
 
 export const DENSER_RADIAL_LAYOUT = {
-  ownedRadius: 320,
-  partnerRadius: 560,
-  contactOrbit: 130,
+  ownedRadius: 220,
+  partnerRadius: 380,
+  contactOrbit: 105,
   vendorOrbit: 110,
   vendorRingRadius: 400,
-  projectOrbit: 235,
-  orphanContactRadius: 320,
-  standaloneProjectX: 600,
-  fitPadding: 0.18,
-  overviewZoom: 0.76,
+  projectOrbit: 175,
+  orphanContactRadius: 260,
+  standaloneProjectX: 460,
+  fitPadding: 0.28,
+  overviewZoom: 1.05,
 } as const;
 
-const LAYOUT_STORAGE_VERSION = "v4";
+const LAYOUT_STORAGE_VERSION = "v5";
 const COLLAPSE_STORAGE_VERSION = "v3";
 
 type SavedNodePosition = { x: number; y: number };

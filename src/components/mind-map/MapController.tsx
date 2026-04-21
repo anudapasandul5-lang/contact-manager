@@ -89,7 +89,14 @@ export function MapController({
     prevFocusSourceRef.current = focusSource;
 
     if (prev === "company" && focusSource === null && !isAnimating) {
-      fitView({ padding: DENSER_RADIAL_LAYOUT.fitPadding, duration: 400 });
+      const mainNodes = getNodes()
+        .filter((n) => n.type === "center" || n.type === "company")
+        .map((n) => ({ id: n.id }));
+      fitView({
+        nodes: mainNodes.length > 0 ? mainNodes : undefined,
+        padding: 0.35,
+        duration: 400,
+      });
     }
   }, [fitView, focusSource, isAnimating]);
 

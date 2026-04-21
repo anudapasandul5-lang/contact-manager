@@ -104,7 +104,7 @@ test("applySavedNodePositions applies saved positions for projected contact node
 
 test("createLayoutStorageKey uses a versioned namespace for migration safety", () => {
   const storageKey = createLayoutStorageKey("user-1");
-  assert.equal(storageKey, "contact-manager:mind-map-layout:v4:user-1");
+  assert.equal(storageKey, "contact-manager:mind-map-layout:v5:user-1");
 });
 
 test("mergeNodePositionMap preserves collapsed node baselines while updating visible nodes", () => {
@@ -169,8 +169,8 @@ test("writeSavedNodePositionMap persists expanded baseline positions for focused
 });
 
 test("denser radial layout reduces default spacing compared with the old layout", () => {
-  assert.ok(DENSER_RADIAL_LAYOUT.ownedRadius < 380);
-  assert.ok(DENSER_RADIAL_LAYOUT.partnerRadius < 700);
+  assert.ok(DENSER_RADIAL_LAYOUT.ownedRadius < 280);
+  assert.ok(DENSER_RADIAL_LAYOUT.partnerRadius < 440);
   assert.ok(DENSER_RADIAL_LAYOUT.contactOrbit < 280);
   assert.ok(DENSER_RADIAL_LAYOUT.vendorRingRadius < 860);
 });

@@ -49,7 +49,7 @@ export function FloatingAddButton() {
 
   return (
     <>
-      <div ref={menuRef} className="floating-add-root fixed bottom-28 right-6 z-50 flex flex-col items-end gap-2">
+      <div ref={menuRef} className="floating-add-root fixed bottom-4 right-14 z-50 flex flex-col items-end gap-2">
         {/* Menu items */}
         <div className={cn(
           "flex flex-col items-end gap-2 mb-1 transition-all duration-200",

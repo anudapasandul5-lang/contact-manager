@@ -33,7 +33,13 @@ export function buildViewportFocusNodeIds({
   }
 
   if (source === "manual" || source === "hover" || source === "company") {
-    return neighborhoodNodeIds.size > 0 ? Array.from(neighborhoodNodeIds) : [activeNodeId];
+    const ids = neighborhoodNodeIds.size > 0 ? Array.from(neighborhoodNodeIds) : [activeNodeId];
+    // Exclude center node from company focus so fitView zooms into the company cluster
+    if (source === "company") {
+      const filtered = ids.filter((id) => id !== "center");
+      return filtered.length > 0 ? filtered : ids;
+    }
+    return ids;
   }
 
   return [];

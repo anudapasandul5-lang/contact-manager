@@ -57,7 +57,7 @@ import { ContactModal } from "@/components/shared/ContactModal";
 import { VendorModal } from "@/components/shared/VendorModal";
 import { WelcomeOverlay } from "./WelcomeOverlay";
 import { ContextMenu, type ContextMenuState } from "./ContextMenu";
-import { GravityOverlay, type GravityTarget } from "./GravityOverlay";
+import type { GravityTarget } from "./GravityOverlay";
 import { deriveDisplayEdge } from "./edge-visibility";
 import { shouldCollapseNodeDuringMapCollapse } from "./collapse-behavior";
 import { useTheme } from "@/hooks/useTheme";
@@ -97,6 +97,7 @@ import {
 } from "./layout-memory";
 import { buildArcLayout, buildSortedRingLayout, buildTieredArcLayout, sortByLabel } from "./radial-layout";
 import { buildCompanyClusterGraph } from "./company-clusters";
+import { createReorganizedGraphState } from "./reorganize-layout";
 
 const ALL_GRAVITY_TARGETS = new Set<GravityTarget>(["company", "employee", "vendor", "project"]);
 
@@ -778,6 +779,7 @@ function MindMapCanvasInner() {
   const [followUpNotice, setFollowUpNotice] = useState<FollowUpNotice | null>(null);
   const [isCompactContactRail, setIsCompactContactRail] = useState(false);
   const [isCompactContactRailOpen, setIsCompactContactRailOpen] = useState(false);
+  const [railCollapsed, setRailCollapsed] = useState(true);
   const { toggleTheme } = useTheme();
 
   // Gravity collapse/expand state
@@ -795,7 +797,7 @@ function MindMapCanvasInner() {
   const filterExpandedPositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const previousSubsetNodeIdsRef = useRef<Set<string>>(new Set());
   const selectedSubsetNodeIdsRef = useRef<Set<string>>(new Set());
-  const [focusTargets, setFocusTargets] = useState<Set<GravityTarget>>(new Set());
+  const [focusTargets] = useState<Set<GravityTarget>>(new Set());
 
   const companyContacts = useMemo(() => {
     if (!selectedCompany || !networkData) return [];
@@ -823,7 +825,9 @@ function MindMapCanvasInner() {
     () => followUps.reduce((total, followUp) => total + (followUp.completed_at === null ? 1 : 0), 0),
     [followUps],
   );
-  const isContactRailVisible = !isCompactContactRail || isCompactContactRailOpen || selectedContact !== null;
+  const isContactRailVisible =
+    (!isCompactContactRail || isCompactContactRailOpen || selectedContact !== null) &&
+    !railCollapsed;
 
   const syncNodePositionRefs = useCallback((nextNodes: Node[]) => {
     nodesRef.current = nextNodes;
@@ -1174,18 +1178,6 @@ function MindMapCanvasInner() {
     setAnimationPhase("idle");
   }, [mapCollapsed, setNodes]);
 
-  const onToggleGravityTarget = useCallback((target: GravityTarget) => {
-    setFocusTargets((prev) => {
-      const next = new Set(prev);
-      if (next.has(target)) next.delete(target);
-      else next.add(target);
-      return next;
-    });
-
-    if (mapCollapsed && !isAnimatingRef.current) {
-      void toggleCollapse();
-    }
-  }, [mapCollapsed, toggleCollapse]);
 
   // Hover: compute connected nodes and edges
   const connectedEdgeIds = useMemo(() => {
@@ -1592,21 +1584,39 @@ function MindMapCanvasInner() {
     setActiveNeighborhoodSource(null);
   }, []);
 
+  const { fitView: rfFitView, zoomTo: rfZoomTo } = useReactFlow();
+
   const handleReorganize = useCallback(() => {
     if (isAnimatingRef.current || !networkData) return;
+    const liveNodes = nodesRef.current;
     const storageKey = layoutStorageKeyRef.current;
+    const reorganizedState = createReorganizedGraphState({
+      currentNodes: liveNodes,
+      data: networkData,
+    });
+
+    nodesRef.current = reorganizedState.nodes;
+    layoutPositionsRef.current = reorganizedState.layoutPositions;
+    expandedPositionsRef.current = reorganizedState.expandedPositions;
+    filterExpandedPositionsRef.current = reorganizedState.filterExpandedPositions;
+    previousSubsetNodeIdsRef.current = reorganizedState.previousSubsetNodeIds;
+    setActiveNeighborhoodNodeId(reorganizedState.nextActiveNeighborhoodNodeId);
+    setActiveNeighborhoodSource(reorganizedState.nextActiveNeighborhoodSource);
+    setHoveredNodeId(reorganizedState.nextHoveredNodeId);
+
+    setNodes(reorganizedState.nodes);
+    setEdges(reorganizedState.edges);
+
     if (storageKey) {
-      window.localStorage.removeItem(storageKey);
+      writeSavedNodePositionMap(storageKey, reorganizedState.layoutPositions);
     }
-    layoutPositionsRef.current = new Map();
-    expandedPositionsRef.current = new Map();
-    filterExpandedPositionsRef.current = new Map();
-    const graph = buildGraph(networkData);
-    setNodes(graph.nodes);
-    setEdges(graph.edges);
+
     setIsReorganizing(true);
     setTimeout(() => setIsReorganizing(false), 400);
-  }, [networkData, setNodes, setEdges]);
+    window.requestAnimationFrame(() => {
+      rfFitView({ padding: DENSER_RADIAL_LAYOUT.fitPadding, duration: 400 });
+    });
+  }, [networkData, setNodes, setEdges, rfFitView]);
 
   const closeSelectedContact = useCallback(() => {
     setSelectedContact(null);
@@ -1674,6 +1684,7 @@ function MindMapCanvasInner() {
           : node.id.replace("contact-", "");
         const contact = networkData.contacts.find((c) => c.id === contactId);
         if (contact) {
+          setRailCollapsed(false);
           setSelectedContact(contact);
         }
       }
@@ -1713,7 +1724,6 @@ function MindMapCanvasInner() {
     setSearchFocusIndex((prev) => (prev + 1) % count);
   }, [searchResults.length]);
 
-  const { fitView: rfFitView, zoomTo: rfZoomTo } = useReactFlow();
   const updateNodeInternals = useUpdateNodeInternals();
 
   useEffect(() => {
@@ -1998,8 +2008,6 @@ function MindMapCanvasInner() {
         />
       )}
 
-      {/* Focus selector — bottom right */}
-      <GravityOverlay targets={focusTargets} onToggle={onToggleGravityTarget} />
       <FilterOverlay
         inactiveCategories={inactiveCategories}
         onToggle={onToggleFilterCategory}
@@ -2013,15 +2021,15 @@ function MindMapCanvasInner() {
         style={{
           position: "absolute",
           bottom: "108px",
-          right: "12px",
-          background: "var(--clay-card)",
-          border: "1.5px solid #c7c8f9",
+          right: !isCompactContactRail && isContactRailVisible ? "408px" : "12px",
+          background: (isAnimating || isReorganizing) ? "rgba(99,102,241,0.08)" : "rgba(99,102,241,0.12)",
+          border: "1.5px solid rgba(99,102,241,0.45)",
           borderRadius: "20px",
-          padding: "6px 14px",
+          padding: "7px 16px",
           fontSize: "12px",
           fontWeight: 700,
-          color: (isAnimating || isReorganizing) ? "#a5b4fc" : "#6366f1",
-          boxShadow: "0 2px 8px rgba(99,102,241,0.18)",
+          color: (isAnimating || isReorganizing) ? "#a5b4fc" : "#4f46e5",
+          boxShadow: "0 2px 12px rgba(99,102,241,0.28), 0 1px 3px rgba(0,0,0,0.08)",
           cursor: (isAnimating || isReorganizing) ? "default" : "pointer",
           display: "flex",
           alignItems: "center",
@@ -2090,6 +2098,59 @@ function MindMapCanvasInner() {
         </button>
       )}
 
+      {/* Desktop pull-tab — shown when rail is collapsed on non-compact viewports */}
+      {!isCompactContactRail && railCollapsed && (
+        <button
+          type="button"
+          onClick={() => setRailCollapsed(false)}
+          style={{
+            position: "fixed",
+            right: 0,
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 27,
+            writingMode: "vertical-rl",
+            textOrientation: "mixed",
+            border: "1px solid rgba(15,23,42,0.08)",
+            borderRight: "none",
+            borderRadius: "12px 0 0 12px",
+            padding: "14px 10px",
+            background: "linear-gradient(155deg, rgba(255,255,255,0.96), rgba(245,240,235,0.94))",
+            color: "var(--clay-text)",
+            boxShadow: "-4px 0 16px rgba(15,23,42,0.08)",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            cursor: "pointer",
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+          }}
+          aria-label="Open Daily Reminders"
+        >
+          {openFollowUpCount > 0 && (
+            <span
+              style={{
+                minWidth: 18,
+                height: 18,
+                borderRadius: 999,
+                background: "rgba(37,99,235,0.12)",
+                color: "#1d4ed8",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 10,
+                fontWeight: 700,
+                writingMode: "horizontal-tb",
+              }}
+            >
+              {openFollowUpCount}
+            </span>
+          )}
+          Daily Reminders
+        </button>
+      )}
+
       {actionMessage && (
         <div
           style={{
@@ -2144,7 +2205,7 @@ function MindMapCanvasInner() {
             if (!contextMenu.nodeId || !networkData) return;
             if (contextMenu.nodeType === "contact") {
               const contact = networkData.contacts.find((c) => c.id === contextMenu.entityId);
-              if (contact) setSelectedContact(contact);
+              if (contact) { setRailCollapsed(false); setSelectedContact(contact); }
             } else if (contextMenu.nodeType === "vendor") {
               const vendor = networkData.vendors.find((entry) => entry.id === contextMenu.entityId);
               if (vendor) setEditingVendor(vendor);
@@ -2235,6 +2296,7 @@ function MindMapCanvasInner() {
         onCloseRail={closeContactRail}
         onDismissFollowUpNotice={() => setFollowUpNotice(null)}
         onSelectContact={(contact) => {
+          setRailCollapsed(false);
           setSelectedContact(contact);
           setFollowUpNotice(null);
         }}
@@ -2245,6 +2307,8 @@ function MindMapCanvasInner() {
         onRelationshipSaved={saveRelationship}
         onFollowUpUpdate={updateFollowUp}
         onFollowUpComplete={completeFollowUp}
+        isRailCollapsed={railCollapsed}
+        onToggleRailCollapsed={() => setRailCollapsed((v) => !v)}
       />
 
       {/* Contact edit modal (from side panel) */}
