@@ -27,6 +27,7 @@ type OAuthStartClient = {
     provider: "google";
     options: {
       redirectTo: string;
+      queryParams?: Record<string, string>;
     };
   }): Promise<{
     data: { url: string | null };
@@ -186,7 +187,7 @@ export async function createGoogleOAuthStartResponse(
   try {
     ({ data, error } = await authClient.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: callbackUrl },
+      options: { redirectTo: callbackUrl, queryParams: { prompt: "select_account" } },
     }));
   } catch {
     return NextResponse.redirect(buildLoginErrorRedirectUrl(requestUrl, "google_start_failed"));
