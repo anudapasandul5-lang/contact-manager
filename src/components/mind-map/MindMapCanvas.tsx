@@ -1593,6 +1593,7 @@ function MindMapCanvasInner() {
     const reorganizedState = createReorganizedGraphState({
       currentNodes: liveNodes,
       data: networkData,
+      existingLayoutPositions: layoutPositionsRef.current.size > 0 ? layoutPositionsRef.current : undefined,
     });
 
     nodesRef.current = reorganizedState.nodes;

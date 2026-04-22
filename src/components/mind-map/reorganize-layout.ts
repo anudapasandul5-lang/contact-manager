@@ -396,12 +396,21 @@ function applyRadialLayout(
   });
 }
 
-function collectPreservedAnchorPositions(nodes: Node[]): AnchorPositionMap {
+function collectPreservedAnchorPositions(
+  nodes: Node[],
+  layoutPositions?: Map<string, Position2D>,
+): AnchorPositionMap {
   const anchorPositions = new Map<string, Position2D>();
 
   nodes.forEach((node) => {
     if (node.type === "company" || node.type === "project") {
-      anchorPositions.set(node.id, toNodeCenter(node));
+      const layoutPos = layoutPositions?.get(node.id);
+      const pos = layoutPos ?? node.position;
+      const dimensions = nodeDimensions[node.type ?? "contact"] ?? nodeDimensions.contact;
+      anchorPositions.set(node.id, {
+        x: pos.x + dimensions.width / 2,
+        y: pos.y + dimensions.height / 2,
+      });
     }
   });
 
@@ -420,11 +429,13 @@ export function buildGraphLayout(
 export function createReorganizedGraphState({
   currentNodes,
   data,
+  existingLayoutPositions,
 }: {
   currentNodes: Node[];
   data: NetworkData;
+  existingLayoutPositions?: Map<string, Position2D>;
 }): ReorganizedGraphState {
-  const preservedAnchorPositions = collectPreservedAnchorPositions(currentNodes);
+  const preservedAnchorPositions = collectPreservedAnchorPositions(currentNodes, existingLayoutPositions);
   const graph = buildGraphLayout(data, { preservedAnchorPositions });
   const layoutPositions = createNodePositionMap(graph.nodes);
 
