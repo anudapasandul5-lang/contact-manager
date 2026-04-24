@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Handle, Position } from "@xyflow/react";
 import { User } from "lucide-react";
 
@@ -12,6 +13,7 @@ interface CenterNodeProps {
 }
 
 export function CenterNode({ data }: CenterNodeProps) {
+  const [imgError, setImgError] = useState(false);
   const isCollapsed = data.isMapCollapsed ?? false;
   const borderColor = isCollapsed ? "#f59e0b" : "#2dd4a8";
   const iconBg = isCollapsed
@@ -63,11 +65,13 @@ export function CenterNode({ data }: CenterNodeProps) {
           flexShrink: 0,
         }}
       >
-        {data.photoUrl ? (
+        {data.photoUrl && !imgError ? (
           <img
             src={data.photoUrl}
-            alt="Profile"
+            alt={data.displayName ? `${data.displayName}'s profile photo` : "Your profile"}
+            referrerPolicy="no-referrer"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            onError={() => setImgError(true)}
           />
         ) : (
           <User style={{ width: 22, height: 22, color: iconColor, strokeWidth: 2.2, transition: "color 0.3s ease" }} />
