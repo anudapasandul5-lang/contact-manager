@@ -1,6 +1,7 @@
 import "@/env";
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "sonner";
 import { FloatingAddButton } from "@/components/shared/FloatingAddButton";
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         {children}
         <FloatingAddButton />
+        <Toaster position="top-center" richColors closeButton />
       </body>
     </html>
   );
