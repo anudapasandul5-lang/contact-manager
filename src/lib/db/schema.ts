@@ -185,3 +185,10 @@ export const followUps = pgTable("follow_ups", {
     .where(sql`${t.completed_at} IS NULL`),
   index("follow_ups_user_scheduled_idx").on(t.user_id, t.scheduled_for),
 ]);
+
+export const userProfiles = pgTable("user_profiles", {
+  user_id: text("user_id").primaryKey(),
+  display_name: text("display_name"),
+  avatar_path: text("avatar_path"),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
