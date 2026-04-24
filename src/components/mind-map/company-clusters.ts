@@ -167,7 +167,10 @@ export function buildCompanyClusterGraph(data: NetworkData): { nodes: Node[]; ed
     id: "center",
     type: "center",
     position: { x: 0, y: 0 },
-    data: {},
+    data: {
+      photoUrl: data.currentUser?.avatar_url ?? null,
+      displayName: data.currentUser?.display_name ?? null,
+    },
     draggable: false,
   });
 

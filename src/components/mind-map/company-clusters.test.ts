@@ -205,3 +205,43 @@ test("buildCompanyClusterGraph does not create project projections for company-o
 
   assert.ok(!graph.nodes.some((node) => node.id === companyOwnedProjectProjection));
 });
+
+test("center node receives photoUrl and displayName from currentUser", () => {
+  const data: NetworkData = {
+    contacts: [],
+    companies: [],
+    vendors: [],
+    projects: [],
+    relationships: [],
+    introRequests: [],
+    currentUser: {
+      display_name: "Alice",
+      avatar_url: "https://example.com/alice.jpg",
+    },
+  };
+
+  const { nodes } = buildCompanyClusterGraph(data);
+  const centerNode = nodes.find((n) => n.id === "center");
+
+  assert.ok(centerNode, "center node exists");
+  assert.equal((centerNode.data as { displayName: string | null }).displayName, "Alice");
+  assert.equal((centerNode.data as { photoUrl: string | null }).photoUrl, "https://example.com/alice.jpg");
+});
+
+test("center node data is null when currentUser is absent", () => {
+  const data: NetworkData = {
+    contacts: [],
+    companies: [],
+    vendors: [],
+    projects: [],
+    relationships: [],
+    introRequests: [],
+  };
+
+  const { nodes } = buildCompanyClusterGraph(data);
+  const centerNode = nodes.find((n) => n.id === "center");
+
+  assert.ok(centerNode, "center node exists");
+  assert.equal((centerNode.data as { displayName: string | null }).displayName, null);
+  assert.equal((centerNode.data as { photoUrl: string | null }).photoUrl, null);
+});
