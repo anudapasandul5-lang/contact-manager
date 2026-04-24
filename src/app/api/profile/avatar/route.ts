@@ -50,25 +50,33 @@ export async function POST(request: NextRequest) {
     return response;
   }
 
-  // Read current display_name to preserve it during upsert
-  const { data: existing } = await supabase
+  // Read existing avatar path to clean up orphaned file if extension changed
+  const { data: existingProfile } = await supabase
     .from("user_profiles")
-    .select("display_name")
+    .select("avatar_path")
     .eq("user_id", auth.user.id)
     .maybeSingle();
 
-  const { error: upsertError } = await supabase.from("user_profiles").upsert({
-    user_id: auth.user.id,
-    display_name: (existing?.display_name as string | null) ?? null,
-    avatar_path: storagePath,
-    updated_at: new Date().toISOString(),
-  });
+  const previousPath = (existingProfile?.avatar_path as string | null) ?? null;
+
+  const { error: upsertError } = await supabase.from("user_profiles").upsert(
+    {
+      user_id: auth.user.id,
+      avatar_path: storagePath,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id" },
+  );
 
   if (upsertError) {
     await supabase.storage.from(MEDIA_BUCKET).remove([storagePath]);
     const response = NextResponse.json({ error: upsertError.message }, { status: 500 });
     applySessionCookies(response, auth.resolved);
     return response;
+  }
+
+  if (previousPath && previousPath !== storagePath) {
+    await supabase.storage.from(MEDIA_BUCKET).remove([previousPath]);
   }
 
   const avatarUrl = await resolveAvatarUrl(supabase as never, storagePath);

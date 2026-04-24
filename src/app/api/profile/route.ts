@@ -66,19 +66,14 @@ export async function PATCH(request: NextRequest) {
 
   const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
 
-  // Read current row to preserve avatar_path during upsert
-  const { data: existing } = await supabase
-    .from("user_profiles")
-    .select("avatar_path")
-    .eq("user_id", auth.user.id)
-    .maybeSingle();
-
-  const { error } = await supabase.from("user_profiles").upsert({
-    user_id: auth.user.id,
-    display_name: parsed.data.display_name,
-    avatar_path: (existing?.avatar_path as string | null) ?? null,
-    updated_at: new Date().toISOString(),
-  });
+  const { error } = await supabase.from("user_profiles").upsert(
+    {
+      user_id: auth.user.id,
+      display_name: parsed.data.display_name,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id" },
+  );
 
   if (error) {
     const response = NextResponse.json({ error: error.message }, { status: 500 });
