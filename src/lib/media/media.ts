@@ -159,6 +159,13 @@ export async function createSignedMediaUrl(
   return data.signedUrl;
 }
 
+export async function resolveAvatarUrl(
+  supabase: SupabaseLike,
+  avatarPath: string | null | undefined,
+) {
+  return createSignedMediaUrl(supabase, avatarPath, 60 * 60 * 24 * 7);
+}
+
 export async function attachSignedMediaUrls<T extends object>(
   supabase: SupabaseLike,
   entityType: MediaEntityType,
