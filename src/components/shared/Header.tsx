@@ -7,17 +7,29 @@ import { Network, Users, Sun, Moon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
 
+interface HeaderProps {
+  avatarUrl?: string | null;
+  displayName?: string | null;
+  email?: string | null;
+}
+
 const tabs = [
   { href: "/mind-map", label: "Mind Map", icon: Network },
   { href: "/contacts", label: "Contacts", icon: Users },
 ];
 
-export function Header() {
+export function Header({ avatarUrl, displayName, email }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const { theme, toggleTheme, mounted } = useTheme();
   const isDark = mounted && theme === "dark";
+
+  const initials = displayName
+    ? displayName.charAt(0).toUpperCase()
+    : email
+      ? email.charAt(0).toUpperCase()
+      : "?";
 
   async function handleSignOut() {
     await fetch("/api/auth/sign-out", { method: "POST" });
@@ -38,7 +50,6 @@ export function Header() {
       }}
     >
       <div className="flex items-center justify-between px-6 py-3">
-        {/* Brand */}
         <div className="flex items-center gap-3">
           <div
             className="flex h-8 w-8 items-center justify-center rounded-xl"
@@ -62,7 +73,6 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Nav tabs */}
           <nav
             className="flex gap-1 rounded-xl p-1"
             style={{
@@ -87,9 +97,7 @@ export function Header() {
                           color: isDark ? "#a5b4fc" : "#4f46e5",
                           boxShadow: "var(--clay-shadow-sm)",
                         }
-                      : {
-                          color: "var(--clay-text-muted)",
-                        }
+                      : { color: "var(--clay-text-muted)" }
                   }
                 >
                   <tab.icon
@@ -102,7 +110,6 @@ export function Header() {
             })}
           </nav>
 
-          {/* Dark mode toggle */}
           <button
             type="button"
             onClick={toggleTheme}
@@ -117,6 +124,32 @@ export function Header() {
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
 
+          {/* Profile avatar */}
+          <Link
+            href="/profile"
+            className="flex h-8 w-8 items-center justify-center rounded-full overflow-hidden transition-all duration-200"
+            style={{
+              background: `linear-gradient(145deg, var(--clay-card), var(--clay-card-end))`,
+              boxShadow: pathname.startsWith("/profile")
+                ? "0 0 0 2px #6366f1"
+                : "var(--clay-shadow-sm)",
+            }}
+            title="Profile settings"
+          >
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={displayName ? `${displayName}'s profile` : "Your profile"}
+                referrerPolicy="no-referrer"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            ) : (
+              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--clay-text-secondary)" }}>
+                {initials}
+              </span>
+            )}
+          </Link>
+
           <button
             type="button"
             onClick={handleSignOut}
@@ -130,7 +163,7 @@ export function Header() {
             title="Sign out"
           >
             <LogOut className="h-4 w-4" />
-            <span className="text-sm">{isPending ? "Signing out..." : "Sign Out"}</span>
+            <span className="text-sm">{isPending ? "Signing out…" : "Sign Out"}</span>
           </button>
         </div>
       </div>
