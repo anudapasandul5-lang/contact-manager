@@ -114,6 +114,11 @@ export interface FollowUp {
   updated_at: string;
 }
 
+export interface UserProfile {
+  display_name: string | null;
+  avatar_url: string | null;
+}
+
 export interface ContactWithRelations extends Contact {
   contact_companies: { companies: Company }[];
   contact_projects: { projects: Project }[];
@@ -146,4 +151,5 @@ export interface NetworkData {
   relationships: PersonRelationship[];
   introRequests: IntroRequest[];
   followUps?: FollowUp[];
+  currentUser?: UserProfile;
 }
