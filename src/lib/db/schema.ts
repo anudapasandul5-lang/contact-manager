@@ -190,5 +190,6 @@ export const userProfiles = pgTable("user_profiles", {
   user_id: text("user_id").primaryKey(),
   display_name: text("display_name"),
   avatar_path: text("avatar_path"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
