@@ -124,20 +124,24 @@ export async function fetchSupabaseNetworkData(
     ? []
     : ((followUpsRes.data as FollowUp[] | null) ?? []);
 
-  const vendors = await fetchVendorsWithRelations(supabase as never, userId);
+  const [vendors, profileRes] = await Promise.all([
+    fetchVendorsWithRelations(supabase as never, userId),
+    supabase
+      .from("user_profiles")
+      .select("display_name, avatar_path")
+      .eq("user_id", userId)
+      .maybeSingle(),
+  ]);
 
-  const profileRes = await supabase
-    .from("user_profiles")
-    .select("display_name, avatar_path")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  const avatarUrl = profileRes.data?.avatar_path
-    ? await resolveAvatarUrl(supabase as never, String(profileRes.data.avatar_path))
-    : null;
+  const avatarUrl =
+    !profileRes.error && profileRes.data?.avatar_path
+      ? await resolveAvatarUrl(supabase as never, String(profileRes.data.avatar_path))
+      : null;
 
   const currentUser: UserProfile = {
-    display_name: profileRes.data?.display_name ? String(profileRes.data.display_name) : null,
+    display_name: !profileRes.error && profileRes.data?.display_name
+      ? String(profileRes.data.display_name)
+      : null,
     avatar_url: avatarUrl,
   };
 
