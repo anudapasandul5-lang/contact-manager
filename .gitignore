@@ -6,6 +6,9 @@
 # Dependencies
 node_modules/
 
+# Local archive
+_archive/
+
 # Next.js
 contact-manager/.next/
 contact-manager/out/
