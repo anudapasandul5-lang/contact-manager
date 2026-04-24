@@ -27,6 +27,12 @@ export function ProfileForm({ initialDisplayName, initialAvatarUrl, email }: Pro
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Images must be 5 MB or smaller.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
     setIsUploadingAvatar(true);
     try {
       const formData = new FormData();
@@ -85,10 +91,6 @@ export function ProfileForm({ initialDisplayName, initialAvatarUrl, email }: Pro
       setIsSavingName(false);
     }
   }
-
-  const initials = displayName.trim()
-    ? displayName.trim().charAt(0).toUpperCase()
-    : (email?.charAt(0).toUpperCase() ?? "?");
 
   return (
     <div
@@ -188,10 +190,11 @@ export function ProfileForm({ initialDisplayName, initialAvatarUrl, email }: Pro
 
       {/* Display name */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium" style={{ color: "var(--clay-text-secondary)" }}>
+        <label htmlFor="display-name" className="text-sm font-medium" style={{ color: "var(--clay-text-secondary)" }}>
           Display name
         </label>
         <Input
+          id="display-name"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
           placeholder="Your name"
@@ -211,10 +214,11 @@ export function ProfileForm({ initialDisplayName, initialAvatarUrl, email }: Pro
 
       {/* Email (read-only) */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium" style={{ color: "var(--clay-text-secondary)" }}>
+        <label htmlFor="email" className="text-sm font-medium" style={{ color: "var(--clay-text-secondary)" }}>
           Email
         </label>
         <Input
+          id="email"
           value={email ?? ""}
           readOnly
           disabled
