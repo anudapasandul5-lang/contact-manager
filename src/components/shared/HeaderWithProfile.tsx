@@ -14,11 +14,15 @@ export async function HeaderWithProfile() {
 
   const supabase = getSupabaseServer(resolved.accessToken ?? undefined);
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("user_profiles")
     .select("display_name, avatar_path")
     .eq("user_id", resolved.user.id)
     .maybeSingle();
+
+  if (error) {
+    console.error("[HeaderWithProfile] Failed to load user profile:", error.message);
+  }
 
   const avatarUrl = data?.avatar_path
     ? await resolveAvatarUrl(supabase as never, data.avatar_path as string)

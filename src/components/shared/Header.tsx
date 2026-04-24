@@ -1,8 +1,8 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useTransition } from "react";
 import { Network, Users, Sun, Moon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
@@ -19,6 +19,7 @@ const tabs = [
 ];
 
 export function Header({ avatarUrl, displayName, email }: HeaderProps) {
+  const [avatarBroken, setAvatarBroken] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -136,12 +137,13 @@ export function Header({ avatarUrl, displayName, email }: HeaderProps) {
             }}
             title="Profile settings"
           >
-            {avatarUrl ? (
+            {avatarUrl && !avatarBroken ? (
               <img
                 src={avatarUrl}
                 alt={displayName ? `${displayName}'s profile` : "Your profile"}
                 referrerPolicy="no-referrer"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                onError={() => setAvatarBroken(true)}
               />
             ) : (
               <span style={{ fontSize: 13, fontWeight: 700, color: "var(--clay-text-secondary)" }}>
