@@ -3,6 +3,7 @@ import {
   applyRelatedMediaToContacts,
   attachSignedMediaUrls,
   mapEntitiesById,
+  resolveAvatarUrl,
 } from "@/lib/media/media";
 import type {
   Company,
@@ -12,6 +13,7 @@ import type {
   NetworkData,
   PersonRelationship,
   Project,
+  UserProfile,
 } from "@/lib/supabase/types";
 import {
   fetchVendorsWithRelations,
@@ -24,6 +26,10 @@ type QueryBuilder = {
     column: string,
     options?: { ascending?: boolean },
   ) => Promise<{ data: unknown; error: { code?: string; message?: string } | null }>;
+  maybeSingle: () => Promise<{
+    data: Record<string, unknown> | null;
+    error: { code?: string; message?: string } | null;
+  }>;
 };
 
 type SupabaseLike = {
@@ -120,6 +126,21 @@ export async function fetchSupabaseNetworkData(
 
   const vendors = await fetchVendorsWithRelations(supabase as never, userId);
 
+  const profileRes = await supabase
+    .from("user_profiles")
+    .select("display_name, avatar_path")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  const avatarUrl = profileRes.data?.avatar_path
+    ? await resolveAvatarUrl(supabase as never, String(profileRes.data.avatar_path))
+    : null;
+
+  const currentUser: UserProfile = {
+    display_name: profileRes.data?.display_name ? String(profileRes.data.display_name) : null,
+    avatar_url: avatarUrl,
+  };
+
   if (relationshipsRes.error && !isMissingTableError(relationshipsRes.error)) {
     throw new Error(relationshipsRes.error.message);
   }
@@ -140,5 +161,6 @@ export async function fetchSupabaseNetworkData(
     relationships: explicitRelationships,
     introRequests,
     followUps,
+    currentUser,
   };
 }
