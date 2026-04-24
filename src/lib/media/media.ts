@@ -1,6 +1,7 @@
 export const MEDIA_BUCKET = "network-media";
 export const MAX_MEDIA_FILE_SIZE = 5 * 1024 * 1024;
 export const ALLOWED_MEDIA_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+export const AVATAR_SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 export type MediaEntityType = "contact" | "company" | "project";
 
@@ -163,7 +164,7 @@ export async function resolveAvatarUrl(
   supabase: SupabaseLike,
   avatarPath: string | null | undefined,
 ) {
-  return createSignedMediaUrl(supabase, avatarPath, 60 * 60 * 24 * 7);
+  return createSignedMediaUrl(supabase, avatarPath, AVATAR_SIGNED_URL_TTL_SECONDS);
 }
 
 export async function attachSignedMediaUrls<T extends object>(
