@@ -52,17 +52,15 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
   }, [open]);
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (nextOpen) {
-      setMode("browse");
-      setQuery("");
-      setSelectedType(null);
-      setSuccessFlash(null);
-    }
+    setMode("browse");
+    setQuery("");
+    setSelectedType(null);
+    setSuccessFlash(null);
     onOpenChange(nextOpen);
   };
 
   const navigateTo = (kind: FocusableEntityKind, id: string) => {
-    onOpenChange(false);
+    handleOpenChange(false);
     const targetPath = "/mind-map";
     const goNow = () => {
       requestAnimationFrame(() => emitFocus({ id, kind }));
