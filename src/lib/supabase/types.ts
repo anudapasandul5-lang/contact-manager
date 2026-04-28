@@ -1,4 +1,4 @@
-export type ContactType = "employee" | "vendor";
+export type ContactType = "employee" | "vendor" | "investor" | "cofounder" | "partner";
 export type ProjectStatus = "planning" | "active" | "completed";
 export type RelationshipStrength = "weak" | "warm" | "strong";
 export type RelationshipEvidenceType = "manual" | "shared_company" | "shared_project";
