@@ -27,6 +27,21 @@ const FILTERS: { label: string; value: DirectoryFilter; activeStyle?: React.CSSP
     value: "vendor",
     activeStyle: { background: "linear-gradient(145deg, #ffedd5, #f3ddc3)", color: "#7c2d12", border: "1px solid rgba(234,88,12,0.25)" },
   },
+  {
+    label: "Investors",
+    value: "investor",
+    activeStyle: { background: "linear-gradient(145deg, #ccfbf1, #b2f0e8)", color: "#0f766e", border: "1px solid rgba(20,184,166,0.25)" },
+  },
+  {
+    label: "Co-founders",
+    value: "cofounder",
+    activeStyle: { background: "linear-gradient(145deg, #ede9fe, #ddd6fe)", color: "#5b21b6", border: "1px solid rgba(124,58,237,0.25)" },
+  },
+  {
+    label: "Partners",
+    value: "partner",
+    activeStyle: { background: "linear-gradient(145deg, #fef3c7, #fde68a)", color: "#92400e", border: "1px solid rgba(217,119,6,0.25)" },
+  },
 ];
 
 export function ContactsGrid() {
@@ -89,17 +104,20 @@ export function ContactsGrid() {
     [directoryItems, filter, search],
   );
 
+  const FILTER_EMPTY: Partial<Record<DirectoryFilter, { message: string; sub: string }>> = {
+    vendor: { message: "No vendors yet", sub: "Add a vendor to see it here." },
+    investor: { message: "No investors yet", sub: "Use the + button to add your first investor." },
+    cofounder: { message: "No co-founders yet", sub: "Use the + button to add your first co-founder." },
+    partner: { message: "No partners yet", sub: "Use the + button to add your first partner." },
+  };
+
   const emptyMessage = search
     ? "No contacts or vendors match your search"
-    : filter === "vendor"
-      ? "No vendors yet"
-      : "No contacts yet";
+    : (FILTER_EMPTY[filter]?.message ?? "No contacts yet");
 
   const emptySubMessage = search
     ? "Try a different keyword."
-    : filter === "vendor"
-      ? "Add a vendor to see it here."
-      : "Use the + button to add your first contact.";
+    : (FILTER_EMPTY[filter]?.sub ?? "Use the + button to add your first contact.");
 
   return (
     <div className="flex flex-col gap-6">

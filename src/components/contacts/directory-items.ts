@@ -1,6 +1,6 @@
 import type { ContactWithRelations, VendorWithRelations } from "@/lib/supabase/types";
 
-export type DirectoryFilter = "all" | "employee" | "vendor";
+export type DirectoryFilter = "all" | "employee" | "vendor" | "investor" | "cofounder" | "partner";
 
 export type DirectoryItem =
   | {
@@ -79,21 +79,21 @@ export function filterDirectoryItems(items: DirectoryItem[], filter: DirectoryFi
   const normalizedSearch = search.trim().toLowerCase();
 
   return items.filter((item) => {
-    if (filter === "employee" && !(item.kind === "contact" && item.contact.type === "employee")) {
-      return false;
+    if (filter !== "all") {
+      if (filter === "vendor") {
+        // vendor tab shows Vendor entities + legacy contacts typed as vendor
+        if (!((item.kind === "contact" && item.contact.type === "vendor") || item.kind === "vendor")) {
+          return false;
+        }
+      } else {
+        // employee, investor, cofounder, partner — match contact.type exactly
+        if (!(item.kind === "contact" && item.contact.type === filter)) {
+          return false;
+        }
+      }
     }
 
-    if (filter === "vendor" && !(
-      (item.kind === "contact" && item.contact.type === "vendor")
-      || item.kind === "vendor"
-    )) {
-      return false;
-    }
-
-    if (!normalizedSearch) {
-      return true;
-    }
-
+    if (!normalizedSearch) return true;
     return item.searchText.includes(normalizedSearch);
   });
 }
@@ -103,5 +103,8 @@ export function buildDirectoryStats(items: DirectoryItem[]) {
     total: items.length,
     employees: items.filter((item) => item.kind === "contact" && item.contact.type === "employee").length,
     vendors: items.filter((item) => (item.kind === "contact" && item.contact.type === "vendor") || item.kind === "vendor").length,
+    investors: items.filter((item) => item.kind === "contact" && item.contact.type === "investor").length,
+    cofounders: items.filter((item) => item.kind === "contact" && item.contact.type === "cofounder").length,
+    partners: items.filter((item) => item.kind === "contact" && item.contact.type === "partner").length,
   };
 }
