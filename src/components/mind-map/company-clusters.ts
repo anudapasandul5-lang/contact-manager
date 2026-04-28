@@ -4,6 +4,9 @@ import type { Company, ContactType, ContactWithRelations, NetworkData, Project, 
 const typeColors: Record<ContactType, string> = {
   employee: "#86efac",
   vendor: "#fdba74",
+  investor: "#67e8f9",
+  cofounder: "#c4b5fd",
+  partner: "#fcd34d",
 };
 
 function getInitials(name: string): string {

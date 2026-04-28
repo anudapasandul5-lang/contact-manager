@@ -31,6 +31,9 @@ const PRESET_COLORS = [
 const CONTACT_TYPE_LABELS: Record<ContactType, string> = {
   employee: "Employee",
   vendor: "Vendor",
+  investor: "Investor",
+  cofounder: "Co-founder",
+  partner: "Partner",
 };
 
 function getInitials(name: string) {

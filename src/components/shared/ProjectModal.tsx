@@ -33,6 +33,9 @@ const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
 const CONTACT_TYPE_LABELS: Record<ContactType, string> = {
   employee: "Employee",
   vendor: "Vendor",
+  investor: "Investor",
+  cofounder: "Co-founder",
+  partner: "Partner",
 };
 
 function getInitials(name: string) {

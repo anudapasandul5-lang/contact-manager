@@ -27,6 +27,9 @@ import type { Company, ContactType, ContactWithRelations, Project } from "@/lib/
 const CONTACT_TYPE_LABELS: Record<ContactType, string> = {
   employee: "Employee",
   vendor: "Vendor",
+  investor: "Investor",
+  cofounder: "Co-founder",
+  partner: "Partner",
 };
 
 const PROJECT_STATUS_LABELS = {

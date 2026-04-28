@@ -75,6 +75,9 @@ interface ContactSidePanelProps {
 const typeConfig: Record<ContactType, { label: string; color: string; bg: string; border: string }> = {
   employee: { label: "Employee", color: "#16a34a", bg: "#dcfce7", border: "#86efac" },
   vendor: { label: "Vendor", color: "#ea580c", bg: "#ffedd5", border: "#fdba74" },
+  investor: { label: "Investor", color: "#0d9488", bg: "#ccfbf1", border: "#67e8f9" },
+  cofounder: { label: "Co-founder", color: "#7c3aed", bg: "#ede9fe", border: "#c4b5fd" },
+  partner: { label: "Partner", color: "#d97706", bg: "#fef3c7", border: "#fcd34d" },
 };
 
 const statusConfig = {

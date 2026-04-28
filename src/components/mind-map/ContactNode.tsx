@@ -35,6 +35,36 @@ const typeConfig: Record<ContactType, {
     border: "#fb923c",
     avatarBg: "linear-gradient(145deg, #f97316, #ea580c)",
   },
+  investor: {
+    bg: "#ccfbf1",
+    gradient: "linear-gradient(145deg, #d0fdf5, #b2f0e8)",
+    accent: "#0d9488",
+    text: "#0f766e",
+    shadow: "20,184,166",
+    badgeBg: "rgba(20,184,166,0.12)",
+    border: "#2dd4bf",
+    avatarBg: "linear-gradient(145deg, #14b8a6, #0d9488)",
+  },
+  cofounder: {
+    bg: "#ede9fe",
+    gradient: "linear-gradient(145deg, #f0ebff, #e9d5ff)",
+    accent: "#7c3aed",
+    text: "#3b0764",
+    shadow: "139,92,246",
+    badgeBg: "rgba(124,58,237,0.12)",
+    border: "#a78bfa",
+    avatarBg: "linear-gradient(145deg, #a855f7, #7c3aed)",
+  },
+  partner: {
+    bg: "#fef3c7",
+    gradient: "linear-gradient(145deg, #fffbeb, #fde68a)",
+    accent: "#d97706",
+    text: "#92400e",
+    shadow: "217,119,6",
+    badgeBg: "rgba(217,119,6,0.12)",
+    border: "#fbbf24",
+    avatarBg: "linear-gradient(145deg, #f59e0b, #d97706)",
+  },
 };
 
 interface ContactNodeData {
