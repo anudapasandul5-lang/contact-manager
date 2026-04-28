@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, timestamp, pgEnum, primaryKey, boolean, uniqueIndex, index, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, pgEnum, primaryKey, boolean, uniqueIndex, index } from "drizzle-orm/pg-core";
 
 export const contactTypeEnum = pgEnum("contact_type", [
   "employee",
@@ -190,7 +190,7 @@ export const followUps = pgTable("follow_ups", {
 ]);
 
 export const userProfiles = pgTable("user_profiles", {
-  user_id: uuid("user_id").primaryKey(),
+  user_id: text("user_id").primaryKey(),
   display_name: text("display_name"),
   avatar_path: text("avatar_path"),
   created_at: timestamp("created_at").defaultNow().notNull(),
