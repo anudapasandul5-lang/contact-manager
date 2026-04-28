@@ -7,8 +7,7 @@ import type {
   RelationshipStrength,
 } from "@/lib/supabase/types";
 
-const CONTACT_TYPES: ContactType[] = ["employee", "vendor"];
-const EDITABLE_CONTACT_TYPES: ContactType[] = ["employee", "vendor"];
+const EDITABLE_CONTACT_TYPES: ContactType[] = ["employee", "vendor", "investor", "cofounder", "partner"];
 const PROJECT_STATUSES: ProjectStatus[] = ["planning", "active", "completed"];
 const RELATIONSHIP_STRENGTHS: RelationshipStrength[] = ["weak", "warm", "strong"];
 const RELATIONSHIP_EVIDENCE_TYPES: RelationshipEvidenceType[] = ["manual", "shared_company", "shared_project"];

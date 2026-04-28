@@ -35,6 +35,7 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
   const [selectedType, setSelectedType] = useState<ContactType | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [successFlash, setSuccessFlash] = useState<string | null>(null);
+  const isSubmittingRef = useRef(false);
   const createContact = useCreateContact();
 
   // Clean up flash timer on unmount
@@ -83,7 +84,8 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
 
   const submitQuickAddContact = async () => {
     const trimmed = query.trim();
-    if (!trimmed || !selectedType) return;
+    if (!trimmed || !selectedType || isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     try {
       await createContact.mutateAsync({ name: trimmed, type: selectedType });
       // Clear flash timer to handle rapid submits
@@ -96,6 +98,8 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
       setTimeout(() => inputRef.current?.focus(), 0);
     } catch {
       // toast already fired inside the hook
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 
@@ -135,6 +139,7 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
               if (e.key === "Escape") {
                 if (mode === "quickAdd") {
                   e.preventDefault();
+                  e.nativeEvent.stopImmediatePropagation();
                   setMode("browse");
                   setQuery("");
                 }

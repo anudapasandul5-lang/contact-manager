@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -76,6 +76,13 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
   const [mediaError, setMediaError] = useState<string | null>(null);
   const [mediaStatus, setMediaStatus] = useState<string | null>(null);
   const [persistedContactId, setPersistedContactId] = useState<string | null>(null);
+  const [addAnother, setAddAnother] = useState(false);
+  const [successFlash, setSuccessFlash] = useState<string | null>(null);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => { if (flashTimerRef.current) clearTimeout(flashTimerRef.current); };
+  }, []);
 
   const activeContactId = existingContactId ?? persistedContactId;
   const displayedImageUrl = removeImage ? null : (previewUrl ?? mediaUrl);
@@ -124,6 +131,7 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
     setMediaError(null);
     setMediaStatus(null);
     setError(null);
+    setSuccessFlash(null);
   }, [contact, open]);
 
   useEffect(() => {
@@ -136,6 +144,25 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
     setPreviewUrl(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedFile]);
+
+  function resetFormForNextAdd() {
+    setName("");
+    setEmail("");
+    setPhone("");
+    setRole("");
+    setBio("");
+    setType("employee");
+    setMediaUrl(null);
+    setCompanyIds([]);
+    setProjectIds([]);
+    setPersistedContactId(null);
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setRemoveImage(false);
+    setMediaError(null);
+    setMediaStatus(null);
+    setError(null);
+  }
 
   function toggleId(list: string[], id: string): string[] {
     return list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
@@ -233,7 +260,14 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
 
       window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
       onSaved();
-      onOpenChange(false);
+      if (addAnother) {
+        if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+        setSuccessFlash(`${name.trim()} added ✓`);
+        flashTimerRef.current = setTimeout(() => setSuccessFlash(null), 2000);
+        resetFormForNextAdd();
+      } else {
+        onOpenChange(false);
+      }
     } catch {
       setError("Network error.");
     } finally {
@@ -263,6 +297,9 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
                 <SelectContent>
                   <SelectItem value="employee">{CONTACT_TYPE_LABELS.employee}</SelectItem>
                   <SelectItem value="vendor">{CONTACT_TYPE_LABELS.vendor}</SelectItem>
+                  <SelectItem value="investor">{CONTACT_TYPE_LABELS.investor}</SelectItem>
+                  <SelectItem value="cofounder">{CONTACT_TYPE_LABELS.cofounder}</SelectItem>
+                  <SelectItem value="partner">{CONTACT_TYPE_LABELS.partner}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -382,13 +419,31 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
           {error && <p className="text-sm text-red-500">{error}</p>}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={saving}>
-            {saving ? "Saving..." : contact ? "Save Changes" : "Add Contact"}
-          </Button>
+        <DialogFooter className="flex-col gap-2 sm:flex-col">
+          {successFlash && (
+            <p className="text-sm font-medium text-green-600 text-center w-full">
+              {successFlash}
+            </p>
+          )}
+          {!contact && (
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground select-none">
+              <input
+                type="checkbox"
+                checked={addAnother}
+                onChange={(e) => setAddAnother(e.target.checked)}
+                className="accent-indigo-500 h-3.5 w-3.5"
+              />
+              Add another contact
+            </label>
+          )}
+          <div className="flex gap-2 justify-end w-full">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} disabled={saving}>
+              {saving ? "Saving..." : contact ? "Save Changes" : "Add Contact"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
