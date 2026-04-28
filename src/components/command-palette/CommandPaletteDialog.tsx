@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { Building2, FolderKanban, Truck, UserPlus, Users } from "lucide-react";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
   Command,
@@ -18,6 +17,7 @@ import {
 import { useNetworkQuery } from "@/lib/hooks/queries/useNetworkQuery";
 import { useCreateContact } from "@/lib/hooks/mutations/useCreateContact";
 import { emitFocus, type FocusableEntityKind } from "@/lib/navigation/nodeFocusBus";
+import type { ContactType } from "@/lib/supabase/types";
 
 type Mode = "browse" | "quickAdd";
 
@@ -32,17 +32,34 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
   const [mode, setMode] = useState<Mode>("browse");
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const [selectedType, setSelectedType] = useState<ContactType | null>(null);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [successFlash, setSuccessFlash] = useState<string | null>(null);
   const createContact = useCreateContact();
+
+  // Clean up flash timer on unmount
+  useEffect(() => {
+    return () => {
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    };
+  }, []);
   const { data: network } = useNetworkQuery();
 
-  // Reset when reopened.
   useEffect(() => {
     if (open) {
-      setMode("browse");
-      setQuery("");
       setTimeout(() => inputRef.current?.focus(), 0);
     }
   }, [open]);
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (nextOpen) {
+      setMode("browse");
+      setQuery("");
+      setSelectedType(null);
+      setSuccessFlash(null);
+    }
+    onOpenChange(nextOpen);
+  };
 
   const navigateTo = (kind: FocusableEntityKind, id: string) => {
     onOpenChange(false);
@@ -68,12 +85,16 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
 
   const submitQuickAddContact = async () => {
     const trimmed = query.trim();
-    if (!trimmed) return;
+    if (!trimmed || !selectedType) return;
     try {
-      await createContact.mutateAsync({ name: trimmed, type: "employee" });
-      toast.success(`Added "${trimmed}"`);
+      await createContact.mutateAsync({ name: trimmed, type: selectedType });
+      // Clear flash timer to handle rapid submits
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      setSuccessFlash(`${trimmed} added ✓`);
+      flashTimerRef.current = setTimeout(() => setSuccessFlash(null), 1500);
+      // Stay in quickAdd mode — just clear name and type
       setQuery("");
-      setMode("browse");
+      setSelectedType(null);
       setTimeout(() => inputRef.current?.focus(), 0);
     } catch {
       // toast already fired inside the hook
@@ -81,12 +102,12 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
   };
 
   const placeholder = useMemo(() => {
-    if (mode === "quickAdd") return "Name for the new contact…";
-    return "Search, jump to a node, or add something new…";
+    if (mode === "quickAdd") return "Name for the new contact...";
+    return "Search, jump to a node, or add something new...";
   }, [mode]);
 
   return (
-    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+    <DialogPrimitive.Root open={open} onOpenChange={handleOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Backdrop
           className={cn(
@@ -139,7 +160,7 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
                 <CommandGroup heading="Quick actions">
                   <CommandItem value="action-add-contact quick-add new contact" onSelect={() => setMode("quickAdd")}>
                     <UserPlus />
-                    <span>Add contact…</span>
+                    <span>Add contact...</span>
                     <CommandShortcut>Enter name</CommandShortcut>
                   </CommandItem>
                 </CommandGroup>
@@ -215,35 +236,69 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
                 )}
               </CommandList>
             ) : (
-              <CommandList>
-                <CommandGroup heading="Quick add contact">
-                  <CommandItem
-                    value="quick-add-submit"
-                    onSelect={() => void submitQuickAddContact()}
-                    disabled={!query.trim() || createContact.isPending}
+              <>
+                {/* Success flash — sibling to CommandList so cmdk doesn't treat it as a command item */}
+                {successFlash && (
+                  <div
+                    className="px-3 py-1.5 text-xs font-medium text-green-700"
+                    style={{ backgroundColor: "rgba(22,163,74,0.08)", borderBottom: "1px solid var(--border)" }}
                   >
-                    <UserPlus />
-                    <span>
-                      {createContact.isPending
-                        ? "Adding…"
-                        : query.trim()
-                          ? `Add contact "${query.trim()}"`
-                          : "Type a name, then Enter"}
-                    </span>
-                    <CommandShortcut>↵</CommandShortcut>
-                  </CommandItem>
-                  <CommandItem
-                    value="quick-add-cancel"
-                    onSelect={() => {
-                      setMode("browse");
-                      setQuery("");
-                    }}
-                  >
-                    <span>Cancel</span>
-                    <CommandShortcut>Esc</CommandShortcut>
-                  </CommandItem>
-                </CommandGroup>
-              </CommandList>
+                    {successFlash}
+                  </div>
+                )}
+                <CommandList>
+                  <CommandGroup heading="Quick add contact">
+                    {/* Type picker pill row */}
+                    <div className="px-3 py-2 flex flex-wrap gap-1.5">
+                      {(["employee", "investor", "cofounder", "partner", "vendor"] as const).map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setSelectedType(selectedType === t ? null : t)}
+                          className="rounded-full px-3 py-1 text-xs font-medium transition-all duration-100"
+                          style={
+                            selectedType === t
+                              ? { background: "#6366f1", color: "#fff", border: "1px solid #4f46e5" }
+                              : { background: "rgba(99,102,241,0.08)", color: "#6366f1", border: "1px solid rgba(99,102,241,0.2)" }
+                          }
+                        >
+                          {t === "cofounder" ? "Co-founder" : t.charAt(0).toUpperCase() + t.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+
+                    <CommandItem
+                      value="quick-add-submit"
+                      onSelect={() => void submitQuickAddContact()}
+                      disabled={!query.trim() || !selectedType || createContact.isPending}
+                    >
+                      <UserPlus />
+                      <span>
+                        {createContact.isPending
+                          ? "Adding..."
+                          : query.trim() && selectedType
+                            ? `Add "${query.trim()}" as ${selectedType === "cofounder" ? "Co-founder" : selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}`
+                            : !query.trim()
+                              ? "Type a name above"
+                              : "Select a type above"}
+                      </span>
+                      <CommandShortcut>↵</CommandShortcut>
+                    </CommandItem>
+                    <CommandItem
+                      value="quick-add-cancel"
+                      onSelect={() => {
+                        setMode("browse");
+                        setQuery("");
+                        setSelectedType(null);
+                        setSuccessFlash(null);
+                      }}
+                    >
+                      <span>Cancel</span>
+                      <CommandShortcut>Esc</CommandShortcut>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </>
             )}
           </Command>
         </DialogPrimitive.Popup>

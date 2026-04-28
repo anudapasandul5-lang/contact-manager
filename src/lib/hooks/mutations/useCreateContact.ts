@@ -3,10 +3,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryKeys } from "@/lib/query/keys";
+import type { ContactType } from "@/lib/supabase/types";
 
 export interface CreateContactInput {
   name: string;
-  type?: "employee" | "vendor";
+  type?: ContactType;
   email?: string | null;
   phone?: string | null;
   role?: string | null;

@@ -2516,7 +2516,7 @@ function MindMapCanvasInner() {
               const group = projectContacts.filter((c) => c.type === type);
               if (group.length === 0) return null;
               const labels = { employee: "Co-founders / Team", vendor: "Vendors" };
-              const colors = { employee: "#22c55e", vendor: "#f97316" };
+              const colors: Record<string, string> = { employee: "#22c55e", vendor: "#f97316", investor: "#6366f1", cofounder: "#ec4899", partner: "#14b8a6" };
               return (
                 <div key={type}>
                   <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--clay-text-muted)" }}>
