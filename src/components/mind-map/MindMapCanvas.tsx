@@ -18,6 +18,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
+import { fetchAllNetworkData } from "@/lib/db/queries";
 import type {
   NetworkData,
   ContactType,
@@ -27,7 +28,6 @@ import type {
   Project,
 } from "@/lib/supabase/types";
 import { normalizeFollowUps, type MindMapFollowUp } from "./follow-up-helpers";
-import { loadNetworkGraphState } from "./network-graph-loader";
 import {
   Dialog,
   DialogContent,
@@ -80,9 +80,17 @@ import {
 import { getFilterCategoryForNode, type FilterCategory } from "./node-filters";
 import { collectNodeInternalsRefreshIds } from "./node-internals";
 import {
+  applySavedNodePositions,
   createNodePositionMap,
+  createCompanyCollapseStorageKey,
+  createLayoutStorageKey,
+  createProjectCollapseStorageKey,
   DENSER_RADIAL_LAYOUT,
+  deriveLayoutOwnerId,
   mergeNodePositionMap,
+  readSavedNodePositions,
+  restoreSavedCollapsedCompanies,
+  restoreSavedCollapsedProjects,
   writeSavedCollapsedCompanies,
   writeSavedCollapsedProjects,
   writeSavedNodePositionMap,
@@ -139,6 +147,7 @@ const COMPACT_CONTACT_RAIL_QUERY = "(max-width: 1080px)";
 type AnimationPhase = "idle" | "collapsing" | "expanding";
 type NeighborhoodSource = FocusSource;
 type FollowUpNotice = { tone: "error" | "success"; message: string };
+type NetworkDataWithFollowUps = NetworkData & { followUps?: unknown };
 
 const searchKindLabels: Record<SearchResultKind, string> = {
   company: "Company",
@@ -868,18 +877,35 @@ function MindMapCanvasInner() {
 
   const loadData = useCallback(() => {
     if (isAnimatingRef.current) return; // Guard: don't reset during animation
-    loadNetworkGraphState(buildGraph)
-      .then((loaded) => {
-        setNetworkData(loaded.data);
-        setFollowUps(loaded.followUps);
-        layoutStorageKeyRef.current = loaded.layoutStorageKey;
-        companyCollapseStorageKeyRef.current = loaded.companyCollapseStorageKey;
-        projectCollapseStorageKeyRef.current = loaded.projectCollapseStorageKey;
-        setNodes(loaded.nodes);
-        setEdges(loaded.edges);
-        setCollapsedCompanies(loaded.collapsedCompanies);
-        setCollapsedProjects(loaded.collapsedProjects);
-        syncNodePositionRefs(loaded.nodes);
+    fetchAllNetworkData()
+      .then((data) => {
+        setNetworkData(data);
+        setFollowUps(normalizeFollowUps((data as NetworkDataWithFollowUps).followUps));
+        const layoutOwnerId = deriveLayoutOwnerId(data);
+        const storageKey = createLayoutStorageKey(layoutOwnerId);
+        const companyCollapseStorageKey = createCompanyCollapseStorageKey(layoutOwnerId);
+        const projectCollapseStorageKey = createProjectCollapseStorageKey(layoutOwnerId);
+        layoutStorageKeyRef.current = storageKey;
+        companyCollapseStorageKeyRef.current = companyCollapseStorageKey;
+        projectCollapseStorageKeyRef.current = projectCollapseStorageKey;
+        const savedPositions = readSavedNodePositions(storageKey);
+        const graph = buildGraph(data);
+        const nextNodes = applySavedNodePositions(graph.nodes, savedPositions);
+        setNodes(nextNodes);
+        setEdges(graph.edges);
+        setCollapsedCompanies(
+          restoreSavedCollapsedCompanies(
+            data.companies.map((company) => company.id),
+            companyCollapseStorageKey,
+          ),
+        );
+        setCollapsedProjects(
+          restoreSavedCollapsedProjects(
+            data.projects.filter((project) => !project.company_id).map((project) => project.id),
+            projectCollapseStorageKey,
+          ),
+        );
+        syncNodePositionRefs(nextNodes);
         // Reset collapse state on fresh data load
         setMapCollapsed(false);
         setAnimationPhase("idle");
@@ -1591,7 +1617,10 @@ function MindMapCanvasInner() {
 
     setIsReorganizing(true);
     setTimeout(() => setIsReorganizing(false), 400);
-  }, [networkData, setNodes, setEdges]);
+    window.requestAnimationFrame(() => {
+      rfFitView({ padding: DENSER_RADIAL_LAYOUT.fitPadding, duration: 400 });
+    });
+  }, [networkData, setNodes, setEdges, rfFitView]);
 
   const closeSelectedContact = useCallback(() => {
     setSelectedContact(null);
@@ -2014,7 +2043,7 @@ function MindMapCanvasInner() {
           transition: "color 0.15s",
         }}
       >
-        {isReorganizing ? "↻ Organizing..." : "✦ Re-organize"}
+        {isReorganizing ? "↻ Organizing…" : "✦ Re-organize"}
       </button>
 
       {/* Search overlay — top center */}
@@ -2487,7 +2516,7 @@ function MindMapCanvasInner() {
               const group = projectContacts.filter((c) => c.type === type);
               if (group.length === 0) return null;
               const labels = { employee: "Co-founders / Team", vendor: "Vendors" };
-              const colors = { employee: "#22c55e", vendor: "#f97316", investor: "#14b8a6", cofounder: "#a855f7", partner: "#f59e0b" };
+              const colors = { employee: "#22c55e", vendor: "#f97316" };
               return (
                 <div key={type}>
                   <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--clay-text-muted)" }}>
