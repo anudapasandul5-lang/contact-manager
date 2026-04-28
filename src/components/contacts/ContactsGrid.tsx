@@ -44,6 +44,13 @@ const FILTERS: { label: string; value: DirectoryFilter; activeStyle?: React.CSSP
   },
 ];
 
+const FILTER_EMPTY: Partial<Record<DirectoryFilter, { message: string; sub: string }>> = {
+  vendor: { message: "No vendors yet", sub: "Add a vendor to see it here." },
+  investor: { message: "No investors yet", sub: "Use the + button to add your first investor." },
+  cofounder: { message: "No co-founders yet", sub: "Use the + button to add your first co-founder." },
+  partner: { message: "No partners yet", sub: "Use the + button to add your first partner." },
+};
+
 export function ContactsGrid() {
   const [contacts, setContacts] = useState<ContactWithRelations[]>([]);
   const [vendors, setVendors] = useState<VendorWithRelations[]>([]);
@@ -103,13 +110,6 @@ export function ContactsGrid() {
     () => filterDirectoryItems(directoryItems, filter, search),
     [directoryItems, filter, search],
   );
-
-  const FILTER_EMPTY: Partial<Record<DirectoryFilter, { message: string; sub: string }>> = {
-    vendor: { message: "No vendors yet", sub: "Add a vendor to see it here." },
-    investor: { message: "No investors yet", sub: "Use the + button to add your first investor." },
-    cofounder: { message: "No co-founders yet", sub: "Use the + button to add your first co-founder." },
-    partner: { message: "No partners yet", sub: "Use the + button to add your first partner." },
-  };
 
   const emptyMessage = search
     ? "No contacts or vendors match your search"
