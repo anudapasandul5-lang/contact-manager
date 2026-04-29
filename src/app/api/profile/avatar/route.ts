@@ -69,7 +69,9 @@ export async function POST(request: NextRequest) {
   );
 
   if (upsertError) {
-    await supabase.storage.from(MEDIA_BUCKET).remove([storagePath]);
+    if (previousPath !== storagePath) {
+      await supabase.storage.from(MEDIA_BUCKET).remove([storagePath]);
+    }
     const response = NextResponse.json({ error: upsertError.message }, { status: 500 });
     applySessionCookies(response, auth.resolved);
     return response;

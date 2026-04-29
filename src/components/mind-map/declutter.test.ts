@@ -9,21 +9,21 @@ import {
 
 function createNode(overrides: Partial<Node> & { id: string; type: string; data?: Record<string, unknown> }): Node {
   return {
+    ...overrides,
     id: overrides.id,
     type: overrides.type,
     position: { x: 0, y: 0 },
     data: overrides.data ?? {},
-    ...overrides,
   } as Node;
 }
 
 function createEdge(overrides: Partial<Edge> & { id: string; source: string; target: string }): Edge {
   return {
+    ...overrides,
     id: overrides.id,
     source: overrides.source,
     target: overrides.target,
     type: "default",
-    ...overrides,
   };
 }
 

@@ -61,8 +61,9 @@ export async function GET(request: NextRequest) {
   const legacyContacts = (legacyContactsRes.data as ContactWithRelations[] | null) ?? [];
 
   try {
-    await migrateLegacyVendorContacts(supabase, auth.user.id, legacyContacts);
-    const vendors = await fetchVendorsWithRelations(supabase, auth.user.id);
+    const vendorSupabase = supabase as unknown as Parameters<typeof migrateLegacyVendorContacts>[0];
+    await migrateLegacyVendorContacts(vendorSupabase, auth.user.id, legacyContacts);
+    const vendors = await fetchVendorsWithRelations(vendorSupabase, auth.user.id);
     const payload = vendors.length > 0 ? vendors : mapLegacyVendorContacts(legacyContacts, auth.user.id);
     const response = NextResponse.json(payload);
     applySessionCookies(response, auth.resolved);
@@ -85,7 +86,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const payload = parseVendorPayload(body);
     const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
-    const vendor = await createVendorWithRelations(supabase, auth.user.id, payload);
+    const vendor = await createVendorWithRelations(
+      supabase as unknown as Parameters<typeof createVendorWithRelations>[0],
+      auth.user.id,
+      payload,
+    );
 
     const response = NextResponse.json(vendor, { status: 201 });
     applySessionCookies(response, auth.resolved);

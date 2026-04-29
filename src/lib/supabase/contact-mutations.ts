@@ -13,7 +13,6 @@ export interface ContactMutationPayload {
 }
 
 type SupabaseLike = {
-  from: (table: string) => any;
   rpc: (
     fn: string,
     args?: Record<string, unknown>,

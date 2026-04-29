@@ -58,7 +58,7 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
 
   // Close when route changes.
   useEffect(() => {
-    setOpen(false);
+    queueMicrotask(() => setOpen(false));
   }, [pathname]);
 
   const value = useMemo(() => ({ open, setOpen, toggle }), [open, toggle]);

@@ -13,6 +13,10 @@
 # testing
 /coverage
 
+# local archive / generated workspace history
+/_archive
+../_archive/
+
 # next.js
 /.next/
 /out/
@@ -30,6 +34,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .worktrees/
+.planning/
+.superpowers/
+docs/superpowers/
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -53,3 +60,5 @@ output/
 # local tooling
 .claude/
 .playwright-cli/
+.logs/
+.vercel/

@@ -19,8 +19,27 @@ export interface VendorMutationPayload {
   people: VendorPersonMutationPayload[];
 }
 
+type SupabaseError = { code?: string; message: string };
+type MutationResult = { error: { message: string } | null };
+type SelectResult = { data: unknown; error: SupabaseError | null };
+
+type SelectBuilder = {
+  eq: (column: string, value: string) => SelectBuilder;
+  order: (column: string, options?: { ascending?: boolean }) => PromiseLike<SelectResult>;
+};
+
+type DeleteBuilder = {
+  eq: (column: string, value: string) => PromiseLike<MutationResult>;
+};
+
+type TableBuilder = {
+  select: (columns?: string) => SelectBuilder;
+  delete: () => DeleteBuilder;
+  insert: (rows: unknown) => PromiseLike<MutationResult>;
+};
+
 type SupabaseLike = {
-  from: (table: string) => any;
+  from: (table: string) => TableBuilder;
   rpc: (
     fn: string,
     args?: Record<string, unknown>,
@@ -63,7 +82,7 @@ async function replaceVendorJoinRows(
   }
 
   const rows = unique.map((id) => ({ vendor_id: vendorId, [key]: id }));
-  const { error: insertError } = await (supabase.from(table) as any).insert(rows);
+  const { error: insertError } = await supabase.from(table).insert(rows);
   if (insertError) {
     throw new Error(insertError.message);
   }
@@ -93,7 +112,7 @@ async function replaceVendorPeople(
     bio: person.bio,
   }));
 
-  const { error: insertError } = await (supabase.from("vendor_people") as any).insert(rows);
+  const { error: insertError } = await supabase.from("vendor_people").insert(rows);
   if (insertError) {
     throw new Error(insertError.message);
   }
@@ -197,11 +216,11 @@ export async function migrateLegacyVendorContacts(
     return { migrated: 0 };
   }
 
-  const existingVendorQuery = await (supabase
+  const existingVendorQuery = await supabase
     .from("vendors")
     .select("*")
     .eq("user_id", userId)
-    .order("name") as any);
+    .order("name");
 
   if (existingVendorQuery.error) {
     if (isMissingTableError(existingVendorQuery.error)) {
@@ -225,7 +244,7 @@ export async function migrateLegacyVendorContacts(
     }
 
     const vendorId = crypto.randomUUID();
-    const { error: vendorError } = await (supabase.from("vendors") as any).insert({
+    const { error: vendorError } = await supabase.from("vendors").insert({
       id: vendorId,
       user_id: userId,
       name: contact.name,

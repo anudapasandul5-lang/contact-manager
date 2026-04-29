@@ -18,7 +18,7 @@ function collectElementsByType(node: ReactNode, type: unknown): ReactElement[] {
   }
 
   const matches = node.type === type ? [node] : [];
-  const childNodes = node.props.children;
+  const childNodes = (node.props as { children?: ReactNode }).children;
 
   if (!childNodes) {
     return matches;
@@ -56,20 +56,20 @@ test("ContactCard renders an image when a contact photo URL is present", () => {
 });
 
 test("CompanyNode renders an image when a company logo URL is present", () => {
+  const props = {
+    id: "company-1",
+    data: {
+      label: "Alpha Corp",
+      initials: "AC",
+      logoUrl: "https://signed.test/company.png",
+      color: "#3b82f6",
+      isOwned: true,
+      contactCount: 3,
+    },
+  } as unknown as Parameters<typeof CompanyNode>[0];
+
   const markup = renderWithFlowProvider(
-    <CompanyNode
-      {...({
-        id: "company-1",
-        data: {
-          label: "Alpha Corp",
-          initials: "AC",
-          logoUrl: "https://signed.test/company.png",
-          color: "#3b82f6",
-          isOwned: true,
-          contactCount: 3,
-        },
-      } as never)}
-    />,
+    <CompanyNode {...props} />,
   );
 
   assert.match(markup, /<img[^>]+src="https:\/\/signed\.test\/company\.png"/);
@@ -78,37 +78,37 @@ test("CompanyNode renders an image when a company logo URL is present", () => {
 });
 
 test("ContactNode renders an image when a profile photo URL is present", () => {
+  const props = {
+    id: "contact-1",
+    data: {
+      label: "Sarah Johnson",
+      initials: "SJ",
+      photoUrl: "https://signed.test/contact.png",
+      contactType: "employee",
+      isShared: false,
+      companyNames: [],
+    },
+  } as unknown as Parameters<typeof ContactNode>[0];
+
   const markup = renderWithFlowProvider(
-    <ContactNode
-      {...({
-        id: "contact-1",
-        data: {
-          label: "Sarah Johnson",
-          initials: "SJ",
-          photoUrl: "https://signed.test/contact.png",
-          contactType: "employee",
-          isShared: false,
-          companyNames: [],
-        },
-      } as never)}
-    />,
+    <ContactNode {...props} />,
   );
 
   assert.match(markup, /<img[^>]+src="https:\/\/signed\.test\/contact\.png"/);
 });
 
 test("ProjectNode renders an image when a project logo URL is present", () => {
+  const props = {
+    id: "project-1",
+    data: {
+      label: "Launch",
+      logoUrl: "https://signed.test/project.webp",
+      status: "active",
+    },
+  } as unknown as Parameters<typeof ProjectNode>[0];
+
   const markup = renderWithFlowProvider(
-    <ProjectNode
-      {...({
-        id: "project-1",
-        data: {
-          label: "Launch",
-          logoUrl: "https://signed.test/project.webp",
-          status: "active",
-        },
-      } as never)}
-    />,
+    <ProjectNode {...props} />,
   );
 
   assert.match(markup, /<img[^>]+src="https:\/\/signed\.test\/project\.webp"/);
@@ -127,11 +127,17 @@ test("ProjectNode exposes both inbound and outbound handles for standalone proje
   const handles = collectElementsByType(tree, Handle);
 
   assert.ok(
-    handles.some((handle) => handle.props.type === "target" && handle.props.position === Position.Left),
+    handles.some((handle) => {
+      const props = handle.props as { type?: unknown; position?: unknown };
+      return props.type === "target" && props.position === Position.Left;
+    }),
     "expected ProjectNode to render a left target handle",
   );
   assert.ok(
-    handles.some((handle) => handle.props.type === "source" && handle.props.position === Position.Right),
+    handles.some((handle) => {
+      const props = handle.props as { type?: unknown; position?: unknown };
+      return props.type === "source" && props.position === Position.Right;
+    }),
     "expected ProjectNode to render a right source handle",
   );
 });

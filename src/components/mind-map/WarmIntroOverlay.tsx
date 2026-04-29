@@ -105,9 +105,21 @@ export function WarmIntroOverlay({
 
   useEffect(() => {
     const request = result?.existingRequest ?? null;
-    setMessageDraft(request?.message_draft ?? "");
-    setStatus(defaultStatus(request, result));
-    setOutcomeNotes(request?.outcome_notes ?? "");
+    let isStale = false;
+
+    queueMicrotask(() => {
+      if (isStale) {
+        return;
+      }
+
+      setMessageDraft(request?.message_draft ?? "");
+      setStatus(defaultStatus(request, result));
+      setOutcomeNotes(request?.outcome_notes ?? "");
+    });
+
+    return () => {
+      isStale = true;
+    };
   }, [result]);
 
   async function handleSave() {

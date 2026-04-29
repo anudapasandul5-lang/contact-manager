@@ -16,14 +16,18 @@ function createOrderedResult<T>(data: T) {
         return this;
       },
       order: async () => ({ data, error: null }),
+      maybeSingle: async () => ({
+        data: Array.isArray(data) ? (data[0] ?? null) : data,
+        error: null,
+      }),
     },
   };
 }
 
-function createSupabaseStub(results: Record<string, ReturnType<typeof createOrderedResult>>) {
+function createSupabaseStub(results: Partial<Record<string, ReturnType<typeof createOrderedResult>>>) {
   return {
     from(table: string) {
-      const result = results[table];
+      const result = results[table] ?? createOrderedResult(null);
       if (!result) {
         throw new Error(`Unexpected table ${table}`);
       }
@@ -51,6 +55,7 @@ test("fetchSupabaseNetworkData scopes base queries to the authenticated user", a
   const introRequests = createOrderedResult([]);
   const followUps = createOrderedResult([]);
   const vendors = createOrderedResult([]);
+  const userProfiles = createOrderedResult(null);
 
   const supabase = createSupabaseStub({
     contacts,
@@ -60,6 +65,7 @@ test("fetchSupabaseNetworkData scopes base queries to the authenticated user", a
     intro_requests: introRequests,
     follow_ups: followUps,
     vendors,
+    user_profiles: userProfiles,
   });
 
   await fetchSupabaseNetworkData("user-123", supabase as never);
@@ -71,6 +77,7 @@ test("fetchSupabaseNetworkData scopes base queries to the authenticated user", a
     ["person_relationships", relationships.queryCall],
     ["intro_requests", introRequests.queryCall],
     ["follow_ups", followUps.queryCall],
+    ["user_profiles", userProfiles.queryCall],
   ] as const) {
     assert.deepEqual(call.eqCalls, [{ column: "user_id", value: "user-123" }], `Expected ${table} to filter by user_id`);
   }
@@ -114,6 +121,7 @@ test("fetchSupabaseNetworkData normalizes legacy service providers into vendor c
 
   assert.equal(result.contacts.length, 1);
   assert.equal(result.contacts[0]?.type, "vendor");
+  assert.deepEqual(result.currentUser, { display_name: null, avatar_url: null });
 });
 
 test("fetchSupabaseNetworkData attaches signed media URLs to top-level and related entities", async () => {
@@ -210,6 +218,29 @@ test("fetchSupabaseNetworkData attaches signed media URLs to top-level and relat
     result.contacts[0]?.contact_projects[0]?.projects.logo_url,
     "https://signed.test/user-123/projects/project-1/logo.webp",
   );
+});
+
+test("fetchSupabaseNetworkData includes the signed current user profile", async () => {
+  const supabase = createSupabaseStub({
+    contacts: createOrderedResult([]),
+    companies: createOrderedResult([]),
+    projects: createOrderedResult([]),
+    person_relationships: createOrderedResult([]),
+    intro_requests: createOrderedResult([]),
+    follow_ups: createOrderedResult([]),
+    vendors: createOrderedResult([]),
+    user_profiles: createOrderedResult({
+      display_name: "Alice",
+      avatar_path: "user-123/profile/avatar.png",
+    }),
+  });
+
+  const result = await fetchSupabaseNetworkData("user-123", supabase as never);
+
+  assert.deepEqual(result.currentUser, {
+    display_name: "Alice",
+    avatar_url: "https://signed.test/user-123/profile/avatar.png",
+  });
 });
 
 test("fetchSupabaseNetworkData returns follow-ups ordered alongside the network payload", async () => {

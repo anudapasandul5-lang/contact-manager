@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Handle, Position } from "@xyflow/react";
 import { User } from "lucide-react";
 
+/* eslint-disable @next/next/no-img-element */
+
 interface CenterNodeProps {
   data: {
     isMapCollapsed?: boolean;
@@ -26,7 +28,7 @@ export function CenterNode({ data }: CenterNodeProps) {
 
   const label = data.displayName
     ? data.displayName.length > 14
-      ? `${data.displayName.slice(0, 13)}…`
+      ? `${data.displayName.slice(0, 13)}...`
       : data.displayName
     : "You";
 

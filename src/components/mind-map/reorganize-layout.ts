@@ -61,14 +61,6 @@ function toNodePosition(center: Position2D, nodeType: string | undefined) {
   };
 }
 
-function toNodeCenter(node: Node): Position2D {
-  const dimensions = nodeDimensions[node.type ?? "contact"] ?? nodeDimensions.contact;
-  return {
-    x: node.position.x + dimensions.width / 2,
-    y: node.position.y + dimensions.height / 2,
-  };
-}
-
 function seedPreservedAnchors(
   positionMap: Map<string, Position2D>,
   anchorEntries: Array<{ id: string; label: string }>,

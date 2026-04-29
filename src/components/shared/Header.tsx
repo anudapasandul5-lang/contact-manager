@@ -7,6 +7,8 @@ import { Network, Users, Sun, Moon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
 
+/* eslint-disable @next/next/no-img-element */
+
 interface HeaderProps {
   avatarUrl?: string | null;
   displayName?: string | null;
@@ -165,7 +167,7 @@ export function Header({ avatarUrl, displayName, email }: HeaderProps) {
             title="Sign out"
           >
             <LogOut className="h-4 w-4" />
-            <span className="text-sm">{isPending ? "Signing out…" : "Sign Out"}</span>
+            <span className="text-sm">{isPending ? "Signing out..." : "Sign Out"}</span>
           </button>
         </div>
       </div>

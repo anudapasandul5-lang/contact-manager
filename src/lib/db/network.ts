@@ -82,8 +82,6 @@ export async function fetchNetworkData(userId: string): Promise<NetworkData> {
     ]);
 
     const contactIds = (contactsResult.rows as ContactRow[]).map((contact) => contact.id);
-    const companyIds = (companiesResult.rows as CompanyRow[]).map((company) => company.id);
-    const projectIds = (projectsResult.rows as ProjectRow[]).map((project) => project.id);
     const vendorIds = (vendorsResult.rows as VendorRow[]).map((vendor) => vendor.id);
 
     const [

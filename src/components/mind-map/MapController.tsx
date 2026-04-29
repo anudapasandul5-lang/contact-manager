@@ -34,6 +34,7 @@ export function MapController({
   const hasInitialized = useRef(false);
   const previousSearchQuery = useRef(searchQuery);
   const prevFocusSourceRef = useRef<FocusSource>(null);
+  const pendingUnfocusZoomRef = useRef(false);
 
   // One-time initial fit when nodes first load
   useEffect(() => {
@@ -84,21 +85,30 @@ export function MapController({
     });
   }, [fitView, focusNodeIds, focusSource, isAnimating]);
 
+  // Detect company → unfocus transition and mark pending zoom
   useEffect(() => {
     const prev = prevFocusSourceRef.current;
     prevFocusSourceRef.current = focusSource;
 
-    if (prev === "company" && focusSource === null && !isAnimating) {
-      const mainNodes = getNodes()
-        .filter((n) => n.type === "center" || n.type === "company")
-        .map((n) => ({ id: n.id }));
-      fitView({
-        nodes: mainNodes.length > 0 ? mainNodes : undefined,
-        padding: 0.35,
-        duration: 400,
-      });
+    if (prev === "company" && focusSource === null) {
+      pendingUnfocusZoomRef.current = true;
     }
-  }, [fitView, focusSource, isAnimating]);
+  }, [focusSource]);
+
+  // Fire zoom once pending and animation has settled
+  useEffect(() => {
+    if (!pendingUnfocusZoomRef.current || isAnimating) return;
+    pendingUnfocusZoomRef.current = false;
+
+    const mainNodes = getNodes()
+      .filter((n) => n.type === "center" || n.type === "company")
+      .map((n) => ({ id: n.id }));
+    fitView({
+      nodes: mainNodes.length > 0 ? mainNodes : undefined,
+      padding: 0.35,
+      duration: 400,
+    });
+  }, [fitView, getNodes, isAnimating]);
 
   useEffect(() => {
     const previousQuery = previousSearchQuery.current;

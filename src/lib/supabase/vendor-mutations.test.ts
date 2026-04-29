@@ -7,14 +7,21 @@ import {
 
 function makeRpcSpy(result: { data: unknown; error: null | { message: string } }) {
   const calls: { fn: string; args: Record<string, unknown> }[] = [];
+  const selectBuilder = {
+    eq: () => selectBuilder,
+    order: () => Promise.resolve({ data: [], error: null }),
+  };
+  const mutationResult = Promise.resolve({ error: null });
   const supabase = {
     from: () => ({
-      insert: () => ({ select: () => ({ single: () => Promise.resolve({ data: null, error: null }) }) }),
-      update: () => ({ eq: () => ({ eq: () => ({ select: () => ({ maybeSingle: () => Promise.resolve({ data: null, error: null }) }) }) }) }),
-      delete: () => ({ eq: () => Promise.resolve({ error: null }) }),
-      select: () => ({ order: () => Promise.resolve({ data: [], error: null }), eq: () => Promise.resolve({ data: [], error: null }) }),
+      insert: () => mutationResult,
+      delete: () => ({ eq: () => mutationResult }),
+      select: () => selectBuilder,
     }),
-    rpc: (fn: string, args: Record<string, unknown>) => {
+    rpc: (fn: string, args?: Record<string, unknown>) => {
+      if (!args) {
+        throw new Error("Expected RPC args.");
+      }
       calls.push({ fn, args });
       return Promise.resolve(result);
     },
@@ -28,7 +35,7 @@ test("createVendorWithRelations calls create_vendor_with_relations RPC", async (
     error: null,
   });
 
-  await createVendorWithRelations(supabase as any, "user-1", {
+  await createVendorWithRelations(supabase as Parameters<typeof createVendorWithRelations>[0], "user-1", {
     name: "Acme",
     specialty: "Design",
     notes: null,
@@ -46,7 +53,7 @@ test("createVendorWithRelations calls create_vendor_with_relations RPC", async (
   assert.deepEqual(calls[0]!.args["p_project_ids"], []);
   const people = calls[0]!.args["p_people"] as unknown[];
   assert.equal(people.length, 1);
-  assert.equal((people[0] as any).name, "Alice");
+  assert.equal((people[0] as { name?: unknown }).name, "Alice");
 });
 
 test("updateVendorWithRelations calls update_vendor_with_relations RPC", async () => {
@@ -55,7 +62,7 @@ test("updateVendorWithRelations calls update_vendor_with_relations RPC", async (
     error: null,
   });
 
-  await updateVendorWithRelations(supabase as any, "user-1", "vendor-1", {
+  await updateVendorWithRelations(supabase as Parameters<typeof updateVendorWithRelations>[0], "user-1", "vendor-1", {
     name: "Acme Updated",
     specialty: null,
     notes: "new notes",
@@ -78,7 +85,7 @@ test("createVendorWithRelations throws when RPC returns an error", async () => {
 
   await assert.rejects(
     () =>
-      createVendorWithRelations(supabase as any, "user-1", {
+      createVendorWithRelations(supabase as Parameters<typeof createVendorWithRelations>[0], "user-1", {
         name: "X",
         specialty: null,
         notes: null,

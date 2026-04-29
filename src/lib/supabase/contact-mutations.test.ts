@@ -9,7 +9,10 @@ function makeRpcSpy(result: { data: unknown; error: null | { message: string } }
   const calls: { fn: string; args: Record<string, unknown> }[] = [];
   const supabase = {
     from: () => ({}),
-    rpc: (fn: string, args: Record<string, unknown>) => {
+    rpc: (fn: string, args?: Record<string, unknown>) => {
+      if (!args) {
+        throw new Error("Expected RPC args.");
+      }
       calls.push({ fn, args });
       return Promise.resolve(result);
     },

@@ -8,6 +8,7 @@ function createVendor(): VendorWithRelations {
 
   return {
     id: "vendor-1",
+    user_id: "user-1",
     name: "Acme Printing",
     specialty: "Print shop",
     notes: null,
@@ -18,6 +19,7 @@ function createVendor(): VendorWithRelations {
       {
         companies: {
           id: "company-1",
+          user_id: "user-1",
           name: "Acme Co",
           industry: "Printing",
           color: null,
@@ -30,6 +32,7 @@ function createVendor(): VendorWithRelations {
       {
         projects: {
           id: "project-1",
+          user_id: "user-1",
           name: "Rebrand",
           status: "active",
           company_id: "company-1",

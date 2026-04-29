@@ -48,7 +48,10 @@ export function RelationshipManager({
     () => directContacts.filter((candidate) => candidate.id !== contact.id),
     [contact.id, directContacts],
   );
-  const [selectedConnectorId, setSelectedConnectorId] = useState("");
+  const [selectedConnectorIdState, setSelectedConnectorId] = useState("");
+  const selectedConnectorId = candidates.some((candidate) => candidate.id === selectedConnectorIdState)
+    ? selectedConnectorIdState
+    : candidates[0]?.id ?? "";
   const [howTheyKnow, setHowTheyKnow] = useState("");
   const [notes, setNotes] = useState("");
 
@@ -58,18 +61,16 @@ export function RelationshipManager({
   );
 
   useEffect(() => {
-    setSelectedConnectorId((prev) => prev || candidates[0]?.id || "");
-  }, [candidates]);
+    queueMicrotask(() => {
+      if (!currentRelationship) {
+        setHowTheyKnow("");
+        setNotes("");
+        return;
+      }
 
-  useEffect(() => {
-    if (!currentRelationship) {
-      setHowTheyKnow("");
-      setNotes("");
-      return;
-    }
-
-    setHowTheyKnow(currentRelationship.how_they_know_each_other ?? "");
-    setNotes(currentRelationship.notes ?? "");
+      setHowTheyKnow(currentRelationship.how_they_know_each_other ?? "");
+      setNotes(currentRelationship.notes ?? "");
+    });
   }, [currentRelationship]);
 
   if (candidates.length === 0) {

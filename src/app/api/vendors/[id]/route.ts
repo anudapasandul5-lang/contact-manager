@@ -17,7 +17,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const body = await request.json();
     const payload = parseVendorPayload(body);
     const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
-    await updateVendorWithRelations(supabase, auth.user.id, id, payload);
+    await updateVendorWithRelations(
+      supabase as unknown as Parameters<typeof updateVendorWithRelations>[0],
+      auth.user.id,
+      id,
+      payload,
+    );
 
     const response = NextResponse.json({ success: true });
     applySessionCookies(response, auth.resolved);

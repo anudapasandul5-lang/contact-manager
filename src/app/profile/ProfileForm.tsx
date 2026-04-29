@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
+/* eslint-disable @next/next/no-img-element */
+
 interface ProfileFormProps {
   initialDisplayName: string | null;
   initialAvatarUrl: string | null;
@@ -183,7 +185,7 @@ export function ProfileForm({ initialDisplayName, initialAvatarUrl, email }: Pro
             style={{ color: "var(--clay-text-muted)" }}
           >
             <Trash2 style={{ width: 13, height: 13 }} />
-            {isDeletingAvatar ? "Removing…" : "Remove photo"}
+            {isDeletingAvatar ? "Removing..." : "Remove photo"}
           </button>
         )}
       </div>
@@ -208,7 +210,7 @@ export function ProfileForm({ initialDisplayName, initialAvatarUrl, email }: Pro
           size="sm"
           className="self-end"
         >
-          {isSavingName ? "Saving…" : "Save name"}
+          {isSavingName ? "Saving..." : "Save name"}
         </Button>
       </div>
 

@@ -133,7 +133,7 @@ export function ContactsGrid() {
         </p>
       </div>
 
-      <StatsBar items={directoryItems} />
+      <StatsBar items={directoryItems} activeFilter={filter} onFilterChange={setFilter} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">

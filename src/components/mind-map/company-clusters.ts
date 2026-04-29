@@ -18,10 +18,7 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-function isProjectedCompanyMember(contact: ContactWithRelations) {
-  if ((contact.type !== "employee" && contact.type !== "vendor")) {
-    return false;
-  }
+function isProjectedCompanyMember(_contact: ContactWithRelations) {
   return true;
 }
 
