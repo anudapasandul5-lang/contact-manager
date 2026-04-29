@@ -2,7 +2,7 @@ DO $$ BEGIN
   -- Convert user_id from text to uuid if column is still text type
   IF EXISTS (
     SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'user_profiles' AND column_name = 'user_id' AND data_type = 'text'
+    WHERE table_schema = 'public' AND table_name = 'user_profiles' AND column_name = 'user_id' AND data_type = 'text'
   ) THEN
     ALTER TABLE user_profiles ALTER COLUMN user_id TYPE uuid USING user_id::uuid;
   END IF;
@@ -10,15 +10,19 @@ DO $$ BEGIN
   -- Add created_at if missing (baseline migration didn't include it)
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'user_profiles' AND column_name = 'created_at'
+    WHERE table_schema = 'public' AND table_name = 'user_profiles' AND column_name = 'created_at'
   ) THEN
     ALTER TABLE user_profiles ADD COLUMN created_at timestamptz NOT NULL DEFAULT now();
   END IF;
 
   -- Add FK to auth.users if no FK constraint exists yet
   IF NOT EXISTS (
-    SELECT 1 FROM information_schema.table_constraints
-    WHERE table_name = 'user_profiles' AND constraint_type = 'FOREIGN KEY'
+    SELECT 1 FROM pg_constraint c
+    JOIN pg_class t ON t.oid = c.conrelid
+    JOIN pg_namespace n ON n.oid = t.relnamespace
+    WHERE n.nspname = 'public'
+      AND t.relname = 'user_profiles'
+      AND c.conname = 'user_profiles_user_id_fkey'
   ) THEN
     ALTER TABLE user_profiles
       ADD CONSTRAINT user_profiles_user_id_fkey
