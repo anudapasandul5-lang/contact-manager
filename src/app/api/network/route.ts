@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authenticateRequest, applySessionCookies } from "@/lib/auth/session";
 import { fetchSupabaseNetworkData } from "@/lib/supabase/network";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticateRequest(request);
