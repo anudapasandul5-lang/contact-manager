@@ -107,11 +107,20 @@ export async function fetchSupabaseNetworkData(
   const rawContacts = ((contactsRes.data as ContactWithRelations[]) ?? []).map((contact) => normalizeContactType(contact));
   const rawCompanies = (companiesRes.data as Company[]) ?? [];
   const rawProjects = (projectsRes.data as Project[]) ?? [];
-  const companies = await attachSignedMediaUrls(supabase as never, "company", rawCompanies);
-  const projects = await attachSignedMediaUrls(supabase as never, "project", rawProjects);
+  const [companies, projects, contactsWithSignedMedia, vendors, profileRes] = await Promise.all([
+    attachSignedMediaUrls(supabase as never, "company", rawCompanies),
+    attachSignedMediaUrls(supabase as never, "project", rawProjects),
+    attachSignedMediaUrls(supabase as never, "contact", rawContacts),
+    fetchVendorsWithRelations(supabase as never, userId),
+    supabase
+      .from("user_profiles")
+      .select("display_name, avatar_path")
+      .eq("user_id", userId)
+      .maybeSingle(),
+  ]);
+
   const companiesById = new Map(companies.map((company) => [company.id, company]));
   const projectsById = new Map(projects.map((project) => [project.id, project]));
-  const contactsWithSignedMedia = await attachSignedMediaUrls(supabase as never, "contact", rawContacts);
   const contacts = applyRelatedMediaToContacts(
     contactsWithSignedMedia,
     mapEntitiesById(companies),
@@ -123,15 +132,6 @@ export async function fetchSupabaseNetworkData(
   const followUps = isMissingTableError(followUpsRes.error)
     ? []
     : ((followUpsRes.data as FollowUp[] | null) ?? []);
-
-  const [vendors, profileRes] = await Promise.all([
-    fetchVendorsWithRelations(supabase as never, userId),
-    supabase
-      .from("user_profiles")
-      .select("display_name, avatar_path")
-      .eq("user_id", userId)
-      .maybeSingle(),
-  ]);
 
   const avatarUrl =
     !profileRes.error && profileRes.data?.avatar_path
