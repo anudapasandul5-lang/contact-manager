@@ -750,7 +750,7 @@ function computeFilterVisuals(
 
 function MindMapCanvasInner() {
   const queryClient = useQueryClient();
-  const { data: networkData, isLoading, isError } = useNetworkQuery();
+  const { data: networkData, isError } = useNetworkQuery();
   const prevNetworkDataRef = useRef<NetworkData | null>(null);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -1912,17 +1912,6 @@ function MindMapCanvasInner() {
     },
     [onNodesChange],
   );
-
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center" style={{ background: "var(--clay-bg)", transition: "background 0.3s ease" }}>
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-teal-200 border-t-teal-500" />
-          <p className="text-sm text-slate-500">Loading network...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (isError) {
     return (

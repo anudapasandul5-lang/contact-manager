@@ -55,7 +55,7 @@ const FILTER_EMPTY: Partial<Record<DirectoryFilter, { message: string; sub: stri
 };
 
 export function ContactsGrid() {
-  const { data, isLoading } = useNetworkQuery();
+  const { data } = useNetworkQuery();
   const qc = useQueryClient();
   const contacts = data?.contacts ?? [];
   const vendors = data?.vendors ?? [];
@@ -156,20 +156,7 @@ export function ContactsGrid() {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-36 animate-pulse rounded-2xl"
-              style={{
-                background: "linear-gradient(145deg, #e8e4de, #ddd9d3)",
-                boxShadow: "3px 3px 8px rgba(0,0,0,0.06), -2px -2px 6px rgba(255,255,255,0.8)",
-              }}
-            />
-          ))}
-        </div>
-      ) : filteredItems.length === 0 ? (
+      {filteredItems.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center rounded-2xl py-20 text-center"
           style={{

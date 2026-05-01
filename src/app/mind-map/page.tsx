@@ -14,7 +14,9 @@ export default async function MindMapPage() {
   const resolved = await resolveSessionFromCookies(cookieStore);
   if (!resolved.user) redirect("/login");
 
-  const qc = new QueryClient();
+  const qc = new QueryClient({
+    defaultOptions: { queries: { staleTime: 5 * 60_000 } },
+  });
   await qc.prefetchQuery({
     queryKey: queryKeys.network.all,
     queryFn: () =>
