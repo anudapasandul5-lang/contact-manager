@@ -111,6 +111,23 @@ const nodeTypes = {
   vendor: VendorNode,
 };
 
+const proOptions = { hideAttribution: true };
+
+const reactFlowStyle = { background: "var(--clay-bg)", transition: "background 0.3s ease" };
+
+const wrapperStyle = { position: "absolute", inset: 0, background: "#f5f0eb" } as const;
+
+const miniMapNodeColor = (node: any) => {
+  if (node.type === "center") return "#38bdf8";
+  if (node.type === "company") return (node.data.color as string) || "#3b82f6";
+  if (node.type === "vendor") return (node.data.color as string) || "#f97316";
+  if (node.type === "project") return "#64748b";
+  const ct = node.data.contactType as string;
+  if (ct === "employee") return "#22c55e";
+  if (ct === "vendor") return "#f97316";
+  return "#94a3b8";
+};
+
 const contactTypeLabels: Record<ContactType, string> = {
   employee: "Employee",
   vendor: "Vendor",
@@ -1924,7 +1941,7 @@ function MindMapCanvasInner() {
   }
 
   return (
-    <div style={{ position: "absolute", inset: 0, background: "#f5f0eb" }}>
+    <div style={wrapperStyle}>
       <ReactFlow
         onInit={(instance) => setCurrentZoomLevel(instance.getViewport().zoom)}
         nodes={displayNodes}
@@ -1944,8 +1961,8 @@ function MindMapCanvasInner() {
         onMove={(_, viewport) => setCurrentZoomLevel(viewport.zoom)}
         nodesDraggable={true}
         nodesConnectable={false}
-        proOptions={{ hideAttribution: true }}
-        style={{ background: "var(--clay-bg)", transition: "background 0.3s ease" }}
+        proOptions={proOptions}
+        style={reactFlowStyle}
       >
         <Background variant={BackgroundVariant.Dots} gap={28} size={0.8} color="#d6cfc6" />
         <Controls
@@ -1956,16 +1973,7 @@ function MindMapCanvasInner() {
           position="bottom-left"
           pannable
           zoomable
-          nodeColor={(node) => {
-            if (node.type === "center") return "#38bdf8";
-            if (node.type === "company") return (node.data.color as string) || "#3b82f6";
-            if (node.type === "vendor") return (node.data.color as string) || "#f97316";
-            if (node.type === "project") return "#64748b";
-            const ct = node.data.contactType as string;
-            if (ct === "employee") return "#22c55e";
-            if (ct === "vendor") return "#f97316";
-            return "#94a3b8";
-          }}
+          nodeColor={miniMapNodeColor}
           maskColor="var(--clay-mask)"
         />
         <MapController
