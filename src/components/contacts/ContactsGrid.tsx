@@ -1,7 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Search, Users } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNetworkQuery } from "@/lib/hooks/queries/useNetworkQuery";
+import { queryKeys } from "@/lib/query/keys";
 import type { ContactWithRelations, VendorWithRelations } from "@/lib/supabase/types";
 import { StatsBar } from "./StatsBar";
 import { ContactCard } from "./ContactCard";
@@ -52,9 +55,11 @@ const FILTER_EMPTY: Partial<Record<DirectoryFilter, { message: string; sub: stri
 };
 
 export function ContactsGrid() {
-  const [contacts, setContacts] = useState<ContactWithRelations[]>([]);
-  const [vendors, setVendors] = useState<VendorWithRelations[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useNetworkQuery();
+  const qc = useQueryClient();
+  const contacts = data?.contacts ?? [];
+  const vendors = data?.vendors ?? [];
+
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<DirectoryFilter>("all");
   const [editingContact, setEditingContact] = useState<ContactWithRelations | null>(null);
@@ -62,47 +67,14 @@ export function ContactsGrid() {
   const [editingVendor, setEditingVendor] = useState<VendorWithRelations | null>(null);
   const [deletingVendor, setDeletingVendor] = useState<VendorWithRelations | null>(null);
 
-  const fetchDirectoryData = useCallback(async () => {
-    setLoading(true);
-
-    try {
-      const [contactsRes, vendorsRes] = await Promise.all([
-        fetch("/api/contacts"),
-        fetch("/api/vendors"),
-      ]);
-      const [contactsData, vendorsData] = await Promise.all([
-        contactsRes.json(),
-        vendorsRes.json(),
-      ]);
-
-      setContacts(Array.isArray(contactsData) ? contactsData : []);
-      setVendors(Array.isArray(vendorsData) ? vendorsData : []);
-    } catch {
-      setContacts([]);
-      setVendors([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchDirectoryData();
-  }, [fetchDirectoryData]);
-
-  useEffect(() => {
-    const handler = () => fetchDirectoryData();
-    window.addEventListener("contact-manager:data-changed", handler);
-    return () => window.removeEventListener("contact-manager:data-changed", handler);
-  }, [fetchDirectoryData]);
-
   async function handleDeleteContact(contact: ContactWithRelations) {
     await fetch(`/api/contacts/${contact.id}`, { method: "DELETE" });
-    window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+    void qc.invalidateQueries({ queryKey: queryKeys.network.all });
   }
 
   async function handleDeleteVendor(vendor: VendorWithRelations) {
     await fetch(`/api/vendors/${vendor.id}`, { method: "DELETE" });
-    window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+    void qc.invalidateQueries({ queryKey: queryKeys.network.all });
   }
 
   const directoryItems = useMemo(() => buildDirectoryItems(contacts, vendors), [contacts, vendors]);
@@ -184,7 +156,7 @@ export function ContactsGrid() {
         </div>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
@@ -248,14 +220,14 @@ export function ContactsGrid() {
         open={!!editingContact}
         onOpenChange={(open) => !open && setEditingContact(null)}
         contact={editingContact ?? undefined}
-        onSaved={fetchDirectoryData}
+        onSaved={() => void qc.invalidateQueries({ queryKey: queryKeys.network.all })}
       />
 
       <VendorModal
         open={!!editingVendor}
         onOpenChange={(open) => !open && setEditingVendor(null)}
         vendor={editingVendor ?? undefined}
-        onSaved={fetchDirectoryData}
+        onSaved={() => void qc.invalidateQueries({ queryKey: queryKeys.network.all })}
       />
 
       <ConfirmDialog
