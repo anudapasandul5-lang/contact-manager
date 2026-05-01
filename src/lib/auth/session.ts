@@ -1,4 +1,3 @@
-import { cache } from "react";
 import { createClient, type Session, type User } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseEnv } from "@/lib/supabase/config";
@@ -119,7 +118,7 @@ export function clearSessionCookies(response: NextResponse) {
   response.cookies.set(REFRESH_TOKEN_COOKIE, "", getCookieOptions(0));
 }
 
-export const authenticateRequest = cache(async (request: NextRequest) => {
+export async function authenticateRequest(request: NextRequest) {
   const resolved = await resolveSessionFromCookies(request.cookies);
 
   if (!resolved.user) {
@@ -129,4 +128,4 @@ export const authenticateRequest = cache(async (request: NextRequest) => {
   }
 
   return { user: resolved.user, resolved } as const;
-});
+}
