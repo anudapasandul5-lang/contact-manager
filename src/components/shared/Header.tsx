@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Network, Users, Sun, Moon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
@@ -25,6 +26,7 @@ export function Header({ avatarUrl, displayName, email }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const qc = useQueryClient();
   const { theme, toggleTheme, mounted } = useTheme();
   const isDark = mounted && theme === "dark";
 
@@ -36,6 +38,7 @@ export function Header({ avatarUrl, displayName, email }: HeaderProps) {
 
   async function handleSignOut() {
     await fetch("/api/auth/sign-out", { method: "POST" });
+    qc.clear();
     startTransition(() => {
       router.replace("/login");
       router.refresh();
