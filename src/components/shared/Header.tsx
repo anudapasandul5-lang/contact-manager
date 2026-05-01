@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Network, Users, Sun, Moon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
+import { fetchAllNetworkData } from "@/lib/db/queries";
+import { queryKeys } from "@/lib/query/keys";
 
 /* eslint-disable @next/next/no-img-element */
 
@@ -14,6 +16,16 @@ interface HeaderProps {
   avatarUrl?: string | null;
   displayName?: string | null;
   email?: string | null;
+}
+
+function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number) {
+  let timer: ReturnType<typeof setTimeout>;
+  const debounced = (...args: Parameters<T>) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+  debounced.cancel = () => clearTimeout(timer);
+  return debounced;
 }
 
 const tabs = [
@@ -29,6 +41,20 @@ export function Header({ avatarUrl, displayName, email }: HeaderProps) {
   const qc = useQueryClient();
   const { theme, toggleTheme, mounted } = useTheme();
   const isDark = mounted && theme === "dark";
+
+  const debouncedPrefetch = useMemo(
+    () =>
+      debounce(
+        () =>
+          void qc.prefetchQuery({
+            queryKey: queryKeys.network.all,
+            queryFn: fetchAllNetworkData,
+            staleTime: 5 * 60_000,
+          }),
+        150,
+      ),
+    [qc],
+  );
 
   const initials = displayName
     ? displayName.charAt(0).toUpperCase()
@@ -105,6 +131,8 @@ export function Header({ avatarUrl, displayName, email }: HeaderProps) {
                         }
                       : { color: "var(--clay-text-muted)" }
                   }
+                  onMouseEnter={debouncedPrefetch}
+                  onMouseLeave={() => debouncedPrefetch.cancel()}
                 >
                   <tab.icon
                     className="h-3.5 w-3.5"
