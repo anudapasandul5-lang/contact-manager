@@ -18,7 +18,9 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import { fetchAllNetworkData } from "@/lib/db/queries";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNetworkQuery } from "@/lib/hooks/queries/useNetworkQuery";
+import { queryKeys } from "@/lib/query/keys";
 import type {
   NetworkData,
   ContactType,
@@ -747,11 +749,12 @@ function computeFilterVisuals(
 // ────────────────────────────────────────────────────────────────────
 
 function MindMapCanvasInner() {
+  const queryClient = useQueryClient();
+  const { data: networkData, isLoading, isError } = useNetworkQuery();
+  const prevNetworkDataRef = useRef<NetworkData | null>(null);
+
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const [networkData, setNetworkData] = useState<NetworkData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [editingVendor, setEditingVendor] = useState<VendorWithRelations | null>(null);
@@ -875,58 +878,42 @@ function MindMapCanvasInner() {
     }
   }, []);
 
-  const loadData = useCallback(() => {
-    if (isAnimatingRef.current) return; // Guard: don't reset during animation
-    fetchAllNetworkData()
-      .then((data) => {
-        setNetworkData(data);
-        setFollowUps(normalizeFollowUps((data as NetworkDataWithFollowUps).followUps));
-        const layoutOwnerId = deriveLayoutOwnerId(data);
-        const storageKey = createLayoutStorageKey(layoutOwnerId);
-        const companyCollapseStorageKey = createCompanyCollapseStorageKey(layoutOwnerId);
-        const projectCollapseStorageKey = createProjectCollapseStorageKey(layoutOwnerId);
-        layoutStorageKeyRef.current = storageKey;
-        companyCollapseStorageKeyRef.current = companyCollapseStorageKey;
-        projectCollapseStorageKeyRef.current = projectCollapseStorageKey;
-        const savedPositions = readSavedNodePositions(storageKey);
-        const graph = buildGraph(data);
-        const nextNodes = applySavedNodePositions(graph.nodes, savedPositions);
-        setNodes(nextNodes);
-        setEdges(graph.edges);
-        setCollapsedCompanies(
-          restoreSavedCollapsedCompanies(
-            data.companies.map((company) => company.id),
-            companyCollapseStorageKey,
-          ),
-        );
-        setCollapsedProjects(
-          restoreSavedCollapsedProjects(
-            data.projects.filter((project) => !project.company_id).map((project) => project.id),
-            projectCollapseStorageKey,
-          ),
-        );
-        syncNodePositionRefs(nextNodes);
-        // Reset collapse state on fresh data load
-        setMapCollapsed(false);
-        setAnimationPhase("idle");
-      })
-      .catch((err) => {
-        console.error("Failed to fetch network data:", err);
-        setError("Failed to load network data. Check your Supabase connection.");
-        setFollowUps([]);
-      })
-      .finally(() => setLoading(false));
-  }, [setNodes, setEdges, syncNodePositionRefs]);
-
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (isAnimatingRef.current) return;
+    if (!networkData) return;
+    if (networkData === prevNetworkDataRef.current) return;
+    prevNetworkDataRef.current = networkData;
 
-  useEffect(() => {
-    const handler = () => loadData();
-    window.addEventListener("contact-manager:data-changed", handler);
-    return () => window.removeEventListener("contact-manager:data-changed", handler);
-  }, [loadData]);
+    setFollowUps(normalizeFollowUps((networkData as NetworkDataWithFollowUps).followUps));
+    const layoutOwnerId = deriveLayoutOwnerId(networkData);
+    const storageKey = createLayoutStorageKey(layoutOwnerId);
+    const companyCollapseStorageKey = createCompanyCollapseStorageKey(layoutOwnerId);
+    const projectCollapseStorageKey = createProjectCollapseStorageKey(layoutOwnerId);
+    layoutStorageKeyRef.current = storageKey;
+    companyCollapseStorageKeyRef.current = companyCollapseStorageKey;
+    projectCollapseStorageKeyRef.current = projectCollapseStorageKey;
+    const savedPositions = readSavedNodePositions(storageKey);
+    const graph = buildGraph(networkData);
+    const nextNodes = applySavedNodePositions(graph.nodes, savedPositions);
+    setNodes(nextNodes);
+    setEdges(graph.edges);
+    setCollapsedCompanies(
+      restoreSavedCollapsedCompanies(
+        networkData.companies.map((company) => company.id),
+        companyCollapseStorageKey,
+      ),
+    );
+    setCollapsedProjects(
+      restoreSavedCollapsedProjects(
+        networkData.projects.filter((project) => !project.company_id).map((project) => project.id),
+        projectCollapseStorageKey,
+      ),
+    );
+    syncNodePositionRefs(nextNodes);
+    // Reset collapse state on fresh data load
+    setMapCollapsed(false);
+    setAnimationPhase("idle");
+  }, [networkData, setNodes, setEdges, syncNodePositionRefs]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(COMPACT_CONTACT_RAIL_QUERY);
@@ -981,13 +968,13 @@ function MindMapCanvasInner() {
         return;
       }
 
-      await loadData();
+      await queryClient.invalidateQueries({ queryKey: queryKeys.network.all });
     } catch (relationshipError) {
       setActionMessage(relationshipError instanceof Error ? relationshipError.message : "Failed to save relationship.");
     } finally {
       setRelationshipSaving(false);
     }
-  }, [loadData]);
+  }, [queryClient]);
 
   const updateFollowUp = useCallback(async (
     followUp: MindMapFollowUp,
@@ -1926,7 +1913,7 @@ function MindMapCanvasInner() {
     [onNodesChange],
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center" style={{ background: "var(--clay-bg)", transition: "background 0.3s ease" }}>
         <div className="flex flex-col items-center gap-3">
@@ -1937,11 +1924,11 @@ function MindMapCanvasInner() {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-600">
-          {error}
+          Failed to load network data. Check your Supabase connection.
         </div>
       </div>
     );
@@ -2262,7 +2249,7 @@ function MindMapCanvasInner() {
             try {
               const res = await fetch(`/api/${endpoint}/${rawId}`, { method: "DELETE" });
               if (!res.ok) throw new Error("Delete failed");
-              loadData(); // background sync — position-preserving, no visible change
+              void queryClient.invalidateQueries({ queryKey: queryKeys.network.all }); // background sync
             } catch {
               setNodes(prevNodes);
               setEdges(prevEdges);
@@ -2322,7 +2309,7 @@ function MindMapCanvasInner() {
         contact={editingContact ?? undefined}
         onSaved={() => {
           setEditingContact(null);
-          loadData();
+          void queryClient.invalidateQueries({ queryKey: queryKeys.network.all });
         }}
       />
 
