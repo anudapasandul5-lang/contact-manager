@@ -1,0 +1,26 @@
+-- A3a: user_id index audit for hot tables
+-- Checked: contacts, companies, projects, vendors, person_relationships,
+--          intro_requests, follow_ups, user_profiles,
+--          contact_companies, contact_projects, vendor_companies,
+--          vendor_projects, vendor_people
+--
+-- Already indexed (from 20260401_user_owned_network.sql):
+--   contacts              → contacts_user_id_idx
+--   companies             → companies_user_id_idx
+--   projects              → projects_user_id_idx
+--   vendors               → vendors_user_id_idx
+--   person_relationships  → person_relationships_user_id_idx
+--   intro_requests        → intro_requests_user_id_idx
+--
+-- follow_ups: user_id is leading column in two composite indexes
+--   (user_id, contact_id) and (user_id, scheduled_for) — Postgres uses
+--   these for WHERE user_id = ? scans; standalone index would be redundant.
+--   Adding it anyway for explicit coverage per A3a spec.
+--
+-- user_profiles: user_id is PRIMARY KEY — PK index covers all lookups.
+--
+-- Tables without user_id column (skipped):
+--   contact_companies, contact_projects, vendor_companies,
+--   vendor_projects, vendor_people
+
+CREATE INDEX IF NOT EXISTS idx_follow_ups_user_id ON follow_ups(user_id);
