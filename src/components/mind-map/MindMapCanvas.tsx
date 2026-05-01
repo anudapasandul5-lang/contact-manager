@@ -1961,6 +1961,7 @@ function MindMapCanvasInner() {
         onMove={(_, viewport) => setCurrentZoomLevel(viewport.zoom)}
         nodesDraggable={true}
         nodesConnectable={false}
+        onlyRenderVisibleElements
         proOptions={proOptions}
         style={reactFlowStyle}
       >
