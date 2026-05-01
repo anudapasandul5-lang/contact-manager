@@ -156,7 +156,32 @@ export function ContactsGrid() {
         </div>
       </div>
 
-      {filteredItems.length === 0 ? (
+      {contacts.length === 0 && vendors.length === 0 && !search && filter === "all" ? (
+        <div
+          className="flex flex-col items-center justify-center rounded-2xl py-20 text-center"
+          style={{
+            background: "linear-gradient(145deg, var(--clay-card), var(--clay-card-end))",
+            boxShadow: "5px 5px 14px rgba(0,0,0,0.06), -3px -3px 10px rgba(255,255,255,0.9)",
+            border: "1px dashed rgba(0,0,0,0.1)",
+          }}
+        >
+          <div
+            className="flex h-14 w-14 items-center justify-center rounded-full mb-4"
+            style={{
+              background: "linear-gradient(145deg, #d1fae5, #a7f3d0)",
+              boxShadow: "inset 1px 1px 3px rgba(255,255,255,0.7), inset -1px -1px 2px rgba(0,0,0,0.05)",
+            }}
+          >
+            <Users className="h-6 w-6" style={{ color: "#059669" }} />
+          </div>
+          <p className="text-sm font-medium" style={{ color: "var(--clay-text)" }}>
+            Add your first contact
+          </p>
+          <p className="text-xs mt-1" style={{ color: "#94a3b8" }}>
+            Use the + button to get started.
+          </p>
+        </div>
+      ) : filteredItems.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center rounded-2xl py-20 text-center"
           style={{
