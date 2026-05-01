@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Search, Users } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNetworkQuery } from "@/lib/hooks/queries/useNetworkQuery";
 import { queryKeys } from "@/lib/query/keys";
@@ -14,9 +15,10 @@ import {
   filterDirectoryItems,
   type DirectoryFilter,
 } from "./directory-items";
-import { ContactModal } from "@/components/shared/ContactModal";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
-import { VendorModal } from "@/components/shared/VendorModal";
+
+const ContactModal = dynamic(() => import("@/components/shared/ContactModal").then((m) => m.ContactModal), { ssr: false });
+const ConfirmDialog = dynamic(() => import("@/components/shared/ConfirmDialog").then((m) => m.ConfirmDialog), { ssr: false });
+const VendorModal = dynamic(() => import("@/components/shared/VendorModal").then((m) => m.VendorModal), { ssr: false });
 
 const FILTERS: { label: string; value: DirectoryFilter; activeStyle?: React.CSSProperties }[] = [
   { label: "All", value: "all" },

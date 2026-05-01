@@ -3,11 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Plus, User, Building2, FolderKanban, Truck } from "lucide-react";
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
-import { ContactModal } from "./ContactModal";
-import { CompanyModal } from "./CompanyModal";
-import { ProjectModal } from "./ProjectModal";
-import { VendorModal } from "./VendorModal";
+
+const ContactModal = dynamic(() => import("./ContactModal").then((m) => m.ContactModal), { ssr: false });
+const CompanyModal = dynamic(() => import("./CompanyModal").then((m) => m.CompanyModal), { ssr: false });
+const ProjectModal = dynamic(() => import("./ProjectModal").then((m) => m.ProjectModal), { ssr: false });
+const VendorModal = dynamic(() => import("./VendorModal").then((m) => m.VendorModal), { ssr: false });
 
 const MENU_ITEMS = [
   { label: "Add Contact", icon: User, action: "contact" as const, color: "#4ade80", glow: "rgba(34,197,94,0.3)" },
