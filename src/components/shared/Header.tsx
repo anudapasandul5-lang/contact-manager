@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
+import { useState, useTransition, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -55,6 +55,8 @@ export function Header({ avatarUrl, displayName, email }: HeaderProps) {
       ),
     [qc],
   );
+
+  useEffect(() => () => debouncedPrefetch.cancel(), [debouncedPrefetch]);
 
   const initials = displayName
     ? displayName.charAt(0).toUpperCase()
