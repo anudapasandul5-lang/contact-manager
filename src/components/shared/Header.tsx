@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useMemo, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Network, Users, Sun, Moon, LogOut } from "lucide-react";
@@ -9,8 +10,6 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
 import { fetchAllNetworkData } from "@/lib/db/queries";
 import { queryKeys } from "@/lib/query/keys";
-
-/* eslint-disable @next/next/no-img-element */
 
 interface HeaderProps {
   avatarUrl?: string | null;
@@ -173,11 +172,13 @@ export function Header({ avatarUrl, displayName, email }: HeaderProps) {
             title="Profile settings"
           >
             {avatarUrl && !avatarBroken ? (
-              <img
+              <Image
                 src={avatarUrl}
                 alt={displayName ? `${displayName}'s profile` : "Your profile"}
                 referrerPolicy="no-referrer"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                width={32}
+                height={32}
+                style={{ objectFit: "cover" }}
                 onError={() => setAvatarBroken(true)}
               />
             ) : (

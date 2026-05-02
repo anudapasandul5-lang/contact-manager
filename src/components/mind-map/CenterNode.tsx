@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Handle, Position } from "@xyflow/react";
 import { User } from "lucide-react";
-
-/* eslint-disable @next/next/no-img-element */
 
 interface CenterNodeProps {
   data: {
@@ -68,11 +67,13 @@ export function CenterNode({ data }: CenterNodeProps) {
         }}
       >
         {data.photoUrl && !imgError ? (
-          <img
+          <Image
             src={data.photoUrl}
             alt={data.displayName ? `${data.displayName}'s profile photo` : "Your profile"}
             referrerPolicy="no-referrer"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            width={44}
+            height={44}
+            style={{ objectFit: "cover" }}
             onError={() => setImgError(true)}
           />
         ) : (
