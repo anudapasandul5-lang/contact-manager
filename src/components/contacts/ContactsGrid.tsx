@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNetworkQuery } from "@/lib/hooks/queries/useNetworkQuery";
 import { queryKeys } from "@/lib/query/keys";
 import { useDeleteContact } from "@/lib/hooks/mutations/useDeleteContact";
+import { useDeleteVendor } from "@/lib/hooks/mutations/useDeleteVendor";
 import type { ContactWithRelations, VendorWithRelations } from "@/lib/supabase/types";
 import { StatsBar } from "./StatsBar";
 import { ContactCard } from "./ContactCard";
@@ -71,11 +72,7 @@ export function ContactsGrid() {
   const [deletingVendor, setDeletingVendor] = useState<VendorWithRelations | null>(null);
 
   const deleteContact = useDeleteContact();
-
-  async function handleDeleteVendor(vendor: VendorWithRelations) {
-    await fetch(`/api/vendors/${vendor.id}`, { method: "DELETE" });
-    void qc.invalidateQueries({ queryKey: queryKeys.network.all });
-  }
+  const deleteVendor = useDeleteVendor();
 
   const directoryItems = useMemo(() => buildDirectoryItems(contacts, vendors), [contacts, vendors]);
   const filteredItems = useMemo(
@@ -259,7 +256,7 @@ export function ContactsGrid() {
         title="Delete Vendor"
         description={`Remove ${deletingVendor?.name} from your network? This cannot be undone.`}
         onConfirm={() => {
-          if (deletingVendor) handleDeleteVendor(deletingVendor);
+          if (deletingVendor) deleteVendor.mutate(deletingVendor.id);
           setDeletingVendor(null);
         }}
       />
