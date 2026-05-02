@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNetworkQuery } from "@/lib/hooks/queries/useNetworkQuery";
 import { queryKeys } from "@/lib/query/keys";
+import { useDeleteContact } from "@/lib/hooks/mutations/useDeleteContact";
 import type { ContactWithRelations, VendorWithRelations } from "@/lib/supabase/types";
 import { StatsBar } from "./StatsBar";
 import { ContactCard } from "./ContactCard";
@@ -69,10 +70,7 @@ export function ContactsGrid() {
   const [editingVendor, setEditingVendor] = useState<VendorWithRelations | null>(null);
   const [deletingVendor, setDeletingVendor] = useState<VendorWithRelations | null>(null);
 
-  async function handleDeleteContact(contact: ContactWithRelations) {
-    await fetch(`/api/contacts/${contact.id}`, { method: "DELETE" });
-    void qc.invalidateQueries({ queryKey: queryKeys.network.all });
-  }
+  const deleteContact = useDeleteContact();
 
   async function handleDeleteVendor(vendor: VendorWithRelations) {
     await fetch(`/api/vendors/${vendor.id}`, { method: "DELETE" });
@@ -250,7 +248,7 @@ export function ContactsGrid() {
         title="Delete Contact"
         description={`Remove ${deletingContact?.name} from your network? This cannot be undone.`}
         onConfirm={() => {
-          if (deletingContact) handleDeleteContact(deletingContact);
+          if (deletingContact) deleteContact.mutate(deletingContact.id);
           setDeletingContact(null);
         }}
       />
