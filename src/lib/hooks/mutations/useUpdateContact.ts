@@ -36,7 +36,9 @@ export function useUpdateContact() {
         return {
           ...old,
           contacts: old.contacts.map((c) =>
-            c.id === input.id ? { ...c, ...input } : c,
+            c.id === input.id
+              ? { ...c, name: input.name, email: input.email ?? c.email, phone: input.phone ?? c.phone, role: input.role ?? c.role, notes: input.notes ?? c.notes, bio: input.bio ?? c.bio }
+              : c,
           ),
         };
       });
