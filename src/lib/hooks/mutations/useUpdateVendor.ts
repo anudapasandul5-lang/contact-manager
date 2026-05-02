@@ -7,7 +7,7 @@ import type { NetworkData } from "@/lib/supabase/types";
 
 export interface UpdateVendorInput {
   id: string;
-  name?: string;
+  name: string;
   specialty?: string | null;
   notes?: string | null;
   color?: string | null;
