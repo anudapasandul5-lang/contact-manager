@@ -48,16 +48,9 @@ import { CompanyNode } from "./CompanyNode";
 import { ContactNode } from "./ContactNode";
 import { ProjectNode } from "./ProjectNode";
 import { VendorNode } from "./VendorNode";
-import { StatsOverlay } from "./StatsOverlay";
-import { SearchOverlay } from "./SearchOverlay";
+import dynamic from "next/dynamic";
 import { MapController } from "./MapController";
 import { ContactSidePanel } from "./ContactSidePanel";
-import { FilterOverlay } from "./FilterOverlay";
-import { CompanyModal } from "@/components/shared/CompanyModal";
-import { ProjectModal } from "@/components/shared/ProjectModal";
-import { ContactModal } from "@/components/shared/ContactModal";
-import { VendorModal } from "@/components/shared/VendorModal";
-import { WelcomeOverlay } from "./WelcomeOverlay";
 import { ContextMenu, type ContextMenuState } from "./ContextMenu";
 import type { GravityTarget } from "./GravityOverlay";
 import { deriveDisplayEdge } from "./edge-visibility";
@@ -100,6 +93,15 @@ import {
 import { buildArcLayout, buildSortedRingLayout, buildTieredArcLayout, sortByLabel } from "./radial-layout";
 import { buildCompanyClusterGraph } from "./company-clusters";
 import { createReorganizedGraphState } from "./reorganize-layout";
+
+const StatsOverlay = dynamic(() => import("./StatsOverlay").then((m) => m.StatsOverlay), { ssr: false });
+const SearchOverlay = dynamic(() => import("./SearchOverlay").then((m) => m.SearchOverlay), { ssr: false });
+const FilterOverlay = dynamic(() => import("./FilterOverlay").then((m) => m.FilterOverlay), { ssr: false });
+const CompanyModal = dynamic(() => import("@/components/shared/CompanyModal").then((m) => m.CompanyModal), { ssr: false });
+const ProjectModal = dynamic(() => import("@/components/shared/ProjectModal").then((m) => m.ProjectModal), { ssr: false });
+const ContactModal = dynamic(() => import("@/components/shared/ContactModal").then((m) => m.ContactModal), { ssr: false });
+const VendorModal = dynamic(() => import("@/components/shared/VendorModal").then((m) => m.VendorModal), { ssr: false });
+const WelcomeOverlay = dynamic(() => import("./WelcomeOverlay").then((m) => m.WelcomeOverlay), { ssr: false });
 
 const ALL_GRAVITY_TARGETS = new Set<GravityTarget>(["company", "employee", "vendor", "project"]);
 
