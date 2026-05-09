@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, timestamp, pgEnum, primaryKey, boolean, uniqueIndex, index, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, pgEnum, primaryKey, boolean, uniqueIndex, index, uuid, AnyPgColumn } from "drizzle-orm/pg-core";
 
 export const contactTypeEnum = pgEnum("contact_type", [
   "employee",
@@ -82,11 +82,22 @@ export const vendorPeople = pgTable("vendor_people", {
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const businesses = pgTable("businesses", {
+  id: text("id").primaryKey(),
+  user_id: text("user_id").notNull(),
+  name: text("name").notNull(),
+  color: text("color").notNull().default("#6b7280"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+}, (t) => [
+  index("businesses_user_id_idx").on(t.user_id),
+]);
+
 export const projects = pgTable("projects", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   status: projectStatusEnum("status").notNull().default("planning"),
   company_id: text("company_id").references(() => companies.id, { onDelete: "set null" }),
+  business_id: text("business_id").references(() => businesses.id, { onDelete: "set null" }),
   user_id: text("user_id"),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
@@ -175,6 +186,7 @@ export const followUps = pgTable("follow_ups", {
     .references(() => contacts.id, { onDelete: "cascade" }),
   company_id: text("company_id").references(() => companies.id, { onDelete: "set null" }),
   project_id: text("project_id").references(() => projects.id, { onDelete: "set null" }),
+  business_id: text("business_id").references(() => businesses.id, { onDelete: "set null" }),
   objective: text("objective").notNull(),
   notes: text("notes"),
   scheduled_for: timestamp("scheduled_for", { withTimezone: true }).notNull(),
@@ -187,6 +199,53 @@ export const followUps = pgTable("follow_ups", {
     .on(t.user_id, t.contact_id)
     .where(sql`${t.completed_at} IS NULL`),
   index("follow_ups_user_scheduled_idx").on(t.user_id, t.scheduled_for),
+]);
+
+export const tasks = pgTable("tasks", {
+  id: text("id").primaryKey(),
+  user_id: text("user_id").notNull(),
+  title: text("title").notNull(),
+  notes: text("notes"),
+  project_id: text("project_id").references(() => projects.id, { onDelete: "set null" }),
+  contact_id: text("contact_id").references(() => contacts.id, { onDelete: "set null" }),
+  company_id: text("company_id").references(() => companies.id, { onDelete: "set null" }),
+  business_id: text("business_id").references(() => businesses.id, { onDelete: "set null" }),
+  defer_date: timestamp("defer_date", { withTimezone: true }),
+  due_date: timestamp("due_date", { withTimezone: true }),
+  completed_at: timestamp("completed_at", { withTimezone: true }),
+  parent_task_id: text("parent_task_id").references((): AnyPgColumn => tasks.id, { onDelete: "set null" }),
+  recurrence_rule: text("recurrence_rule"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+}, (t) => [
+  index("tasks_user_id_idx").on(t.user_id),
+  index("tasks_user_due_date_idx").on(t.user_id, t.due_date),
+  index("tasks_user_defer_date_idx").on(t.user_id, t.defer_date),
+  index("tasks_parent_task_id_idx").on(t.parent_task_id),
+]);
+
+export const contactBusinesses = pgTable("contact_businesses", {
+  contact_id: text("contact_id").notNull().references(() => contacts.id, { onDelete: "cascade" }),
+  business_id: text("business_id").notNull().references(() => businesses.id, { onDelete: "cascade" }),
+}, (t) => [
+  primaryKey({ columns: [t.contact_id, t.business_id] }),
+  index("contact_businesses_business_id_idx").on(t.business_id),
+]);
+
+export const companyBusinesses = pgTable("company_businesses", {
+  company_id: text("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+  business_id: text("business_id").notNull().references(() => businesses.id, { onDelete: "cascade" }),
+}, (t) => [
+  primaryKey({ columns: [t.company_id, t.business_id] }),
+  index("company_businesses_business_id_idx").on(t.business_id),
+]);
+
+export const vendorBusinesses = pgTable("vendor_businesses", {
+  vendor_id: text("vendor_id").notNull().references(() => vendors.id, { onDelete: "cascade" }),
+  business_id: text("business_id").notNull().references(() => businesses.id, { onDelete: "cascade" }),
+}, (t) => [
+  primaryKey({ columns: [t.vendor_id, t.business_id] }),
+  index("vendor_businesses_business_id_idx").on(t.business_id),
 ]);
 
 export const userProfiles = pgTable("user_profiles", {
