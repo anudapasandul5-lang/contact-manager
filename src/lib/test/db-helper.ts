@@ -17,6 +17,9 @@ export async function createTestDb() {
   const connectionString = process.env.DATABASE_URL_TEST;
   const client = postgres(connectionString, {
     ssl: connectionString.includes("localhost") ? false : "require",
+    // Transaction-mode pooler (Supabase port 6543) requires prepare: false.
+    // Prepared statements are not supported across PgBouncer transaction boundaries.
+    prepare: false,
   });
   const db = drizzle(client, { schema });
 

@@ -5,6 +5,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Mock server-only so it's a no-op in Vitest (Node env, not Next.js RSC).
+      // The package throws in non-server contexts; tests run fine without the guard.
+      "server-only": path.resolve(__dirname, "src/lib/test/server-only-mock.ts"),
     },
   },
   test: {
