@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Personal Operations Hub — Build Plan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #111827;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --soft: #f9fafb;
+    --accent: #4f46e5;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+  }
+  html, body { font-family: 'Inter', system-ui, sans-serif; color: var(--ink); }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .page { max-width: 880px; margin: 0 auto; padding: 56px 48px; }
+  .section { margin-top: 56px; }
+  h1 { letter-spacing: -0.025em; }
+  h2 { letter-spacing: -0.02em; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 6px;
+    font-size: 11px; font-weight: 500;
+    background: var(--soft); color: var(--muted);
+    border: 1px solid var(--line);
+  }
+  .pill {
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 500;
+    border: 1px solid var(--line); background: white;
+  }
+  .pill.active { background: var(--ink); color: white; border-color: var(--ink); }
+  .biz-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .card { background: white; border: 1px solid var(--line); border-radius: 12px; }
+  .col-head { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+  .task-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    border: 1px solid var(--line); background: white;
+  }
+  .task-row + .task-row { margin-top: 6px; }
+  .checkbox { width: 16px; height: 16px; border: 1.5px solid #d1d5db; border-radius: 4px; flex-shrink: 0; }
+  .meta { font-size: 11px; color: var(--muted); }
+  .overdue { color: var(--red); }
+  .due-today { color: var(--amber); }
+  .accent-bar { height: 3px; width: 32px; background: var(--accent); border-radius: 2px; }
+  .phase-row {
+    display: grid; grid-template-columns: 64px 1fr;
+    align-items: start; gap: 16px;
+    padding: 16px 0; border-bottom: 1px solid var(--line);
+  }
+  .phase-row:last-child { border-bottom: none; }
+  .week-tag {
+    background: #eef2ff; color: var(--accent);
+    border: 1px solid #e0e7ff;
+    padding: 4px 8px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; text-align: center;
+  }
+  .outcome-card {
+    background: var(--soft);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  @media print {
+    @page { margin: 0.5in; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { padding: 0; }
+    .section { page-break-inside: avoid; }
+    .mockup { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body class="bg-white">
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header>
+    <div class="flex items-center gap-2 mb-6">
+      <span class="chip">Internal Tool · Build Plan</span>
+      <span class="chip">May 2026</span>
+    </div>
+    <h1 class="text-5xl font-extrabold leading-tight">Personal Operations Hub</h1>
+    <p class="mt-3 text-xl text-gray-600 max-w-2xl">A second brain for running multiple businesses solo — without dropping anything.</p>
+    <div class="accent-bar mt-6"></div>
+  </header>
+
+  <!-- PROBLEM -->
+  <section class="section">
+    <h2 class="text-2xl font-bold mb-4">The problem</h2>
+    <p class="text-gray-700 leading-relaxed mb-4 max-w-2xl">
+      Running multiple businesses under one banner means juggling dozens of contacts, projects, follow-ups, and commitments — across ventures that don't share a system. Today this lives in scattered pieces: Notion, phone notes, head-storage, half-remembered intentions.
+    </p>
+    <div class="grid grid-cols-2 gap-3 mt-6">
+      <div class="card p-4"><div class="text-sm font-semibold mb-1">Lost context</div><div class="meta">Which contact was tied to which project, again?</div></div>
+      <div class="card p-4"><div class="text-sm font-semibold mb-1">Missed follow-ups</div><div class="meta">"I'll get back to you next week" — and forgot.</div></div>
+      <div class="card p-4"><div class="text-sm font-semibold mb-1">No workload view</div><div class="meta">Which business is starving this week?</div></div>
+      <div class="card p-4"><div class="text-sm font-semibold mb-1">Capture leaks</div><div class="meta">Ideas in shower, in car, in line — gone.</div></div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section class="section">
+    <h2 class="text-2xl font-bold mb-2">The solution</h2>
+    <p class="text-gray-700 leading-relaxed mb-6 max-w-2xl">
+      Extend the existing Mindmap app into a full operations hub. Tasks layer on top of the relationship graph. Workload visible across all businesses in one screen. Voice-capture from anywhere. Daily email at 7am.
+    </p>
+    <p class="text-gray-700 leading-relaxed max-w-2xl">
+      <strong>The killer feature:</strong> workload through a relationship lens. The mindmap shows your network. Tasks reveal which parts of that network are getting attention — and which are rotting. No other tool does this.
+    </p>
+  </section>
+
+  <!-- MOCKUP 1: FORECAST -->
+  <section class="section mockup">
+    <h2 class="text-2xl font-bold mb-1">What it looks like — Forecast view</h2>
+    <p class="meta mb-4">The daily-driver page. Open laptop → see today across all businesses.</p>
+    <div class="card p-5">
+      <!-- Top bar -->
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <div class="text-lg font-bold">Forecast</div>
+          <div class="meta">Monday, May 4</div>
+        </div>
+        <div class="flex gap-2">
+          <span class="pill active">All</span>
+          <span class="pill"><span class="biz-dot" style="background:#4f46e5"></span> Biz 1</span>
+          <span class="pill"><span class="biz-dot" style="background:#10b981"></span> Biz 2</span>
+          <span class="pill"><span class="biz-dot" style="background:#f59e0b"></span> Biz 3</span>
+        </div>
+      </div>
+      <!-- Columns -->
+      <div class="grid grid-cols-5 gap-3">
+        <div>
+          <div class="col-head overdue mb-2">Overdue · 2</div>
+          <div class="task-row" style="border-color:#fecaca; background:#fef2f2"><span class="checkbox"></span><span class="text-sm">Send invoice — Acme</span></div>
+          <div class="task-row" style="border-color:#fecaca; background:#fef2f2"><span class="checkbox"></span><span class="text-sm">Reply to Maria</span></div>
+        </div>
+        <div>
+          <div class="col-head due-today mb-2">Today · 5</div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Proposal review</span></div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Call vendor — pricing</span></div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Sign contract draft</span></div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Standup notes</span></div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Bank transfer</span></div>
+        </div>
+        <div>
+          <div class="col-head mb-2">Tomorrow · 3</div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Pitch deck v2</span></div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Onboarding call</span></div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Review Q2 hires</span></div>
+        </div>
+        <div>
+          <div class="col-head mb-2">This week · 8</div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Renewal — Globex</span></div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Brand audit</span></div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Tax docs</span></div>
+        </div>
+        <div>
+          <div class="col-head mb-2">Later · 14</div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">Annual review prep</span></div>
+          <div class="task-row"><span class="checkbox"></span><span class="text-sm">New office tour</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOCKUP 2: SWIM LANES -->
+  <section class="section mockup">
+    <h2 class="text-2xl font-bold mb-1">Swim lanes — workload by business</h2>
+    <p class="meta mb-4">Toggle from columns. See "Biz 3 has 0 today, Biz 1 has 14" — rebalance before Friday.</p>
+    <div class="card p-5">
+      <!-- Lane 1 -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="biz-dot" style="background:#4f46e5"></span>
+          <span class="font-semibold text-sm">Biz 1</span>
+          <span class="meta">· 14 today</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="task-row" style="background:#eef2ff; border-color:#e0e7ff"><span class="checkbox"></span><span class="text-sm">Send invoice — Acme</span></div>
+          <div class="task-row" style="background:#eef2ff; border-color:#e0e7ff"><span class="checkbox"></span><span class="text-sm">Sign contract draft</span></div>
+          <div class="task-row" style="background:#eef2ff; border-color:#e0e7ff"><span class="checkbox"></span><span class="text-sm">+12 more</span></div>
+        </div>
+      </div>
+      <!-- Lane 2 -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="biz-dot" style="background:#10b981"></span>
+          <span class="font-semibold text-sm">Biz 2</span>
+          <span class="meta">· 3 today</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="task-row" style="background:#ecfdf5; border-color:#d1fae5"><span class="checkbox"></span><span class="text-sm">Pitch deck v2</span></div>
+          <div class="task-row" style="background:#ecfdf5; border-color:#d1fae5"><span class="checkbox"></span><span class="text-sm">Standup notes</span></div>
+          <div class="task-row" style="background:#ecfdf5; border-color:#d1fae5"><span class="checkbox"></span><span class="text-sm">+1 more</span></div>
+        </div>
+      </div>
+      <!-- Lane 3 -->
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="biz-dot" style="background:#f59e0b"></span>
+          <span class="font-semibold text-sm">Biz 3</span>
+          <span class="meta overdue">· 0 today — starving</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="task-row" style="background:#fffbeb; border-color:#fef3c7; opacity:0.6"><span class="text-sm meta">No tasks scheduled</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOCKUP 3: MINDMAP -->
+  <section class="section mockup">
+    <h2 class="text-2xl font-bold mb-1">Mindmap with attention overlay</h2>
+    <p class="meta mb-4">Red rings = nodes you've been ghosting. Your network through an attention lens.</p>
+    <div class="card p-5" style="background:#fafafa">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="pill">Filter: rotting nodes</span>
+        <span class="pill">Show overdue only</span>
+      </div>
+      <!-- SVG mindmap mockup -->
+      <svg viewBox="0 0 760 320" class="w-full">
+        <!-- Edges -->
+        <line x1="380" y1="160" x2="160" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <line x1="380" y1="160" x2="160" y2="240" stroke="#d1d5db" stroke-width="1.5"/>
+        <line x1="380" y1="160" x2="600" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <line x1="380" y1="160" x2="600" y2="240" stroke="#d1d5db" stroke-width="1.5"/>
+        <line x1="160" y1="80" x2="80" y2="160" stroke="#d1d5db" stroke-width="1.5"/>
+        <line x1="600" y1="240" x2="700" y2="160" stroke="#d1d5db" stroke-width="1.5"/>
+        <!-- Center -->
+        <circle cx="380" cy="160" r="34" fill="#fff" stroke="#111827" stroke-width="2"/>
+        <text x="380" y="165" text-anchor="middle" font-size="12" font-weight="600" font-family="Inter">You</text>
+        <!-- Healthy -->
+        <circle cx="160" cy="80" r="26" fill="#fff" stroke="#10b981" stroke-width="2"/>
+        <text x="160" y="84" text-anchor="middle" font-size="11" font-family="Inter">John</text>
+        <!-- Rotting (red ring) -->
+        <circle cx="160" cy="240" r="26" fill="#fff" stroke="#ef4444" stroke-width="3"/>
+        <text x="160" y="244" text-anchor="middle" font-size="11" font-family="Inter">Maria</text>
+        <text x="160" y="280" text-anchor="middle" font-size="9" fill="#ef4444" font-family="Inter" font-weight="600">3 overdue</text>
+        <!-- Healthy -->
+        <circle cx="600" cy="80" r="26" fill="#fff" stroke="#10b981" stroke-width="2"/>
+        <text x="600" y="84" text-anchor="middle" font-size="11" font-family="Inter">Acme</text>
+        <!-- Rotting -->
+        <circle cx="600" cy="240" r="26" fill="#fff" stroke="#ef4444" stroke-width="3"/>
+        <text x="600" y="244" text-anchor="middle" font-size="11" font-family="Inter">Globex</text>
+        <text x="600" y="280" text-anchor="middle" font-size="9" fill="#ef4444" font-family="Inter" font-weight="600">2 overdue</text>
+        <!-- Outliers -->
+        <circle cx="80" cy="160" r="22" fill="#fff" stroke="#d1d5db" stroke-width="1.5"/>
+        <text x="80" y="164" text-anchor="middle" font-size="10" font-family="Inter">Vendor X</text>
+        <circle cx="700" cy="160" r="22" fill="#fff" stroke="#d1d5db" stroke-width="1.5"/>
+        <text x="700" y="164" text-anchor="middle" font-size="10" font-family="Inter">Project Y</text>
+      </svg>
+      <div class="grid grid-cols-3 gap-3 mt-4 text-xs">
+        <div class="flex items-center gap-2"><span class="biz-dot" style="background:#10b981"></span><span class="meta">Healthy — recent contact</span></div>
+        <div class="flex items-center gap-2"><span class="biz-dot" style="background:#ef4444"></span><span class="meta">Overdue tasks attached</span></div>
+        <div class="flex items-center gap-2"><span class="biz-dot" style="background:#d1d5db"></span><span class="meta">Inactive</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="section">
+    <h2 class="text-2xl font-bold mb-1">Build timeline</h2>
+    <p class="meta mb-4">6 phases. ~4–5 weeks full-time.</p>
+    <div class="card p-2 px-5">
+      <div class="phase-row">
+        <div class="week-tag">Week 1</div>
+        <div>
+          <div class="font-semibold text-sm">Foundation — schema &amp; API</div>
+          <div class="meta">Businesses table, junctions, tasks table (with subtasks + recurrence). REST endpoints. Backfill existing owned companies into businesses.</div>
+        </div>
+      </div>
+      <div class="phase-row">
+        <div class="week-tag">Week 2</div>
+        <div>
+          <div class="font-semibold text-sm">Forecast &amp; side panel</div>
+          <div class="meta">/forecast page with five date columns. Business filter chips. Mindmap nodes show their tasks in a side panel on click.</div>
+        </div>
+      </div>
+      <div class="phase-row">
+        <div class="week-tag">Week 3</div>
+        <div>
+          <div class="font-semibold text-sm">Capture &amp; reminders</div>
+          <div class="meta">Cmd+K global quick-add. iOS Shortcut for voice capture. Right-click on graph nodes → add task. 7am daily email digest.</div>
+        </div>
+      </div>
+      <div class="phase-row">
+        <div class="week-tag">Week 4</div>
+        <div>
+          <div class="font-semibold text-sm">Swim lanes &amp; overlay</div>
+          <div class="meta">Toggle forecast view to per-business swim lanes. Overdue overlay on mindmap (red rings). PWA — install on phone.</div>
+        </div>
+      </div>
+      <div class="phase-row">
+        <div class="week-tag">Week 5</div>
+        <div>
+          <div class="font-semibold text-sm">Subtasks</div>
+          <div class="meta">Nested tasks. Drag to reparent. Recursive completion. Checklist view on each task.</div>
+        </div>
+      </div>
+      <div class="phase-row">
+        <div class="week-tag">Week 6</div>
+        <div>
+          <div class="font-semibold text-sm">Recurring tasks</div>
+          <div class="meta">"Every Monday", "first of the month", "every 2 weeks". Generator spawns next instance on completion.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUTCOMES -->
+  <section class="section">
+    <h2 class="text-2xl font-bold mb-4">What changes for you</h2>
+    <div class="grid grid-cols-3 gap-4">
+      <div class="outcome-card">
+        <div class="text-xs font-semibold uppercase text-indigo-600 tracking-wide mb-2">Daily</div>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>One screen shows today's load across all businesses.</li>
+          <li>Voice capture: "Hey Siri, add task…" — done.</li>
+          <li>7am email tells you the day before coffee.</li>
+          <li>Cmd+K captures from anywhere in 2 seconds.</li>
+          <li>Click a contact → see their tasks instantly.</li>
+        </ul>
+      </div>
+      <div class="outcome-card">
+        <div class="text-xs font-semibold uppercase text-emerald-600 tracking-wide mb-2">Weekly</div>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>Sunday review: see which business is starving.</li>
+          <li>Mindmap reveals contacts you've been ghosting.</li>
+          <li>Recurring tasks fire on their own — invoices, reviews, check-ins.</li>
+          <li>Inbox triage as morning ritual. Empty by 9am.</li>
+        </ul>
+      </div>
+      <div class="outcome-card">
+        <div class="text-xs font-semibold uppercase text-amber-600 tracking-wide mb-2">Strategic</div>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>One source of truth replaces Notion + phone + head.</li>
+          <li>Same network serves all 3 businesses without fragmenting.</li>
+          <li>Workload data drives decisions on which business to feed.</li>
+          <li>Reputation: stops dropping balls across ventures.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCOPE -->
+  <section class="section">
+    <h2 class="text-2xl font-bold mb-4">What this is — and isn't</h2>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="card p-5">
+        <div class="font-semibold mb-3 flex items-center gap-2"><span style="color:var(--green)">●</span> In scope</div>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>Tasks with due + defer dates</li>
+          <li>Forecast view + business swim lanes</li>
+          <li>Subtasks (nested) + recurring tasks</li>
+          <li>Mindmap integration (side panel, overlay, quick-add)</li>
+          <li>Voice capture via iOS Shortcut</li>
+          <li>Daily email digest at 7am</li>
+          <li>Installable PWA — works on phone</li>
+        </ul>
+      </div>
+      <div class="card p-5">
+        <div class="font-semibold mb-3 flex items-center gap-2"><span style="color:var(--muted)">●</span> Out of scope (v1)</div>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>CRM lead pipeline / deal stages</li>
+          <li>Tags (cut for simplicity)</li>
+          <li>Team collaboration / multi-user</li>
+          <li>Email integration (auto-task-from-email)</li>
+          <li>Native iOS / Android app</li>
+          <li>Accounting, billing, contracts</li>
+          <li>Marketing or lead-gen automation</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH FOOTER -->
+  <section class="section">
+    <h2 class="text-2xl font-bold mb-3">Build approach</h2>
+    <p class="text-gray-700 leading-relaxed max-w-2xl">
+      Extends the existing Mindmap codebase (Next.js + Supabase + React Flow). No platform migration. Same hosting, same auth, same database. New features layer on top of an already-working graph.
+    </p>
+    <div class="mt-5 flex flex-wrap gap-2">
+      <span class="chip">Next.js 16</span>
+      <span class="chip">Supabase</span>
+      <span class="chip">Drizzle ORM</span>
+      <span class="chip">React Flow</span>
+      <span class="chip">Tailwind v4</span>
+      <span class="chip">Vercel</span>
+      <span class="chip">PWA</span>
+    </div>
+  </section>
+
+  <footer class="section pt-8 border-t border-gray-200">
+    <div class="flex justify-between items-center text-xs text-gray-500">
+      <span>Personal Operations Hub — internal build plan</span>
+      <span class="mono">v1 · 2026-05-04</span>
+    </div>
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<h2>How should the new contact types appear in the filter bar?</h2>
+<p class="subtitle">Currently: All · Employees · Vendors. Where do Investors, Co-founders, Partners fit?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Flat row — all types at same level</h3>
+      <p>All · Employees · Vendors · Investors · Co-founders · Partners</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Simple, one click to filter</li><li>Matches current pattern</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Row gets wide with 6 tabs</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Two rows — People vs Business</h3>
+      <p>Row 1: All · Employees · Investors · Co-founders · Partners</p>
+      <p>Row 2: Vendors (stays separate as it already has different card UI)</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Groups person-contacts together</li><li>Vendors are fundamentally different entities</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>More complex filter UI</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Flat row + dropdown overflow</h3>
+      <p>All · Employees · Vendors · More ▾ (reveals Investors, Co-founders, Partners)</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Row stays clean</li><li>New types discoverable via dropdown</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Extra click to reach new types</li><li>More complexity to build</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

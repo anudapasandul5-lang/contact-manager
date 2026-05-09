@@ -1,0 +1,74 @@
+<h2>Type selector in the quick-add form — which layout?</h2>
+<p class="subtitle">Name input stays open after each submit. Type must be set per contact. How should the picker look?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Segmented pill row below name input</h3>
+      <div class="mockup">
+        <div class="mockup-header">Add contact</div>
+        <div class="mockup-body" style="display:flex;flex-direction:column;gap:10px;padding:14px">
+          <input class="mock-input" placeholder="Name..." style="width:100%">
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="mock-button" style="font-size:11px;padding:4px 10px;background:#6366f1;color:white;border-radius:999px">Employee</button>
+            <button class="mock-button" style="font-size:11px;padding:4px 10px;border-radius:999px">Investor</button>
+            <button class="mock-button" style="font-size:11px;padding:4px 10px;border-radius:999px">Co-founder</button>
+            <button class="mock-button" style="font-size:11px;padding:4px 10px;border-radius:999px">Partner</button>
+            <button class="mock-button" style="font-size:11px;padding:4px 10px;border-radius:999px">Vendor</button>
+          </div>
+          <div style="font-size:11px;color:#888">Enter to add · Esc to close</div>
+        </div>
+      </div>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>All types visible at once</li><li>One click to switch</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Wider palette needed</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Inline dropdown next to name input</h3>
+      <div class="mockup">
+        <div class="mockup-header">Add contact</div>
+        <div class="mockup-body" style="display:flex;flex-direction:column;gap:10px;padding:14px">
+          <div style="display:flex;gap:8px">
+            <input class="mock-input" placeholder="Name..." style="flex:1">
+            <select class="mock-input" style="width:120px;font-size:12px">
+              <option>Employee</option>
+              <option>Investor</option>
+              <option>Co-founder</option>
+              <option>Partner</option>
+              <option>Vendor</option>
+            </select>
+          </div>
+          <div style="font-size:11px;color:#888">Enter to add · Esc to close</div>
+        </div>
+      </div>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Compact — fits existing palette width</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Dropdown opens on click, slower than pills</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Two-step: name → then type</h3>
+      <div class="mockup">
+        <div class="mockup-header">Add contact — step 1 of 2</div>
+        <div class="mockup-body" style="display:flex;flex-direction:column;gap:10px;padding:14px">
+          <input class="mock-input" placeholder="Name..." style="width:100%">
+          <div style="font-size:11px;color:#888">Enter → pick type next</div>
+        </div>
+      </div>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Name field stays clean</li><li>Type step can show richer descriptions</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Two Enter presses per contact — slower</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<h2>How should continuous add work?</h2>
+<p class="subtitle">Currently: submit → palette closes → click + again. What should happen instead?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Input stays open — clears on submit</h3>
+      <p>Type name → Enter → "Jane added ✓" flash → input clears, cursor stays focused → type next name → Enter → ...</p>
+      <p>Press <kbd>Esc</kbd> to close. Same command palette, no extra UI.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Zero extra clicks</li><li>Keyboard-only flow</li><li>Minimal change to existing palette</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>No way to set type per-contact during bulk add</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Bulk-add panel — name + type per row</h3>
+      <p>A persistent side panel or modal with a growing list: each row has [Name input] [Type dropdown] [Add]. Press Enter to append next row automatically.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Can assign type to each contact on the spot</li><li>See all contacts being added at once</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>More UI to build</li><li>More complex interaction</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Quick-add stays open + type selector</h3>
+      <p>Same fast input field, but adds a type toggle row below it (Employee / Investor / Co-founder / Partner / Vendor). Selected type persists across submits.</p>
+      <p>Type name → Enter → input clears → type next name → Enter → ...</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Fast keyboard flow preserved</li><li>Can switch type between contacts</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Type toggle adds visual noise to palette</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
