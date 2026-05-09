@@ -1,6 +1,6 @@
 // Removed node:assert/strict - use vitest expect instead
 import assert from 'node:assert';
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { LoginFormView } from "@/components/auth/LoginFormView";
 

@@ -87,7 +87,7 @@ export const businesses = pgTable("businesses", {
   user_id: text("user_id").notNull(),
   name: text("name").notNull(),
   color: text("color").notNull().default("#6b7280"),
-  created_at: timestamp("created_at").defaultNow().notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [
   index("businesses_user_id_idx").on(t.user_id),
 ]);
@@ -215,8 +215,8 @@ export const tasks = pgTable("tasks", {
   completed_at: timestamp("completed_at", { withTimezone: true }),
   parent_task_id: text("parent_task_id").references((): AnyPgColumn => tasks.id, { onDelete: "set null" }),
   recurrence_rule: text("recurrence_rule"),
-  created_at: timestamp("created_at").defaultNow().notNull(),
-  updated_at: timestamp("updated_at").defaultNow().notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [
   index("tasks_user_id_idx").on(t.user_id),
   index("tasks_user_due_date_idx").on(t.user_id, t.due_date),

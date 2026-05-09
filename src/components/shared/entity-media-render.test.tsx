@@ -1,6 +1,6 @@
 // Removed node:assert/strict - use vitest expect instead
 import assert from 'node:assert';
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it } from "vitest";
 import { Handle, Position, ReactFlowProvider } from "@xyflow/react";
 import { isValidElement, type ReactElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
