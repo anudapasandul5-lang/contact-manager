@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   buildArcLayout,
   buildSortedRingLayout,
@@ -7,7 +8,7 @@ import {
   sortByLabel,
 } from "@/components/mind-map/radial-layout";
 
-test("sortByLabel orders entries deterministically by label and then id", () => {
+it("sortByLabel orders entries deterministically by label and then id", () => {
   const sorted = sortByLabel([
     { id: "b", label: "Beta" },
     { id: "a2", label: "Alpha" },
@@ -17,7 +18,7 @@ test("sortByLabel orders entries deterministically by label and then id", () => 
   assert.deepEqual(sorted.map((entry) => entry.id), ["a1", "a2", "b"]);
 });
 
-test("buildSortedRingLayout places sorted entries around the ring in deterministic order", () => {
+it("buildSortedRingLayout places sorted entries around the ring in deterministic order", () => {
   const positions = buildSortedRingLayout(
     [
       { id: "company-b", label: "Beta" },
@@ -30,7 +31,7 @@ test("buildSortedRingLayout places sorted entries around the ring in determinist
   assert.deepEqual(Array.from(positions.keys()), ["company-a", "company-b", "company-c"]);
 });
 
-test("buildArcLayout keeps a single item centered on the anchor angle and spreads multiple items symmetrically", () => {
+it("buildArcLayout keeps a single item centered on the anchor angle and spreads multiple items symmetrically", () => {
   const single = buildArcLayout(
     [{ id: "contact-1", label: "Alice" }],
     { x: 100, y: 50 },
@@ -59,7 +60,7 @@ test("buildArcLayout keeps a single item centered on the anchor angle and spread
   assert.ok(xValues[1] > xValues[2]!);
 });
 
-test("buildTieredArcLayout pushes dense clusters onto an outer ring instead of stacking one arc", () => {
+it("buildTieredArcLayout pushes dense clusters onto an outer ring instead of stacking one arc", () => {
   const positions = buildTieredArcLayout(
     [
       { id: "a", label: "Alpha" },
@@ -87,7 +88,7 @@ test("buildTieredArcLayout pushes dense clusters onto an outer ring instead of s
   assert.ok(Math.hypot(positions.get("f")!.x, positions.get("f")!.y) >= 149);
 });
 
-test("buildSortedRingLayout distributes 3 entries at equal angular intervals across 360°", () => {
+it("buildSortedRingLayout distributes 3 entries at equal angular intervals across 360°", () => {
   const positions = buildSortedRingLayout(
     [
       { id: "p-a", label: "Alpha" },

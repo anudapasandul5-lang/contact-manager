@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 import {
   buildFollowUpBuckets,
@@ -7,7 +8,7 @@ import {
   selectNextTouchForContact,
 } from "./follow-up-helpers";
 
-test("normalizeFollowUps drops invalid entries and keeps valid follow-ups sorted", () => {
+it("normalizeFollowUps drops invalid entries and keeps valid follow-ups sorted", () => {
   const followUps = normalizeFollowUps([
     {
       id: "follow-up-2",
@@ -57,7 +58,7 @@ test("normalizeFollowUps drops invalid entries and keeps valid follow-ups sorted
   assert.equal(followUps[0]?.objective, "Send recap");
 });
 
-test("buildFollowUpBuckets groups only open follow-ups by local day boundaries", () => {
+it("buildFollowUpBuckets groups only open follow-ups by local day boundaries", () => {
   const followUps = normalizeFollowUps([
     {
       id: "overdue",
@@ -129,7 +130,7 @@ test("buildFollowUpBuckets groups only open follow-ups by local day boundaries",
   );
 });
 
-test("selectNextTouchForContact returns the earliest open follow-up for a contact", () => {
+it("selectNextTouchForContact returns the earliest open follow-up for a contact", () => {
   const followUps = normalizeFollowUps([
     {
       id: "later",

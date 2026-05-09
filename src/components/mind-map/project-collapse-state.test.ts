@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   clearSavedCollapsedProjects,
   createProjectCollapseStorageKey,
@@ -28,18 +29,18 @@ function createStorage() {
   };
 }
 
-test("resolveInitialCollapsedProjects defaults first load to expanded standalone projects", () => {
+it("resolveInitialCollapsedProjects defaults first load to expanded standalone projects", () => {
   const result = resolveInitialCollapsedProjects(["project-2", "project-3"], null);
   assert.deepEqual([...result], []);
 });
 
-test("resolveInitialCollapsedProjects restores saved project collapse state when present", () => {
+it("resolveInitialCollapsedProjects restores saved project collapse state when present", () => {
   const saved = new Set(["project-2"]);
   const result = resolveInitialCollapsedProjects(["project-2", "project-3"], saved);
   assert.deepEqual([...result], ["project-2"]);
 });
 
-test("restoreSavedCollapsedProjects rehydrates tucked project state from localStorage", () => {
+it("restoreSavedCollapsedProjects rehydrates tucked project state from localStorage", () => {
   const storage = createStorage();
   Object.assign(globalThis, {
     window: {
@@ -55,18 +56,18 @@ test("restoreSavedCollapsedProjects rehydrates tucked project state from localSt
   assert.deepEqual([...result], ["project-2"]);
 });
 
-test("resolveInitialCollapsedProjects supports intentional fully-collapsed saved state", () => {
+it("resolveInitialCollapsedProjects supports intentional fully-collapsed saved state", () => {
   const saved = new Set(["project-2", "project-3"]);
   const result = resolveInitialCollapsedProjects(["project-2", "project-3"], saved);
   assert.deepEqual([...result], ["project-2", "project-3"]);
 });
 
-test("createProjectCollapseStorageKey uses a versioned namespace for migration safety", () => {
+it("createProjectCollapseStorageKey uses a versioned namespace for migration safety", () => {
   const storageKey = createProjectCollapseStorageKey("user-1");
   assert.equal(storageKey, "contact-manager:mind-map-project-collapse:v3:user-1");
 });
 
-test("clearSavedCollapsedProjects removes stale saved project collapse state", () => {
+it("clearSavedCollapsedProjects removes stale saved project collapse state", () => {
   const storage = createStorage();
   Object.assign(globalThis, {
     window: {

@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   createContactWithRelations,
   updateContactWithRelations,
@@ -20,7 +21,7 @@ function makeRpcSpy(result: { data: unknown; error: null | { message: string } }
   return { supabase, calls };
 }
 
-test("createContactWithRelations calls create_contact_with_relations RPC with correct args", async () => {
+it("createContactWithRelations calls create_contact_with_relations RPC with correct args", async () => {
   const { supabase, calls } = makeRpcSpy({
     data: { id: "abc", name: "Test" },
     error: null,
@@ -48,7 +49,7 @@ test("createContactWithRelations calls create_contact_with_relations RPC with co
   assert.deepEqual(calls[0]!.args["p_project_ids"], []);
 });
 
-test("createContactWithRelations throws when RPC returns an error", async () => {
+it("createContactWithRelations throws when RPC returns an error", async () => {
   const { supabase } = makeRpcSpy({ data: null, error: { message: "duplicate key" } });
 
   await assert.rejects(
@@ -68,7 +69,7 @@ test("createContactWithRelations throws when RPC returns an error", async () => 
   );
 });
 
-test("updateContactWithRelations calls update_contact_with_relations RPC with correct args", async () => {
+it("updateContactWithRelations calls update_contact_with_relations RPC with correct args", async () => {
   const { supabase, calls } = makeRpcSpy({
     data: { id: "contact-1", name: "Updated" },
     error: null,
@@ -94,7 +95,7 @@ test("updateContactWithRelations calls update_contact_with_relations RPC with co
   assert.deepEqual(calls[0]!.args["p_project_ids"], ["project-1"]);
 });
 
-test("updateContactWithRelations throws when RPC returns an error", async () => {
+it("updateContactWithRelations throws when RPC returns an error", async () => {
   const { supabase } = makeRpcSpy({ data: null, error: { message: "contact not found" } });
 
   await assert.rejects(

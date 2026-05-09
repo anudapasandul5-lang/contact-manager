@@ -1,12 +1,13 @@
-import assert from "node:assert/strict";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
 import fs from "node:fs";
 import path from "node:path";
-import test from "node:test";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 const migrationPath = path.join(process.cwd(), "drizzle", "migrations", "20260401_user_owned_network.sql");
 const migrationSql = fs.readFileSync(migrationPath, "utf8");
 
-test("ownership migration adds user_id columns to user-owned tables", () => {
+it("ownership migration adds user_id columns to user-owned tables", () => {
   for (const table of ["companies", "contacts", "projects", "person_relationships", "intro_requests", "vendors"] as const) {
     assert.match(
       migrationSql,
@@ -16,7 +17,7 @@ test("ownership migration adds user_id columns to user-owned tables", () => {
   }
 });
 
-test("ownership migration backfills existing records to the earliest auth user", () => {
+it("ownership migration backfills existing records to the earliest auth user", () => {
   assert.match(
     migrationSql,
     /select\s+id[\s\S]*from\s+auth\.users[\s\S]*order by\s+created_at\s+asc[\s\S]*limit\s+1/i,
@@ -24,7 +25,7 @@ test("ownership migration backfills existing records to the earliest auth user",
   );
 });
 
-test("ownership migration creates ownership-based policies for base tables", () => {
+it("ownership migration creates ownership-based policies for base tables", () => {
   for (const table of ["companies", "contacts", "projects", "person_relationships", "intro_requests", "vendors"] as const) {
     assert.match(
       migrationSql,

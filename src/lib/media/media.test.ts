@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   attachSignedMediaUrls,
   buildMediaStoragePath,
@@ -17,7 +18,7 @@ function createImageFile(
   return new File([contents], name, { type });
 }
 
-test("validateMediaUpload accepts supported image types within the size limit", () => {
+it("validateMediaUpload accepts supported image types within the size limit", () => {
   const file = createImageFile("hello", "avatar.png", "image/png");
 
   const result = validateMediaUpload(file);
@@ -26,13 +27,13 @@ test("validateMediaUpload accepts supported image types within the size limit", 
   assert.equal(result.mimeType, "image/png");
 });
 
-test("validateMediaUpload rejects unsupported file types", () => {
+it("validateMediaUpload rejects unsupported file types", () => {
   const file = createImageFile("hello", "avatar.gif", "image/gif");
 
   assert.throws(() => validateMediaUpload(file), /jpeg, png, or webp/i);
 });
 
-test("buildMediaStoragePath creates user-scoped paths for each entity type", () => {
+it("buildMediaStoragePath creates user-scoped paths for each entity type", () => {
   assert.equal(
     buildMediaStoragePath("user-1", "contact", "contact-1", "png"),
     "user-1/contacts/contact-1/profile.png",
@@ -47,7 +48,7 @@ test("buildMediaStoragePath creates user-scoped paths for each entity type", () 
   );
 });
 
-test("uploadEntityMedia uploads the file, updates the entity path column, and returns a signed url", async () => {
+it("uploadEntityMedia uploads the file, updates the entity path column, and returns a signed url", async () => {
   let uploadedPath = "";
   let uploadedContentType = "";
   let updatedColumn = "";
@@ -118,7 +119,7 @@ test("uploadEntityMedia uploads the file, updates the entity path column, and re
   assert.equal(result.signedUrl, "https://signed.example/user-1/contacts/contact-1/profile.webp");
 });
 
-test("deleteEntityMedia removes the storage object and clears the stored path", async () => {
+it("deleteEntityMedia removes the storage object and clears the stored path", async () => {
   let clearedColumn = "";
   let removedPaths: string[] = [];
 
@@ -165,7 +166,7 @@ test("deleteEntityMedia removes the storage object and clears the stored path", 
   assert.deepEqual(removedPaths, ["user-1/projects/project-1/logo.png"]);
 });
 
-test("attachSignedMediaUrls leaves entities without media paths untouched and signs the rest", async () => {
+it("attachSignedMediaUrls leaves entities without media paths untouched and signs the rest", async () => {
   const supabase = {
     storage: {
       from(bucket: string) {

@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { Session, User } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from "@/lib/auth/session";
@@ -37,7 +38,7 @@ function createMockUser(): User {
   } as User;
 }
 
-test("createGoogleOAuthStartResponse redirects to the Supabase provider URL", async () => {
+it("createGoogleOAuthStartResponse redirects to the Supabase provider URL", async () => {
   const response = await createGoogleOAuthStartResponse("http://localhost:3000/login", {
     signInWithOAuth: async ({ options }) => {
       assert.equal(options?.redirectTo, "http://localhost:3000/api/auth/google/callback");
@@ -52,7 +53,7 @@ test("createGoogleOAuthStartResponse redirects to the Supabase provider URL", as
   assert.equal(response.headers.get("location"), "https://accounts.google.com/o/oauth2/v2/auth?mock=1");
 });
 
-test("createGoogleOAuthCallbackResponse stores session cookies and redirects to mind-map", async () => {
+it("createGoogleOAuthCallbackResponse stores session cookies and redirects to mind-map", async () => {
   const response = await createGoogleOAuthCallbackResponse(
     "http://localhost:3000/api/auth/google/callback?code=test-code",
     {
@@ -75,7 +76,7 @@ test("createGoogleOAuthCallbackResponse stores session cookies and redirects to 
   assert.equal(response.cookies.get(REFRESH_TOKEN_COOKIE)?.value, "refresh-token");
 });
 
-test("createGoogleOAuthCallbackResponse clears cookies and redirects to login when code is missing", async () => {
+it("createGoogleOAuthCallbackResponse clears cookies and redirects to login when code is missing", async () => {
   const response = await createGoogleOAuthCallbackResponse(
     "http://localhost:3000/api/auth/google/callback",
     {
@@ -91,7 +92,7 @@ test("createGoogleOAuthCallbackResponse clears cookies and redirects to login wh
   assert.equal(response.cookies.get(REFRESH_TOKEN_COOKIE)?.value, undefined);
 });
 
-test("createGoogleOAuthCallbackResponse redirects to login when exchange fails without clearing app session cookies", async () => {
+it("createGoogleOAuthCallbackResponse redirects to login when exchange fails without clearing app session cookies", async () => {
   const response = await createGoogleOAuthCallbackResponse(
     "http://localhost:3000/api/auth/google/callback?code=bad-code",
     {
@@ -108,7 +109,7 @@ test("createGoogleOAuthCallbackResponse redirects to login when exchange fails w
   assert.equal(response.cookies.get(REFRESH_TOKEN_COOKIE)?.value, undefined);
 });
 
-test("createGoogleOAuthCallbackResponse redirects to login when session data is missing without clearing app session cookies", async () => {
+it("createGoogleOAuthCallbackResponse redirects to login when session data is missing without clearing app session cookies", async () => {
   const response = await createGoogleOAuthCallbackResponse(
     "http://localhost:3000/api/auth/google/callback?code=missing-session",
     {
@@ -125,7 +126,7 @@ test("createGoogleOAuthCallbackResponse redirects to login when session data is 
   assert.equal(response.cookies.get(REFRESH_TOKEN_COOKIE)?.value, undefined);
 });
 
-test("createGoogleOAuthStartResponse redirects to login when signInWithOAuth rejects", async () => {
+it("createGoogleOAuthStartResponse redirects to login when signInWithOAuth rejects", async () => {
   const response = await createGoogleOAuthStartResponse("http://localhost:3000/login", {
     signInWithOAuth: async () => {
       throw new Error("network failure");
@@ -136,7 +137,7 @@ test("createGoogleOAuthStartResponse redirects to login when signInWithOAuth rej
   assert.equal(response.headers.get("location"), "http://localhost:3000/login?error=google_start_failed");
 });
 
-test("createGoogleOAuthCallbackResponse redirects to login when exchangeCodeForSession rejects", async () => {
+it("createGoogleOAuthCallbackResponse redirects to login when exchangeCodeForSession rejects", async () => {
   const response = await createGoogleOAuthCallbackResponse(
     "http://localhost:3000/api/auth/google/callback?code=rejected",
     {
@@ -152,7 +153,7 @@ test("createGoogleOAuthCallbackResponse redirects to login when exchangeCodeForS
   assert.equal(response.cookies.get(REFRESH_TOKEN_COOKIE)?.value, undefined);
 });
 
-test("createGooglePkceAuthOptions configures the auth client for server-side PKCE", () => {
+it("createGooglePkceAuthOptions configures the auth client for server-side PKCE", () => {
   const storage = createCookieBackedServerStorage(() => null);
   const options = createGooglePkceAuthOptions(storage);
 
@@ -164,7 +165,7 @@ test("createGooglePkceAuthOptions configures the auth client for server-side PKC
   assert.equal(options.storage, storage);
 });
 
-test("createCookieBackedServerStorage reads staged values and records cookie mutations", async () => {
+it("createCookieBackedServerStorage reads staged values and records cookie mutations", async () => {
   const cookies = new Map<string, string>([["existing", "value"]]);
   const mutations: { name: string; value: string; maxAge: number }[] = [];
   const storage = createCookieBackedServerStorage(
@@ -187,7 +188,7 @@ test("createCookieBackedServerStorage reads staged values and records cookie mut
   ]);
 });
 
-test("createCookieBackedServerStorage decodes browser-encoded PKCE cookie values", async () => {
+it("createCookieBackedServerStorage decodes browser-encoded PKCE cookie values", async () => {
   const storage = createCookieBackedServerStorage(
     (name) => (name === GOOGLE_PKCE_VERIFIER_COOKIE ? "%22verifier-token%22" : null),
   );
@@ -195,7 +196,7 @@ test("createCookieBackedServerStorage decodes browser-encoded PKCE cookie values
   assert.equal(await storage.getItem(GOOGLE_PKCE_VERIFIER_COOKIE), "\"verifier-token\"");
 });
 
-test("applyGoogleStorageMutations only persists verifier cookie mutations", () => {
+it("applyGoogleStorageMutations only persists verifier cookie mutations", () => {
   const nextResponse = NextResponse.redirect("http://localhost:3000/login");
 
   applyGoogleStorageMutations(nextResponse, [
@@ -207,7 +208,7 @@ test("applyGoogleStorageMutations only persists verifier cookie mutations", () =
   assert.equal(nextResponse.cookies.get(GOOGLE_PKCE_VERIFIER_COOKIE)?.value, "verifier-token");
 });
 
-test("createGoogleOAuthStartRouteResponse builds PKCE auth options and applies verifier cookie mutations", async () => {
+it("createGoogleOAuthStartRouteResponse builds PKCE auth options and applies verifier cookie mutations", async () => {
   let capturedOptions:
     | ReturnType<typeof createGooglePkceAuthOptions>
     | undefined;
@@ -237,7 +238,7 @@ test("createGoogleOAuthStartRouteResponse builds PKCE auth options and applies v
   assert.equal(response.cookies.get(GOOGLE_PKCE_VERIFIER_COOKIE)?.value, "verifier-token");
 });
 
-test("createGoogleOAuthCallbackRouteResponse skips auth client creation when code is missing and clears the verifier cookie", async () => {
+it("createGoogleOAuthCallbackRouteResponse skips auth client creation when code is missing and clears the verifier cookie", async () => {
   let createClientCalls = 0;
 
   const response = await createGoogleOAuthCallbackRouteResponse(
@@ -257,7 +258,7 @@ test("createGoogleOAuthCallbackRouteResponse skips auth client creation when cod
   assert.equal(response.cookies.get(REFRESH_TOKEN_COOKIE)?.value, undefined);
 });
 
-test("createGoogleOAuthCallbackRouteResponse builds PKCE auth options for callback requests", async () => {
+it("createGoogleOAuthCallbackRouteResponse builds PKCE auth options for callback requests", async () => {
   let capturedOptions:
     | ReturnType<typeof createGooglePkceAuthOptions>
     | undefined;
@@ -287,7 +288,7 @@ test("createGoogleOAuthCallbackRouteResponse builds PKCE auth options for callba
   assert.equal(response.headers.get("location"), "http://localhost:3000/mind-map");
 });
 
-test("createGoogleOAuthCallbackRouteResponse clears only the verifier cookie when auth client rejects", async () => {
+it("createGoogleOAuthCallbackRouteResponse clears only the verifier cookie when auth client rejects", async () => {
   const response = await createGoogleOAuthCallbackRouteResponse(
     "http://localhost:3000/api/auth/google/callback?code=rejected",
     (name) => (name === GOOGLE_PKCE_VERIFIER_COOKIE ? "stored-verifier" : null),

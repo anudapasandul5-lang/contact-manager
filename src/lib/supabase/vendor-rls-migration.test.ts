@@ -1,14 +1,15 @@
-import assert from "node:assert/strict";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
 import fs from "node:fs";
 import path from "node:path";
-import test from "node:test";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 const migrationPath = path.join(process.cwd(), "drizzle", "migrations", "20260331_vendor_domain.sql");
 const migrationSql = fs.readFileSync(migrationPath, "utf8");
 
 const vendorTables = ["vendors", "vendor_people", "vendor_companies", "vendor_projects"] as const;
 
-test("vendor domain migration enables RLS on every vendor table", () => {
+it("vendor domain migration enables RLS on every vendor table", () => {
   for (const table of vendorTables) {
     assert.match(
       migrationSql,
@@ -18,7 +19,7 @@ test("vendor domain migration enables RLS on every vendor table", () => {
   }
 });
 
-test("vendor domain migration creates authenticated CRUD policies for every vendor table", () => {
+it("vendor domain migration creates authenticated CRUD policies for every vendor table", () => {
   for (const table of vendorTables) {
     assert.match(
       migrationSql,

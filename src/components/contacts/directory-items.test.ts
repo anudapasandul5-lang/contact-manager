@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { ContactWithRelations, VendorWithRelations } from "@/lib/supabase/types";
 import {
   buildDirectoryItems,
@@ -53,7 +54,7 @@ function createVendor(overrides: Partial<VendorWithRelations>): VendorWithRelati
   };
 }
 
-test("buildDirectoryItems includes vendor businesses as separate cards", () => {
+it("buildDirectoryItems includes vendor businesses as separate cards", () => {
   const items = buildDirectoryItems(
     [createContact({ id: "contact-1", type: "employee" })],
     [createVendor({ id: "vendor-1", name: "Acme Print Studio" })],
@@ -65,7 +66,7 @@ test("buildDirectoryItems includes vendor businesses as separate cards", () => {
   assert.equal(vendorItem?.vendor.name, "Acme Print Studio");
 });
 
-test("filterDirectoryItems can isolate vendor businesses without turning vendor people into cards", () => {
+it("filterDirectoryItems can isolate vendor businesses without turning vendor people into cards", () => {
   const items = buildDirectoryItems(
     [
       createContact({ id: "contact-1", type: "vendor", name: "Eli Vendor" }),
@@ -81,7 +82,7 @@ test("filterDirectoryItems can isolate vendor businesses without turning vendor 
   assert.equal(filtered.some((item) => item.kind === "vendor" && item.vendor.vendor_people.length === 1), true);
 });
 
-test("filterDirectoryItems searches vendor business details and connected company names", () => {
+it("filterDirectoryItems searches vendor business details and connected company names", () => {
   const items = buildDirectoryItems(
     [createContact({ id: "contact-1", name: "Alice Employee" })],
     [
@@ -110,7 +111,7 @@ test("filterDirectoryItems searches vendor business details and connected compan
   assert.equal(filterDirectoryItems(items, "all", "printing")[0]?.kind, "vendor");
 });
 
-test("buildDirectoryStats reports vendor businesses alongside contacts", () => {
+it("buildDirectoryStats reports vendor businesses alongside contacts", () => {
   const items = buildDirectoryItems(
     [
       createContact({ id: "contact-1", type: "employee" }),

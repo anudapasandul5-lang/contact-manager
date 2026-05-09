@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { Node } from "@xyflow/react";
 import { getFilterCategoryForNode, type FilterCategory } from "@/components/mind-map/node-filters";
 
@@ -12,7 +13,7 @@ function createNode(id: string, type: string, data: Record<string, unknown> = {}
   } as Node;
 }
 
-test("getFilterCategoryForNode maps nodes to the visible filter groups", () => {
+it("getFilterCategoryForNode maps nodes to the visible filter groups", () => {
   const cases: Array<[Node, FilterCategory | null]> = [
     [createNode("company-1", "company"), "company"],
     [createNode("project-1", "project"), "project"],

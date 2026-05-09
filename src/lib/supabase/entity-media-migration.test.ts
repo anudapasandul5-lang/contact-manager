@@ -1,12 +1,13 @@
-import assert from "node:assert/strict";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
 import fs from "node:fs";
 import path from "node:path";
-import test from "node:test";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 const migrationPath = path.join(process.cwd(), "drizzle", "migrations", "20260410_entity_media.sql");
 const migrationSql = fs.readFileSync(migrationPath, "utf8");
 
-test("entity media migration adds nullable media path columns", () => {
+it("entity media migration adds nullable media path columns", () => {
   assert.match(
     migrationSql,
     /ALTER TABLE contacts[\s\S]*ADD COLUMN IF NOT EXISTS photo_path text/i,
@@ -21,14 +22,14 @@ test("entity media migration adds nullable media path columns", () => {
   );
 });
 
-test("entity media migration creates a private storage bucket for uploaded images", () => {
+it("entity media migration creates a private storage bucket for uploaded images", () => {
   assert.match(migrationSql, /INSERT INTO storage\.buckets/i);
   assert.match(migrationSql, /'network-media'/i);
   assert.match(migrationSql, /public[\s\S]*false/i);
   assert.match(migrationSql, /5242880/i);
 });
 
-test("entity media migration creates storage policies scoped to the authenticated user folder", () => {
+it("entity media migration creates storage policies scoped to the authenticated user folder", () => {
   for (const action of ["select", "insert", "update", "delete"] as const) {
     assert.match(
       migrationSql,
