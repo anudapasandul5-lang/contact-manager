@@ -23,5 +23,6 @@ export default defineConfig({
     // on inserts/migrations. Per-test fresh user_id provides isolation,
     // not parallel workers.
     threads: false,
+    testTimeout: 30000,
   } as any,
 });

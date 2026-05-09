@@ -25,18 +25,13 @@ describe("BusinessRegistry", () => {
   });
 
   afterEach(async () => {
-    // Clean up junction tables first (cascade handles some, but be explicit)
-    await db.delete(schema.contactBusinesses).where(
-      // Delete rows where business belongs to this user — join via subquery is complex;
-      // instead delete by business_id after fetching them
-      eq(schema.contactBusinesses.contact_id, userId) // placeholder — we clean via business deletion below
-    );
-    // Delete all businesses for userId (cascades to all 3 junction tables)
-    await db.delete(schema.businesses).where(eq(schema.businesses.user_id, userId));
-    // Delete entity rows created under userId
+    // Delete contacts/companies/vendors first — their deletion cascades junction rows via FK.
+    // Then delete businesses (cascade removes any remaining junction rows).
     await db.delete(schema.contacts).where(eq(schema.contacts.user_id, userId));
     await db.delete(schema.companies).where(eq(schema.companies.user_id, userId));
     await db.delete(schema.vendors).where(eq(schema.vendors.user_id, userId));
+    // Deleting businesses cascades to all 3 junction tables (ON DELETE CASCADE)
+    await db.delete(schema.businesses).where(eq(schema.businesses.user_id, userId));
     await teardownTestDb(client);
   });
 
@@ -153,7 +148,8 @@ describe("BusinessRegistry", () => {
     const biz = await createBusiness(db, userId, { name: "Biz B" });
 
     await attachEntityToBusiness(db, userId, "contact", contactId, biz.id);
-    await expect(attachEntityToBusiness(db, userId, "contact", contactId, biz.id)).resolves.not.toThrow();
+    // Second call should not throw (idempotent via ON CONFLICT DO NOTHING)
+    await attachEntityToBusiness(db, userId, "contact", contactId, biz.id);
 
     const rows = await db.select().from(schema.contactBusinesses)
       .where(eq(schema.contactBusinesses.contact_id, contactId));
@@ -201,7 +197,7 @@ describe("BusinessRegistry", () => {
     expect(rows.length).toBe(0);
 
     // Idempotent: second detach should not throw
-    await expect(detachEntityFromBusiness(db, userId, "contact", contactId, biz.id)).resolves.not.toThrow();
+    await detachEntityFromBusiness(db, userId, "contact", contactId, biz.id);
   });
 
   // ─── Batch 3: Junction — company ─────────────────────────────────────────
@@ -225,7 +221,8 @@ describe("BusinessRegistry", () => {
     const biz = await createBusiness(db, userId, { name: "Biz F" });
 
     await attachEntityToBusiness(db, userId, "company", companyId, biz.id);
-    await expect(attachEntityToBusiness(db, userId, "company", companyId, biz.id)).resolves.not.toThrow();
+    // Second call should not throw (idempotent)
+    await attachEntityToBusiness(db, userId, "company", companyId, biz.id);
 
     const rows = await db.select().from(schema.companyBusinesses)
       .where(eq(schema.companyBusinesses.company_id, companyId));
@@ -270,7 +267,7 @@ describe("BusinessRegistry", () => {
       .where(eq(schema.companyBusinesses.company_id, companyId));
     expect(rows.length).toBe(0);
 
-    await expect(detachEntityFromBusiness(db, userId, "company", companyId, biz.id)).resolves.not.toThrow();
+    await detachEntityFromBusiness(db, userId, "company", companyId, biz.id);
   });
 
   // ─── Batch 4: Junction — vendor ──────────────────────────────────────────
@@ -294,7 +291,8 @@ describe("BusinessRegistry", () => {
     const biz = await createBusiness(db, userId, { name: "Biz J" });
 
     await attachEntityToBusiness(db, userId, "vendor", vendorId, biz.id);
-    await expect(attachEntityToBusiness(db, userId, "vendor", vendorId, biz.id)).resolves.not.toThrow();
+    // Second call should not throw (idempotent)
+    await attachEntityToBusiness(db, userId, "vendor", vendorId, biz.id);
 
     const rows = await db.select().from(schema.vendorBusinesses)
       .where(eq(schema.vendorBusinesses.vendor_id, vendorId));
@@ -339,7 +337,8 @@ describe("BusinessRegistry", () => {
       .where(eq(schema.vendorBusinesses.vendor_id, vendorId));
     expect(rows.length).toBe(0);
 
-    await expect(detachEntityFromBusiness(db, userId, "vendor", vendorId, biz.id)).resolves.not.toThrow();
+    // Idempotent: second detach should not throw
+    await detachEntityFromBusiness(db, userId, "vendor", vendorId, biz.id);
   });
 
   // ─── Batch 5: Listing ─────────────────────────────────────────────────────
