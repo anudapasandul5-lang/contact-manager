@@ -1,8 +1,8 @@
 import "@/env";
 import type { Metadata } from "next";
 import "./globals.css";
-import { Toaster } from "sonner";
 import { FloatingAddButton } from "@/components/shared/FloatingAddButton";
+import { QueryProvider } from "@/lib/query/QueryProvider";
 
 export const metadata: Metadata = {
   title: "Contact Manager",
@@ -23,9 +23,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        {children}
-        <FloatingAddButton />
-        <Toaster position="top-center" richColors closeButton />
+        <QueryProvider>
+          {children}
+          <FloatingAddButton />
+        </QueryProvider>
       </body>
     </html>
   );

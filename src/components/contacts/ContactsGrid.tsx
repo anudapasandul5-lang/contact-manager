@@ -22,6 +22,9 @@ const ContactModal = dynamic(() => import("@/components/shared/ContactModal").th
 const ConfirmDialog = dynamic(() => import("@/components/shared/ConfirmDialog").then((m) => m.ConfirmDialog), { ssr: false });
 const VendorModal = dynamic(() => import("@/components/shared/VendorModal").then((m) => m.VendorModal), { ssr: false });
 
+const EMPTY_CONTACTS: ContactWithRelations[] = [];
+const EMPTY_VENDORS: VendorWithRelations[] = [];
+
 const FILTERS: { label: string; value: DirectoryFilter; activeStyle?: React.CSSProperties }[] = [
   { label: "All", value: "all" },
   {
@@ -61,8 +64,8 @@ const FILTER_EMPTY: Partial<Record<DirectoryFilter, { message: string; sub: stri
 export function ContactsGrid() {
   const { data } = useNetworkQuery();
   const qc = useQueryClient();
-  const contacts = data?.contacts ?? [];
-  const vendors = data?.vendors ?? [];
+  const contacts = data?.contacts ?? EMPTY_CONTACTS;
+  const vendors = data?.vendors ?? EMPTY_VENDORS;
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<DirectoryFilter>("all");

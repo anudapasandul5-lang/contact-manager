@@ -6,7 +6,7 @@ import withBundleAnalyzer from "@next/bundle-analyzer";
 const appRoot = dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["127.0.0.1"],
+  allowedDevOrigins: ["127.0.0.1", "192.168.8.107"],
   reactCompiler: true,
   turbopack: {
     root: appRoot,

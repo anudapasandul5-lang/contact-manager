@@ -2,17 +2,12 @@ import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import dynamic from "next/dynamic";
 import { HeaderWithProfile } from "@/components/shared/HeaderWithProfile";
 import { MindMapSkeleton } from "@/components/mind-map/MindMapSkeleton";
+import { MindMapCanvasClient } from "./MindMapCanvasClient";
 import { resolveSessionFromCookies } from "@/lib/auth/session";
 import { fetchSupabaseNetworkData } from "@/lib/supabase/network";
 import { queryKeys } from "@/lib/query/keys";
-
-const MindMapCanvas = dynamic(
-  () => import("@/components/mind-map/MindMapCanvas").then((m) => m.MindMapCanvas),
-  { ssr: false, loading: () => <MindMapSkeleton /> },
-);
 
 export default async function MindMapPage() {
   const cookieStore = await cookies();
@@ -34,7 +29,7 @@ export default async function MindMapPage() {
       <main className="flex-1" style={{ background: "#f5f0eb", position: "relative" }}>
         <HydrationBoundary state={dehydrate(qc)}>
           <Suspense fallback={<MindMapSkeleton />}>
-            <MindMapCanvas />
+            <MindMapCanvasClient />
           </Suspense>
         </HydrationBoundary>
       </main>

@@ -18,7 +18,7 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-function isProjectedCompanyMember(_contact: ContactWithRelations) {
+function isProjectedCompanyMember() {
   return true;
 }
 
@@ -296,7 +296,7 @@ export function buildCompanyClusterGraph(data: NetworkData): { nodes: Node[]; ed
     const companyContainerCompanies = buildCompanyContainerCompanies(data, companies, projects);
     const standaloneProjects = getStandaloneProjects(projects);
 
-    if (isProjectedCompanyMember(contact)) {
+    if (isProjectedCompanyMember()) {
       companyContainerCompanies.forEach((company, index) => {
         const nodeId = createCompanyMemberNodeId(company.id, contact.id);
         nodes.push(buildContactNode(contact, nodeId, {

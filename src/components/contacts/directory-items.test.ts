@@ -123,5 +123,8 @@ test("buildDirectoryStats reports vendor businesses alongside contacts", () => {
     total: 3,
     employees: 1,
     vendors: 2,
+    investors: 0,
+    cofounders: 0,
+    partners: 0,
   });
 });

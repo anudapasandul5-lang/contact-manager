@@ -53,13 +53,11 @@ import { MapController } from "./MapController";
 import { ContactSidePanel } from "./ContactSidePanel";
 import { ContextMenu, type ContextMenuState } from "./ContextMenu";
 import type { GravityTarget } from "./GravityOverlay";
-import { deriveDisplayEdge } from "./edge-visibility";
 import { shouldCollapseNodeDuringMapCollapse } from "./collapse-behavior";
 import { useTheme } from "@/hooks/useTheme";
 import {
   buildNeighborhoodNodeIds,
   buildSearchResults,
-  getNodePresentationState,
   type SearchResultKind,
 } from "./declutter";
 import {
@@ -72,7 +70,7 @@ import {
   shouldClearFocusForPaneClick,
   type FocusSource,
 } from "./focus-view";
-import { getFilterCategoryForNode, type FilterCategory } from "./node-filters";
+import type { FilterCategory } from "./node-filters";
 import { collectNodeInternalsRefreshIds } from "./node-internals";
 import {
   applySavedNodePositions,
@@ -93,6 +91,7 @@ import {
 import { buildArcLayout, buildSortedRingLayout, buildTieredArcLayout, sortByLabel } from "./radial-layout";
 import { buildCompanyClusterGraph } from "./company-clusters";
 import { createReorganizedGraphState } from "./reorganize-layout";
+import { computeMindMapDisplayState } from "./mind-map-view-state";
 
 const StatsOverlay = dynamic(() => import("./StatsOverlay").then((m) => m.StatsOverlay), { ssr: false });
 const SearchOverlay = dynamic(() => import("./SearchOverlay").then((m) => m.SearchOverlay), { ssr: false });
@@ -119,7 +118,7 @@ const reactFlowStyle = { background: "var(--clay-bg)", transition: "background 0
 
 const wrapperStyle = { position: "absolute", inset: 0, background: "#f5f0eb" } as const;
 
-const miniMapNodeColor = (node: any) => {
+const miniMapNodeColor = (node: Node) => {
   if (node.type === "center") return "#38bdf8";
   if (node.type === "company") return (node.data.color as string) || "#3b82f6";
   if (node.type === "vendor") return (node.data.color as string) || "#f97316";
@@ -161,7 +160,6 @@ const COLLAPSE_DURATION_MS = 620;
 const COLLAPSE_STAGGER_MS = 90;
 const COLLAPSED_SCALE = 0.18;
 const COLLAPSED_OPACITY = 0;
-const FILTER_FADE_OPACITY = 0.18;
 const EMPTY_NODE_ID_SET = new Set<string>();
 const COMPACT_CONTACT_RAIL_QUERY = "(max-width: 1080px)";
 
@@ -1341,228 +1339,34 @@ function MindMapCanvasInner() {
     ],
   );
 
-  // Display layer: single useMemo that produces displayNodes and displayEdges
-  const { displayNodes, displayEdges } = useMemo(() => {
-    const hiddenNodeIds = new Set<string>();
-    const selectedFilterNodeIds = new Set(selectedSubsetNodeIds);
-    const edgeFocusTargets = companyFocusCollapsedNodeIds.size > 0 ? new Set<GravityTarget>() : focusTargets;
-    const searchRevealNodeIds = activeNeighborhoodSource === "search" ? neighborhoodNodeIds : new Set<string>();
-    const isCompanyFocusMode = activeNeighborhoodSource === "company";
-
-    nodes.forEach((n) => {
-      if (n.type !== "contact" && n.type !== "vendor") return;
-      const companyIds = (n.data.companyIds ?? []) as string[];
-      const parentCompanyId = typeof n.data.parentCompanyId === "string" ? n.data.parentCompanyId : null;
-      const parentProjectId = typeof n.data.parentProjectId === "string" ? n.data.parentProjectId : null;
-      const isProjectionHidden = parentCompanyId ? effectiveCollapsedCompanies.has(parentCompanyId) : false;
-      const isProjectHidden = parentProjectId ? effectiveCollapsedProjects.has(parentProjectId) : false;
-      const isCollapsedByAllCompanies = companyIds.length > 0 && companyIds.every((id) => effectiveCollapsedCompanies.has(id));
-      // Vendor (truck-icon) nodes always tuck back into their parent container when not in the active neighborhood
-      const isVendorNotInFocus =
-        isCompanyFocusMode
-        && n.type === "vendor"
-        && (parentCompanyId !== null || parentProjectId !== null)
-        && !neighborhoodNodeIds.has(n.id);
-      if ((isProjectionHidden || isProjectHidden || isCollapsedByAllCompanies || isVendorNotInFocus) && !searchRevealNodeIds.has(n.id)) {
-        hiddenNodeIds.add(n.id);
-      }
-    });
-
-    // Compute hidden count per company for tucked projections and shared members.
-    const hiddenCountByCompany = new Map<string, number>();
-    const hiddenCountByProject = new Map<string, number>();
-    nodes.forEach((n) => {
-      if (n.type !== "contact" && n.type !== "vendor") return;
-      const companyIds = (n.data.companyIds ?? []) as string[];
-      const parentCompanyId = typeof n.data.parentCompanyId === "string" ? n.data.parentCompanyId : null;
-      const parentProjectId = typeof n.data.parentProjectId === "string" ? n.data.parentProjectId : null;
-      const isVendorNotInFocus =
-        isCompanyFocusMode
-        && n.type === "vendor"
-        && (parentCompanyId !== null || parentProjectId !== null)
-        && !neighborhoodNodeIds.has(n.id);
-
-      if (parentCompanyId) {
-        if ((effectiveCollapsedCompanies.has(parentCompanyId) || isVendorNotInFocus) && !searchRevealNodeIds.has(n.id)) {
-          hiddenCountByCompany.set(parentCompanyId, (hiddenCountByCompany.get(parentCompanyId) ?? 0) + 1);
-        }
-        return;
-      }
-
-      if (parentProjectId) {
-        if ((effectiveCollapsedProjects.has(parentProjectId) || isVendorNotInFocus) && !searchRevealNodeIds.has(n.id)) {
-          hiddenCountByProject.set(parentProjectId, (hiddenCountByProject.get(parentProjectId) ?? 0) + 1);
-        }
-        return;
-      }
-
-      companyIds.forEach((cId) => {
-        if (effectiveCollapsedCompanies.has(cId) && !searchRevealNodeIds.has(n.id)) {
-          hiddenCountByCompany.set(cId, (hiddenCountByCompany.get(cId) ?? 0) + 1);
-        }
-      });
-    });
-
-    const nodeOpacityById = new Map<string, number>();
-    const animStyle = (node: Node, baseOpacity: number): React.CSSProperties => {
-      const animOpacity = getNodeOpacity(node);
-      const finalOpacity = Math.max(0, Math.min(1, baseOpacity * animOpacity));
-      nodeOpacityById.set(node.id, finalOpacity);
-      return {
-        opacity: finalOpacity,
-        pointerEvents: finalOpacity <= 0.02 ? "none" as const : "auto" as const,
-        transition: "opacity 240ms ease",
-      };
-    };
-
-    const dNodes = nodes.map((n) => {
-      const presentation = n.type === "center"
-        ? {
-            isQuiet: false,
-            showLabel: true,
-            isNeighborhoodActive: false,
-            isNeighborhoodDimmed: neighborhoodNodeIds.size > 0,
-          }
-        : getNodePresentationState(n, {
-            currentZoomLevel,
-            neighborhoodNodeIds,
-            searchFocusedNodeId: currentSearchResult?.nodeId ?? null,
-            searchMatchIds,
-            hoveredNodeId,
-          });
-
-      let baseOpacity = 1;
-
-      if (neighborhoodNodeIds.size > 0) {
-        if (presentation.isNeighborhoodActive) {
-          baseOpacity = 1;
-        } else if (n.type === "company" || n.type === "center") {
-          baseOpacity = 0.4;
-        } else {
-          baseOpacity = 0.1;
-        }
-      } else if (hoveredNodeId) {
-        baseOpacity = connectedNodeIds.has(n.id)
-          ? 1
-          : n.type === "contact"
-            ? 0.12
-            : 0.25;
-      } else if (presentation.isQuiet) {
-        baseOpacity = n.type === "contact" ? 0.34 : 0.42;
-      }
-
-      const filterCategory = getFilterCategoryForNode(n);
-      const isInactiveCategory = filterCategory ? inactiveCategories.has(filterCategory) : false;
-      if (isInactiveCategory && !presentation.isNeighborhoodActive) {
-        baseOpacity = Math.min(baseOpacity, FILTER_FADE_OPACITY);
-      }
-
-      if (n.type === "contact") {
-        const isHidden = hiddenNodeIds.has(n.id);
-        return {
-          ...n,
-          hidden: isHidden,
-          style: isHidden ? { opacity: 0, pointerEvents: "none" as const } : animStyle(n, baseOpacity),
-          data: {
-            ...n.data,
-            searchMatch: searchMatchIds.has(n.id),
-            isQuiet: presentation.isQuiet,
-            showLabel: presentation.showLabel,
-            isNeighborhoodActive: presentation.isNeighborhoodActive,
-            isNeighborhoodDimmed: presentation.isNeighborhoodDimmed,
-            isFocusAnchor: activeNeighborhoodNodeId === n.id,
-          },
-        };
-      }
-
-      if (n.type === "company") {
-        const companyId = n.id.replace("company-", "");
-        const isCollapsed = effectiveCollapsedCompanies.has(companyId);
-        const hiddenCount = hiddenCountByCompany.get(companyId) ?? 0;
-        return {
-          ...n,
-          style: animStyle(n, baseOpacity),
-          data: {
-            ...n.data,
-            isCollapsed,
-            hiddenCount,
-            onCollapse: () => onCollapseCompany(companyId),
-            isNeighborhoodActive: presentation.isNeighborhoodActive,
-            isNeighborhoodDimmed: presentation.isNeighborhoodDimmed,
-            isFocusAnchor: activeNeighborhoodNodeId === n.id,
-          },
-        };
-      }
-
-      if (n.type === "center") {
-        return {
-          ...n,
-          style: animStyle(n, baseOpacity),
-          data: {
-            ...n.data,
-            isMapCollapsed: mapCollapsed || animationPhase === "collapsing",
-          },
-        };
-      }
-      if (n.type === "vendor") {
-        const isHidden = hiddenNodeIds.has(n.id);
-        return {
-          ...n,
-          hidden: isHidden,
-          style: isHidden ? { opacity: 0, pointerEvents: "none" as const } : animStyle(n, baseOpacity),
-          data: {
-            ...n.data,
-            isQuiet: presentation.isQuiet,
-            showLabel: presentation.showLabel,
-            isNeighborhoodActive: presentation.isNeighborhoodActive,
-            isNeighborhoodDimmed: presentation.isNeighborhoodDimmed,
-            isFocusAnchor: activeNeighborhoodNodeId === n.id,
-          },
-        };
-      }
-      if (n.type === "project") {
-        const projectId = typeof n.data.projectId === "string" ? n.data.projectId : n.id.replace("project-", "");
-        const isStandaloneContainer = Boolean(n.data.isStandaloneContainer);
-        return {
-          ...n,
-          style: animStyle(n, baseOpacity),
-          data: {
-            ...n.data,
-            isCollapsed: isStandaloneContainer ? effectiveCollapsedProjects.has(projectId) : false,
-            hiddenCount: isStandaloneContainer ? (hiddenCountByProject.get(projectId) ?? 0) : 0,
-            onCollapse: isStandaloneContainer ? () => onCollapseProject(projectId) : undefined,
-            isStandaloneContainer,
-            isQuiet: presentation.isQuiet,
-            showLabel: presentation.showLabel,
-            isNeighborhoodActive: presentation.isNeighborhoodActive,
-            isNeighborhoodDimmed: presentation.isNeighborhoodDimmed,
-            isFocusAnchor: activeNeighborhoodNodeId === n.id,
-          },
-        };
-      }
-      return {
-        ...n,
-        style: animStyle(n, baseOpacity),
-      };
-    });
-
-    const dEdges = edges.map((edge) =>
-      deriveDisplayEdge(edge, {
-        hiddenNodeIds,
-        nodeOpacityById,
-        hasFocusedSubset,
-        selectedFilterNodeIds,
-        focusTargets: edgeFocusTargets,
-        hoveredNodeId,
-        connectedEdgeIds,
-      }),
-    );
-
-    return { displayNodes: dNodes, displayEdges: dEdges };
-  }, [
+  const { displayNodes, displayEdges } = useMemo(() => computeMindMapDisplayState({
     nodes,
     edges,
     effectiveCollapsedCompanies,
+    effectiveCollapsedProjects,
+    hoveredNodeId,
+    connectedNodeIds,
+    connectedEdgeIds,
+    searchMatchIds,
+    searchFocusedNodeId: currentSearchResult?.nodeId ?? null,
+    currentZoomLevel,
+    neighborhoodNodeIds,
+    activeNeighborhoodSource,
+    activeNeighborhoodNodeId,
+    inactiveCategories,
+    hasFocusedSubset,
+    companyFocusCollapsedNodeIds,
+    focusTargets,
+    selectedSubsetNodeIds,
+    mapCollapsed,
+    animationPhase,
+    onCollapseCompany,
+    onCollapseProject,
+  }), [
+    nodes,
+    edges,
+    effectiveCollapsedCompanies,
+    effectiveCollapsedProjects,
     hoveredNodeId,
     connectedNodeIds,
     connectedEdgeIds,
@@ -1581,7 +1385,6 @@ function MindMapCanvasInner() {
     selectedSubsetNodeIds,
     mapCollapsed,
     animationPhase,
-    effectiveCollapsedProjects,
   ]);
   const refreshNodeInternalIds = useMemo(
     () => collectNodeInternalsRefreshIds(displayNodes, displayEdges),
