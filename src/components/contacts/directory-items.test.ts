@@ -1,6 +1,6 @@
 // Removed node:assert/strict - use vitest expect instead
 import assert from 'node:assert';
-import { describe, it } from "vitest";
+import { it } from "vitest";
 import type { ContactWithRelations, VendorWithRelations } from "@/lib/supabase/types";
 import {
   buildDirectoryItems,
