@@ -1,8 +1,12 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { migrate } from "drizzle-orm/postgres-js/migrator";
 import * as schema from "../db/schema";
 
+// Test DB schema is operator-managed via Supabase MCP, NOT applied per-test.
+// This project uses hand-written SQL migrations (see drizzle/migrations/) without
+// a Drizzle journal file, so drizzle-orm/postgres-js/migrator can't be used here.
+// When schema changes: apply the new migration to test project ref amfgmckgntsrovdrmojy
+// via Supabase MCP, then bump this comment with the migration name.
 export async function createTestDb() {
   if (!process.env.DATABASE_URL_TEST) {
     throw new Error(
@@ -15,8 +19,6 @@ export async function createTestDb() {
     ssl: connectionString.includes("localhost") ? false : "require",
   });
   const db = drizzle(client, { schema });
-
-  await migrate(db, { migrationsFolder: "drizzle/migrations" });
 
   return { db, client };
 }
