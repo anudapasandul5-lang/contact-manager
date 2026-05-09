@@ -6,7 +6,7 @@ import {
   dialogCloseIconClassName,
 } from "@/components/ui/dialog";
 
-describe("dialog close styles use an explicit high-contrast surface and icon stroke", () => {
+it("dialog close styles use an explicit high-contrast surface and icon stroke", () => {
   assert.match(dialogCloseButtonClassName, /bg-white\/92/);
   assert.match(dialogCloseButtonClassName, /text-slate-500/);
   assert.match(dialogCloseButtonClassName, /hover:text-slate-900/);

@@ -24,13 +24,13 @@ function renderView(props?: Partial<React.ComponentProps<typeof LoginFormView>>)
   );
 }
 
-describe("LoginFormView renders the Google sign-in button", () => {
+it("LoginFormView renders the Google sign-in button", () => {
   const markup = renderView();
 
   assert.match(markup, /Continue with Google/);
 });
 
-describe("LoginFormView renders OAuth error copy when provided", () => {
+it("LoginFormView renders OAuth error copy when provided", () => {
   const markup = renderView({
     oauthError: "Google sign-in was not completed. Please try again.",
   });
@@ -38,7 +38,7 @@ describe("LoginFormView renders OAuth error copy when provided", () => {
   assert.match(markup, /Google sign-in was not completed\. Please try again\./);
 });
 
-describe("LoginFormView keeps sign-up email and password copy visible for create-account mode", () => {
+it("LoginFormView keeps sign-up email and password copy visible for create-account mode", () => {
   const markup = renderView({
     mode: "sign-up",
   });

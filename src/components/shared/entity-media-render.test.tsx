@@ -29,7 +29,7 @@ function collectElementsByType(node: ReactNode, type: unknown): ReactElement[] {
   return matches.concat(children.flatMap((child) => collectElementsByType(child, type)));
 }
 
-describe("ContactCard renders an image when a contact photo URL is present", () => {
+it("ContactCard renders an image when a contact photo URL is present", () => {
   const markup = renderToStaticMarkup(
     <ContactCard
       contact={{
@@ -56,7 +56,7 @@ describe("ContactCard renders an image when a contact photo URL is present", () 
   assert.match(markup, /<img[^>]+src="https:\/\/signed\.test\/photo\.jpg"/);
 });
 
-describe("CompanyNode renders an image when a company logo URL is present", () => {
+it("CompanyNode renders an image when a company logo URL is present", () => {
   const props = {
     id: "company-1",
     data: {
@@ -78,7 +78,7 @@ describe("CompanyNode renders an image when a company logo URL is present", () =
   assert.match(markup, /background:rgba\(255,255,255,0\.92\)/);
 });
 
-describe("ContactNode renders an image when a profile photo URL is present", () => {
+it("ContactNode renders an image when a profile photo URL is present", () => {
   const props = {
     id: "contact-1",
     data: {
@@ -98,7 +98,7 @@ describe("ContactNode renders an image when a profile photo URL is present", () 
   assert.match(markup, /<img[^>]+src="https:\/\/signed\.test\/contact\.png"/);
 });
 
-describe("ProjectNode renders an image when a project logo URL is present", () => {
+it("ProjectNode renders an image when a project logo URL is present", () => {
   const props = {
     id: "project-1",
     data: {
@@ -117,7 +117,7 @@ describe("ProjectNode renders an image when a project logo URL is present", () =
   assert.match(markup, /background:rgba\(255,255,255,0\.92\)/);
 });
 
-describe("ProjectNode exposes both inbound and outbound handles for standalone project edges", () => {
+it("ProjectNode exposes both inbound and outbound handles for standalone project edges", () => {
   const tree = ProjectNode({
     id: "project-1",
     data: {
