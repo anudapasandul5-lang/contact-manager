@@ -15,5 +15,10 @@ export default defineConfig({
     env: {
       NODE_ENV: "test",
     },
-  },
+    // Serialize test files: integration tests share a single test DB
+    // (Supabase project amfgmckgntsrovdrmojy). Parallel files would race
+    // on inserts/migrations. Per-test fresh user_id provides isolation,
+    // not parallel workers.
+    threads: false,
+  } as any,
 });
