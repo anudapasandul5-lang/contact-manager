@@ -14,9 +14,11 @@ import {
   listEntitiesForBusiness,
 } from "./businesses";
 
+type TestDb = Awaited<ReturnType<typeof createTestDb>>;
+
 describe("BusinessRegistry", () => {
-  let db: any;
-  let client: any;
+  let db: TestDb["db"];
+  let client: TestDb["client"];
   let userId: string;
 
   beforeEach(async () => {

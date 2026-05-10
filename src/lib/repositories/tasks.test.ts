@@ -14,9 +14,11 @@ import {
   listTasksByEntity,
 } from "./tasks";
 
+type TestDb = Awaited<ReturnType<typeof createTestDb>>;
+
 describe("TaskRepository", () => {
-  let db: any;
-  let client: any;
+  let db: TestDb["db"];
+  let client: TestDb["client"];
   let userId: string;
 
   beforeEach(async () => {

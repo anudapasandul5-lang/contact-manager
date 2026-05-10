@@ -22,7 +22,7 @@ export default defineConfig({
     // (Supabase project amfgmckgntsrovdrmojy). Parallel files would race
     // on inserts/migrations. Per-test fresh user_id provides isolation,
     // not parallel workers.
-    threads: false,
+    fileParallelism: false,
     testTimeout: 30000,
-  } as any,
+  },
 });
