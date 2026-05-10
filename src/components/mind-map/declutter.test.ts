@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { Node, Edge } from "@xyflow/react";
 import {
   buildSearchResults,
@@ -27,7 +28,7 @@ function createEdge(overrides: Partial<Edge> & { id: string; source: string; tar
   };
 }
 
-test("buildSearchResults matches companies contacts vendors and projects in ranked order", () => {
+it("buildSearchResults matches companies contacts vendors and projects in ranked order", () => {
   const nodes = [
     createNode({ id: "company-1", type: "company", data: { label: "Acme Labs" } }),
     createNode({ id: "contact-1", type: "contact", data: { label: "Alice Acme", contactType: "employee" } }),
@@ -48,7 +49,7 @@ test("buildSearchResults matches companies contacts vendors and projects in rank
   );
 });
 
-test("buildSearchResults collapses duplicate projected contact copies into one search result", () => {
+it("buildSearchResults collapses duplicate projected contact copies into one search result", () => {
   const nodes = [
     createNode({
       id: "contact-alice::company-1",
@@ -69,7 +70,7 @@ test("buildSearchResults collapses duplicate projected contact copies into one s
   assert.equal(results[0]?.label, "Alice Acme");
 });
 
-test("buildNeighborhoodNodeIds returns the selected node plus first-degree neighbors", () => {
+it("buildNeighborhoodNodeIds returns the selected node plus first-degree neighbors", () => {
   const edges = [
     createEdge({ id: "company-contact", source: "company-1", target: "contact-1" }),
     createEdge({ id: "contact-project", source: "contact-1", target: "project-1" }),
@@ -81,7 +82,7 @@ test("buildNeighborhoodNodeIds returns the selected node plus first-degree neigh
   assert.deepEqual([...ids].sort(), ["company-1", "contact-1", "project-1"]);
 });
 
-test("getNodePresentationState keeps company labels visible at overview zoom", () => {
+it("getNodePresentationState keeps company labels visible at overview zoom", () => {
   const state = getNodePresentationState(
     createNode({ id: "company-1", type: "company", data: { label: "Acme Labs" } }),
     {
@@ -97,7 +98,7 @@ test("getNodePresentationState keeps company labels visible at overview zoom", (
   assert.equal(state.isQuiet, false);
 });
 
-test("getNodePresentationState quiets secondary nodes at overview zoom until focused", () => {
+it("getNodePresentationState quiets secondary nodes at overview zoom until focused", () => {
   const quiet = getNodePresentationState(
     createNode({ id: "contact-1", type: "contact", data: { label: "Alice Acme" } }),
     {
@@ -127,7 +128,7 @@ test("getNodePresentationState quiets secondary nodes at overview zoom until foc
   assert.equal(active.isQuiet, false);
 });
 
-test("getNodePresentationState dims nodes outside an active neighborhood", () => {
+it("getNodePresentationState dims nodes outside an active neighborhood", () => {
   const state = getNodePresentationState(
     createNode({ id: "vendor-1", type: "vendor", data: { label: "Acme Print" } }),
     {

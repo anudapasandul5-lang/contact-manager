@@ -1,8 +1,9 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { getAuthModeConfig, parseAuthCredentials } from "@/lib/auth/form";
 
-test("parseAuthCredentials trims email and keeps password", () => {
+it("parseAuthCredentials trims email and keeps password", () => {
   assert.deepEqual(
     parseAuthCredentials({
       email: "  person@example.com  ",
@@ -15,7 +16,7 @@ test("parseAuthCredentials trims email and keeps password", () => {
   );
 });
 
-test("parseAuthCredentials rejects missing fields", () => {
+it("parseAuthCredentials rejects missing fields", () => {
   assert.throws(
     () =>
       parseAuthCredentials({
@@ -26,7 +27,7 @@ test("parseAuthCredentials rejects missing fields", () => {
   );
 });
 
-test("getAuthModeConfig returns create-account labels", () => {
+it("getAuthModeConfig returns create-account labels", () => {
   assert.deepEqual(getAuthModeConfig("sign-up"), {
     endpoint: "/api/auth/sign-up",
     idleLabel: "Create Account",

@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { fetchSupabaseNetworkData } from "@/lib/supabase/network";
 
 function createOrderedResult<T>(data: T) {
@@ -47,7 +48,7 @@ function createSupabaseStub(results: Partial<Record<string, ReturnType<typeof cr
   };
 }
 
-test("fetchSupabaseNetworkData scopes base queries to the authenticated user", async () => {
+it("fetchSupabaseNetworkData scopes base queries to the authenticated user", async () => {
   const contacts = createOrderedResult([]);
   const companies = createOrderedResult([]);
   const projects = createOrderedResult([]);
@@ -83,7 +84,7 @@ test("fetchSupabaseNetworkData scopes base queries to the authenticated user", a
   }
 });
 
-test("fetchSupabaseNetworkData normalizes legacy service providers into vendor contacts", async () => {
+it("fetchSupabaseNetworkData normalizes legacy service providers into vendor contacts", async () => {
   const contacts = createOrderedResult([
     {
       id: "contact-1",
@@ -124,7 +125,7 @@ test("fetchSupabaseNetworkData normalizes legacy service providers into vendor c
   assert.deepEqual(result.currentUser, { display_name: null, avatar_url: null });
 });
 
-test("fetchSupabaseNetworkData attaches signed media URLs to top-level and related entities", async () => {
+it("fetchSupabaseNetworkData attaches signed media URLs to top-level and related entities", async () => {
   const contacts = createOrderedResult([
     {
       id: "contact-1",
@@ -220,7 +221,7 @@ test("fetchSupabaseNetworkData attaches signed media URLs to top-level and relat
   );
 });
 
-test("fetchSupabaseNetworkData includes the signed current user profile", async () => {
+it("fetchSupabaseNetworkData includes the signed current user profile", async () => {
   const supabase = createSupabaseStub({
     contacts: createOrderedResult([]),
     companies: createOrderedResult([]),
@@ -243,7 +244,7 @@ test("fetchSupabaseNetworkData includes the signed current user profile", async 
   });
 });
 
-test("fetchSupabaseNetworkData returns follow-ups ordered alongside the network payload", async () => {
+it("fetchSupabaseNetworkData returns follow-ups ordered alongside the network payload", async () => {
   const contacts = createOrderedResult([]);
   const companies = createOrderedResult([]);
   const projects = createOrderedResult([]);

@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { validateEnv } from "@/lib/validate-env";
 
 const FULL_ENV = {
@@ -8,21 +9,21 @@ const FULL_ENV = {
   DATABASE_URL: "postgresql://localhost/test",
 };
 
-test("validateEnv returns typed object when all required vars are present", () => {
+it("validateEnv returns typed object when all required vars are present", () => {
   const result = validateEnv(FULL_ENV);
   assert.equal(result.NEXT_PUBLIC_SUPABASE_URL, "https://abc.supabase.co");
   assert.equal(result.NEXT_PUBLIC_SUPABASE_ANON_KEY, "anon-key");
   assert.equal(result.DATABASE_URL, "postgresql://localhost/test");
 });
 
-test("validateEnv throws when all required vars are missing", () => {
+it("validateEnv throws when all required vars are missing", () => {
   assert.throws(
     () => validateEnv({}),
     /Missing required environment variables/,
   );
 });
 
-test("validateEnv names all missing vars in the error message", () => {
+it("validateEnv names all missing vars in the error message", () => {
   assert.throws(
     () => validateEnv({ NEXT_PUBLIC_SUPABASE_URL: "https://abc.supabase.co" }),
     (err: Error) => {
@@ -33,6 +34,6 @@ test("validateEnv names all missing vars in the error message", () => {
   );
 });
 
-test("validateEnv does not throw when all vars are set", () => {
+it("validateEnv does not throw when all vars are set", () => {
   assert.doesNotThrow(() => validateEnv(FULL_ENV));
 });

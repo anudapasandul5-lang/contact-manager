@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { Node } from "@xyflow/react";
 import type { Company, ContactWithRelations, NetworkData, Project } from "@/lib/supabase/types";
 import {
@@ -97,7 +98,7 @@ function toCenterPoint(node: Node) {
   };
 }
 
-test("buildGraphLayout positions projected members relative to preserved company anchors", () => {
+it("buildGraphLayout positions projected members relative to preserved company anchors", () => {
   const data = createNetworkData();
   const preservedAnchorPositions = new Map<string, { x: number; y: number }>([
     ["company-company-1", { x: 900, y: 240 }],
@@ -130,7 +131,7 @@ test("buildGraphLayout positions projected members relative to preserved company
   assert.ok(Math.abs(projectCenter.y - alphaCenter.y) < 220, "project should stay near the preserved company anchor");
 });
 
-test("buildGraphLayout keeps orphan contacts on the orphan fallback instead of pinning them to preserved anchors", () => {
+it("buildGraphLayout keeps orphan contacts on the orphan fallback instead of pinning them to preserved anchors", () => {
   const data = createNetworkData();
   const preservedAnchorPositions = new Map<string, { x: number; y: number }>([
     ["company-company-1", { x: 900, y: 240 }],
@@ -148,7 +149,7 @@ test("buildGraphLayout keeps orphan contacts on the orphan fallback instead of p
   assert.ok(Math.abs(orphanCenter.y - preservedCompanyCenter.y) > 120);
 });
 
-test("createReorganizedGraphState reseeds layout baselines and clears stale subset snapshots", () => {
+it("createReorganizedGraphState reseeds layout baselines and clears stale subset snapshots", () => {
   const data = createNetworkData();
   const currentNodes: Node[] = [
     {

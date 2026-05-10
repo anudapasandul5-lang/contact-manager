@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { Edge, Node } from "@xyflow/react";
 import { computeMindMapDisplayState } from "@/components/mind-map/mind-map-view-state";
 
@@ -27,7 +28,7 @@ function createEdge(overrides: Partial<Edge> & { id: string; source: string; tar
   };
 }
 
-test("computeMindMapDisplayState hides tucked company projections and reports hidden counts", () => {
+it("computeMindMapDisplayState hides tucked company projections and reports hidden counts", () => {
   const nodes = [
     createNode({ id: "center", type: "center" }),
     createNode({ id: "company-acme", type: "company", data: { label: "Acme" } }),

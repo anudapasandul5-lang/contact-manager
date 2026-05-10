@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   createVendorWithRelations,
   updateVendorWithRelations,
@@ -29,7 +30,7 @@ function makeRpcSpy(result: { data: unknown; error: null | { message: string } }
   return { supabase, calls };
 }
 
-test("createVendorWithRelations calls create_vendor_with_relations RPC", async () => {
+it("createVendorWithRelations calls create_vendor_with_relations RPC", async () => {
   const { supabase, calls } = makeRpcSpy({
     data: { id: "vendor-1", name: "Acme" },
     error: null,
@@ -56,7 +57,7 @@ test("createVendorWithRelations calls create_vendor_with_relations RPC", async (
   assert.equal((people[0] as { name?: unknown }).name, "Alice");
 });
 
-test("updateVendorWithRelations calls update_vendor_with_relations RPC", async () => {
+it("updateVendorWithRelations calls update_vendor_with_relations RPC", async () => {
   const { supabase, calls } = makeRpcSpy({
     data: { id: "vendor-1", name: "Acme Updated" },
     error: null,
@@ -80,7 +81,7 @@ test("updateVendorWithRelations calls update_vendor_with_relations RPC", async (
   assert.deepEqual(calls[0]!.args["p_people"], []);
 });
 
-test("createVendorWithRelations throws when RPC returns an error", async () => {
+it("createVendorWithRelations throws when RPC returns an error", async () => {
   const { supabase } = makeRpcSpy({ data: null, error: { message: "insert failed" } });
 
   await assert.rejects(

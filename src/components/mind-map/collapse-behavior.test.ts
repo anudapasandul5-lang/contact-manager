@@ -1,8 +1,9 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { shouldCollapseNodeDuringMapCollapse } from "@/components/mind-map/collapse-behavior";
 
-test("map-wide collapse hides company, vendor, contact, and project nodes but keeps the center visible", () => {
+it("map-wide collapse hides company, vendor, contact, and project nodes but keeps the center visible", () => {
   assert.equal(shouldCollapseNodeDuringMapCollapse("center"), false);
   assert.equal(shouldCollapseNodeDuringMapCollapse("company"), true);
   assert.equal(shouldCollapseNodeDuringMapCollapse("vendor"), true);

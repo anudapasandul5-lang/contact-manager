@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { Node } from "@xyflow/react";
 import {
   DENSER_RADIAL_LAYOUT,
@@ -41,13 +42,13 @@ function createStorage() {
   };
 }
 
-test("shouldResetViewOnSearchChange only resets when a non-empty search is cleared", () => {
+it("shouldResetViewOnSearchChange only resets when a non-empty search is cleared", () => {
   assert.equal(shouldResetViewOnSearchChange("alice", ""), true);
   assert.equal(shouldResetViewOnSearchChange("alice", "ali"), false);
   assert.equal(shouldResetViewOnSearchChange("", ""), false);
 });
 
-test("applySavedNodePositions keeps dragged positions for known nodes and leaves new nodes laid out", () => {
+it("applySavedNodePositions keeps dragged positions for known nodes and leaves new nodes laid out", () => {
   const nodes = [
     createNode("contact-1", { x: 10, y: 20 }),
     createNode("contact-2", { x: 30, y: 40 }),
@@ -63,7 +64,7 @@ test("applySavedNodePositions keeps dragged positions for known nodes and leaves
   assert.deepEqual(result[1]?.position, { x: 30, y: 40 });
 });
 
-test("applySavedNodePositions applies saved positions for draggable non-center nodes", () => {
+it("applySavedNodePositions applies saved positions for draggable non-center nodes", () => {
   const nodes = [
     { id: "center", type: "center", position: { x: 0, y: 0 }, data: {} } as Node,
     { id: "company-1", type: "company", position: { x: 255, y: -28 }, data: {} } as Node,
@@ -83,7 +84,7 @@ test("applySavedNodePositions applies saved positions for draggable non-center n
   assert.deepEqual(result[2]?.position, { x: 100, y: 120 });
 });
 
-test("applySavedNodePositions applies saved positions for projected contact nodes", () => {
+it("applySavedNodePositions applies saved positions for projected contact nodes", () => {
   const projectedNode = {
     id: "contact-1::company-1",
     type: "contact",
@@ -102,12 +103,12 @@ test("applySavedNodePositions applies saved positions for projected contact node
   assert.deepEqual(result[0]?.position, { x: 5, y: 5 });
 });
 
-test("createLayoutStorageKey uses a versioned namespace for migration safety", () => {
+it("createLayoutStorageKey uses a versioned namespace for migration safety", () => {
   const storageKey = createLayoutStorageKey("user-1");
   assert.equal(storageKey, "contact-manager:mind-map-layout:v5:user-1");
 });
 
-test("mergeNodePositionMap preserves collapsed node baselines while updating visible nodes", () => {
+it("mergeNodePositionMap preserves collapsed node baselines while updating visible nodes", () => {
   const baseline = new Map([
     ["company-1", { x: 20, y: 30 }],
     ["contact-2", { x: 200, y: 220 }],
@@ -125,7 +126,7 @@ test("mergeNodePositionMap preserves collapsed node baselines while updating vis
   assert.deepEqual(result.get("contact-3"), { x: 310, y: 330 });
 });
 
-test("createNodePositionMap snapshots current node positions", () => {
+it("createNodePositionMap snapshots current node positions", () => {
   const nodes = [
     createNode("contact-1", { x: 10, y: 20 }),
     { id: "company-1", type: "company", position: { x: 200, y: 240 }, data: {} } as Node,
@@ -137,7 +138,7 @@ test("createNodePositionMap snapshots current node positions", () => {
   assert.deepEqual(result.get("company-1"), { x: 200, y: 240 });
 });
 
-test("writeSavedNodePositionMap persists expanded baseline positions for focused nodes", () => {
+it("writeSavedNodePositionMap persists expanded baseline positions for focused nodes", () => {
   const storage = createStorage();
   Object.assign(globalThis, {
     window: {
@@ -168,14 +169,14 @@ test("writeSavedNodePositionMap persists expanded baseline positions for focused
   });
 });
 
-test("denser radial layout reduces default spacing compared with the old layout", () => {
+it("denser radial layout reduces default spacing compared with the old layout", () => {
   assert.ok(DENSER_RADIAL_LAYOUT.ownedRadius < 280);
   assert.ok(DENSER_RADIAL_LAYOUT.partnerRadius < 440);
   assert.ok(DENSER_RADIAL_LAYOUT.contactOrbit < 280);
   assert.ok(DENSER_RADIAL_LAYOUT.vendorRingRadius < 860);
 });
 
-test("getInitialViewportTarget centers the initial view on the You node", () => {
+it("getInitialViewportTarget centers the initial view on the You node", () => {
   assert.deepEqual(getInitialViewportTarget(), {
     x: 65,
     y: 65,
@@ -183,7 +184,7 @@ test("getInitialViewportTarget centers the initial view on the You node", () => 
   });
 });
 
-test("getInitialViewportTarget uses the actual center node position when available", () => {
+it("getInitialViewportTarget uses the actual center node position when available", () => {
   const centerNode = {
     id: "center",
     position: { x: 120, y: 40 },
@@ -197,7 +198,7 @@ test("getInitialViewportTarget uses the actual center node position when availab
   });
 });
 
-test("shouldApplyInitialViewport waits until nodes are initialized", () => {
+it("shouldApplyInitialViewport waits until nodes are initialized", () => {
   assert.equal(
     shouldApplyInitialViewport({ hasInitialized: false, nodesReady: true, nodesInitialized: false }),
     false,

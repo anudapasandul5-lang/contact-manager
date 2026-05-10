@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { LoginFormView } from "@/components/auth/LoginFormView";
 
@@ -23,13 +24,13 @@ function renderView(props?: Partial<React.ComponentProps<typeof LoginFormView>>)
   );
 }
 
-test("LoginFormView renders the Google sign-in button", () => {
+it("LoginFormView renders the Google sign-in button", () => {
   const markup = renderView();
 
   assert.match(markup, /Continue with Google/);
 });
 
-test("LoginFormView renders OAuth error copy when provided", () => {
+it("LoginFormView renders OAuth error copy when provided", () => {
   const markup = renderView({
     oauthError: "Google sign-in was not completed. Please try again.",
   });
@@ -37,7 +38,7 @@ test("LoginFormView renders OAuth error copy when provided", () => {
   assert.match(markup, /Google sign-in was not completed\. Please try again\./);
 });
 
-test("LoginFormView keeps sign-up email and password copy visible for create-account mode", () => {
+it("LoginFormView keeps sign-up email and password copy visible for create-account mode", () => {
   const markup = renderView({
     mode: "sign-up",
   });

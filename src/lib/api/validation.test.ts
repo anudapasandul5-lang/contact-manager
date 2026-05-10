@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   parseContactPayload,
   parseFollowUpCompletionPayload,
@@ -7,7 +8,7 @@ import {
   parseFollowUpPatchPayload,
 } from "@/lib/api/validation";
 
-test("parseContactPayload accepts vendor contacts after the provider merge", () => {
+it("parseContactPayload accepts vendor contacts after the provider merge", () => {
   const payload = parseContactPayload({
     name: "Vera Vendor",
     type: "vendor",
@@ -20,7 +21,7 @@ test("parseContactPayload accepts vendor contacts after the provider merge", () 
   assert.deepEqual(payload.projectIds, ["project-1"]);
 });
 
-test("parseContactPayload normalizes the removed service_provider type to vendor", () => {
+it("parseContactPayload normalizes the removed service_provider type to vendor", () => {
   const payload = parseContactPayload({
     name: "Priya Provider",
     type: "service_provider",
@@ -29,7 +30,7 @@ test("parseContactPayload normalizes the removed service_provider type to vendor
   assert.equal(payload.type, "vendor");
 });
 
-test("parseFollowUpCreatePayload requires objective and scheduled_for while normalizing optional links", () => {
+it("parseFollowUpCreatePayload requires objective and scheduled_for while normalizing optional links", () => {
   const payload = parseFollowUpCreatePayload({
     contact_id: " contact-1 ",
     company_id: " company-1 ",
@@ -49,7 +50,7 @@ test("parseFollowUpCreatePayload requires objective and scheduled_for while norm
   });
 });
 
-test("parseFollowUpCreatePayload rejects missing required fields", () => {
+it("parseFollowUpCreatePayload rejects missing required fields", () => {
   assert.throws(
     () =>
       parseFollowUpCreatePayload({
@@ -61,7 +62,7 @@ test("parseFollowUpCreatePayload rejects missing required fields", () => {
   );
 });
 
-test("parseFollowUpPatchPayload only allows editable fields", () => {
+it("parseFollowUpPatchPayload only allows editable fields", () => {
   const payload = parseFollowUpPatchPayload({
     company_id: "",
     project_id: "project-1",
@@ -79,7 +80,7 @@ test("parseFollowUpPatchPayload only allows editable fields", () => {
   });
 });
 
-test("parseFollowUpCompletionPayload supports an optional next follow-up", () => {
+it("parseFollowUpCompletionPayload supports an optional next follow-up", () => {
   const payload = parseFollowUpCompletionPayload({
     completion_note: "Left voicemail",
     next: {
@@ -105,7 +106,7 @@ test("parseFollowUpCompletionPayload supports an optional next follow-up", () =>
   });
 });
 
-test("parseFollowUpCompletionPayload rejects an invalid nested next follow-up", () => {
+it("parseFollowUpCompletionPayload rejects an invalid nested next follow-up", () => {
   assert.throws(
     () =>
       parseFollowUpCompletionPayload({

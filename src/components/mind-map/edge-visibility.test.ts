@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { Edge } from "@xyflow/react";
 import { deriveDisplayEdge } from "@/components/mind-map/edge-visibility";
 
@@ -17,7 +18,7 @@ function createEdge(overrides: Partial<Edge> = {}): Edge {
   };
 }
 
-test("hides center-to-company stubs once companies collapse into the center", () => {
+it("hides center-to-company stubs once companies collapse into the center", () => {
   const edge = deriveDisplayEdge(createEdge(), {
     hiddenNodeIds: new Set(),
     nodeOpacityById: new Map([
@@ -36,7 +37,7 @@ test("hides center-to-company stubs once companies collapse into the center", ()
   assert.equal(edge.style?.pointerEvents, "none");
 });
 
-test("keeps company-to-contact edges visible when companies collapse into the center", () => {
+it("keeps company-to-contact edges visible when companies collapse into the center", () => {
   const edge = deriveDisplayEdge(createEdge({
     id: "company-1-contact-1",
     source: "company-1",
@@ -60,7 +61,7 @@ test("keeps company-to-contact edges visible when companies collapse into the ce
   assert.notEqual(edge.style?.pointerEvents, "none");
 });
 
-test("dims non-center crossing edges when focus targets do not match both ends", () => {
+it("dims non-center crossing edges when focus targets do not match both ends", () => {
   const edge = deriveDisplayEdge(createEdge({
     id: "project-1-contact-1",
     source: "project-1",

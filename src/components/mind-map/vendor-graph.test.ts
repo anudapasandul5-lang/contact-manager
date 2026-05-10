@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { buildVendorGraphElements } from "@/components/mind-map/vendor-graph";
 import type { VendorWithRelations } from "@/lib/supabase/types";
 
@@ -55,7 +56,7 @@ function createVendor(): VendorWithRelations {
   };
 }
 
-test("buildVendorGraphElements keeps vendor businesses without rendering vendor people", () => {
+it("buildVendorGraphElements keeps vendor businesses without rendering vendor people", () => {
   const { nodes, edges } = buildVendorGraphElements([createVendor()]);
 
   assert.equal(nodes.length, 1);

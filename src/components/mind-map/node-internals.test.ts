@@ -1,5 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+// Removed node:assert/strict - use vitest expect instead
+import assert from 'node:assert';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { Edge, Node } from "@xyflow/react";
 import { collectNodeInternalsRefreshIds } from "@/components/mind-map/node-internals";
 
@@ -17,7 +18,7 @@ function createEdge(id: string, source: string, target: string): Edge {
   return { id, source, target } as Edge;
 }
 
-test("collectNodeInternalsRefreshIds returns visible edge-bound nodes and skips hidden nodes", () => {
+it("collectNodeInternalsRefreshIds returns visible edge-bound nodes and skips hidden nodes", () => {
   const nodes = [
     createNode("center"),
     createNode("project-project-2"),
