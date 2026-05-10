@@ -15,7 +15,8 @@ export function nextInstance(rruleStr: string, after: Date): Date | null {
 }
 
 /**
- * All occurrences in `(after, until]`, sorted ascending.
+ * All occurrences in `(after, until)` — exclusive on both ends, sorted ascending.
+ * If an occurrence falls exactly on `until`, it is NOT included.
  * Used by digest backfill cron to surface missed recurrences.
  *
  * @throws Error if `rruleStr` is malformed.
@@ -23,8 +24,7 @@ export function nextInstance(rruleStr: string, after: Date): Date | null {
 export function expandUntil(rruleStr: string, after: Date, until: Date): Date[] {
   if (until.getTime() <= after.getTime()) return [];
   const rule = RRule.fromString(rruleStr);
-  // `between(start, end, inc)` — both ends inclusive when inc=true.
-  // We want strictly-after-`after`, so use inc=false on start and pad `until` to inclusive.
+  // inc=false: both endpoints exclusive → (after, until)
   return rule.between(after, until, false);
 }
 

@@ -130,4 +130,18 @@ describe("RecurrenceEngine — expandUntil", () => {
     );
     expect(out).toHaveLength(5);
   });
+
+  it("occurrence exactly on `until` is excluded (exclusive upper bound)", () => {
+    // Rule fires daily at 09:00 UTC. until=2026-05-12T09:00:00Z — exactly an occurrence.
+    // Behavior: (after, until) exclusive — May 12 09:00 is NOT included.
+    const out = expandUntil(
+      "DTSTART:20260510T090000Z\nRRULE:FREQ=DAILY",
+      new Date("2026-05-10T08:00:00Z"),
+      new Date("2026-05-12T09:00:00Z"),
+    );
+    // Expect May 10 09:00 and May 11 09:00 — NOT May 12 09:00
+    expect(out).toHaveLength(2);
+    expect(out[0].toISOString()).toBe("2026-05-10T09:00:00.000Z");
+    expect(out[1].toISOString()).toBe("2026-05-11T09:00:00.000Z");
+  });
 });
