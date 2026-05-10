@@ -101,9 +101,12 @@ export function propagateCompletion(tasks: Task[], parentId: string): string[] {
     childrenByParent.set(t.parent_task_id, arr);
   }
   const out: string[] = [];
+  const visited = new Set<string>();
   const stack: string[] = [...(childrenByParent.get(parentId) ?? [])];
   while (stack.length > 0) {
     const id = stack.pop()!;
+    if (visited.has(id)) continue;
+    visited.add(id);
     out.push(id);
     const grandkids = childrenByParent.get(id) ?? [];
     for (const g of grandkids) stack.push(g);
