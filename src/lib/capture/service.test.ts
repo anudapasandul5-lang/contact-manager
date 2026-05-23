@@ -19,10 +19,7 @@ describe("normalizeCapture — cmd-k", () => {
 
   it("omits missing optional fields", () => {
     const result = normalizeCapture({ source: "cmd-k", payload: { title: "Task" } });
-    expect(result.projectId).toBeUndefined();
-    expect(result.dueDate).toBeUndefined();
-    expect(result.notes).toBeUndefined();
-    expect(result.businessId).toBeUndefined();
+    expect(result).toStrictEqual({ title: "Task" });
   });
 
   it("trims title whitespace", () => {

@@ -1,8 +1,6 @@
 import "server-only";
 import type { CreateTaskInput } from "@/lib/repositories/tasks";
 
-export type CaptureSource = "cmd-k" | "ios-shortcut" | "right-click-graph";
-
 export type CmdKPayload = {
   title: string;
   notes?: string;
@@ -39,12 +37,12 @@ export function normalizeCapture(input: CaptureInput): CreateTaskInput {
   if (source === "cmd-k") {
     return {
       title: payload.title.trim(),
-      notes: payload.notes,
-      dueDate: payload.dueDate,
-      projectId: payload.projectId,
-      businessId: payload.businessId,
-      contactId: payload.contactId,
-      companyId: payload.companyId,
+      ...(payload.notes !== undefined && { notes: payload.notes }),
+      ...(payload.dueDate !== undefined && { dueDate: payload.dueDate }),
+      ...(payload.projectId !== undefined && { projectId: payload.projectId }),
+      ...(payload.businessId !== undefined && { businessId: payload.businessId }),
+      ...(payload.contactId !== undefined && { contactId: payload.contactId }),
+      ...(payload.companyId !== undefined && { companyId: payload.companyId }),
     };
   }
 
@@ -60,7 +58,8 @@ export function normalizeCapture(input: CaptureInput): CreateTaskInput {
     if (entityType === "contact") return { title: payload.title.trim(), contactId: entityId };
     if (entityType === "company") return { title: payload.title.trim(), companyId: entityId };
     if (entityType === "project") return { title: payload.title.trim(), projectId: entityId };
-    throw new Error(`Unknown entityType: ${entityType as string}`);
+    const _exhaustiveEntity: never = entityType;
+    throw new Error(`Unknown entityType: ${_exhaustiveEntity as string}`);
   }
 
   const _exhaustive: never = source;
