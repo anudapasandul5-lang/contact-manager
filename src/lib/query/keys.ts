@@ -16,6 +16,9 @@ export const queryKeys = {
   projects: {
     all: ["projects"] as const,
   },
+  tasks: {
+    all: ["tasks"] as const,
+  },
   relationships: {
     all: ["relationships"] as const,
   },
