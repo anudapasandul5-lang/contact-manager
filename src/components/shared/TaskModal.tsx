@@ -107,8 +107,7 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
             type="date"
             value={rawDate}
             onChange={(e) => setRawDate(e.target.value)}
-            className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            style={{ minHeight: 44 }}
+            className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-11"
           />
 
           {entityContext?.type !== "project" && (
