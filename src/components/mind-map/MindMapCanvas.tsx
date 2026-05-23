@@ -52,6 +52,7 @@ import dynamic from "next/dynamic";
 import { MapController } from "./MapController";
 import { ContactSidePanel } from "./ContactSidePanel";
 import { ContextMenu, type ContextMenuState } from "./ContextMenu";
+import { useCommandPalette } from "@/components/command-palette/CommandPaletteProvider";
 import type { GravityTarget } from "./GravityOverlay";
 import { shouldCollapseNodeDuringMapCollapse } from "./collapse-behavior";
 import { useTheme } from "@/hooks/useTheme";
@@ -768,6 +769,7 @@ function computeFilterVisuals(
 function MindMapCanvasInner() {
   const queryClient = useQueryClient();
   const { data: networkData, isError } = useNetworkQuery();
+  const { openTaskModal } = useCommandPalette();
   const prevNetworkDataRef = useRef<NetworkData | null>(null);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -1668,19 +1670,31 @@ function MindMapCanvasInner() {
   const onNodeContextMenu = useCallback(
     (event: React.MouseEvent, node: Node) => {
       event.preventDefault();
+      const entityId =
+        typeof node.data?.contactId === "string"
+          ? node.data.contactId
+          : typeof node.data?.vendorId === "string"
+            ? node.data.vendorId
+            : node.id.replace(/^(contact|company|project|vendor)-/, "");
+
+      const entityName = (() => {
+        if (!networkData) return undefined;
+        if (node.type === "contact") return networkData.contacts.find((c) => c.id === entityId)?.name;
+        if (node.type === "company") return networkData.companies.find((c) => c.id === entityId)?.name;
+        if (node.type === "project") return networkData.projects.find((p) => p.id === entityId)?.name;
+        return undefined;
+      })();
+
       setContextMenu({
         x: event.clientX,
         y: event.clientY,
         nodeType: node.type as ContextMenuState["nodeType"],
         nodeId: node.id,
-        entityId: typeof node.data?.contactId === "string"
-          ? node.data.contactId
-          : typeof node.data?.vendorId === "string"
-            ? node.data.vendorId
-            : node.id.replace(/^(contact|company|project|vendor)-/, ""),
+        entityId,
+        entityName,
       });
     },
-    [],
+    [networkData],
   );
 
   const onPaneContextMenu = useCallback(
@@ -1995,6 +2009,10 @@ function MindMapCanvasInner() {
           onFitView={() => rfFitView({ padding: DENSER_RADIAL_LAYOUT.fitPadding })}
           onResetZoom={() => rfZoomTo(DENSER_RADIAL_LAYOUT.overviewZoom)}
           onToggleDarkMode={toggleTheme}
+          onAddTask={(entityType, entityId, entityName) => {
+            setContextMenu(null);
+            openTaskModal({ type: entityType, id: entityId, name: entityName });
+          }}
           onViewDetails={() => {
             if (!contextMenu.nodeId || !networkData) return;
             if (contextMenu.nodeType === "contact") {
