@@ -1,0 +1,1594 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`composeDigest > all-clear: all buckets empty — shows all-clear message 1`] = `"✓ All clear — Sat 23 May"`;
+
+exports[`composeDigest > all-clear: all buckets empty — shows all-clear message 2`] = `
+"<!doctype html>
+<html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+  <head>
+    <title></title>
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+      #outlook a { padding:0; }
+      body { margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%; }
+      table, td { border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt; }
+      img { border:0;height:auto;line-height:100%; outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; }
+      p { display:block;margin:13px 0; }
+    </style>
+    <!--[if mso]>
+    <noscript>
+    <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    </noscript>
+    <![endif]-->
+    <!--[if lte mso 11]>
+    <style type="text/css">
+      .mj-outlook-group-fix { width:100% !important; }
+    </style>
+    <![endif]-->
+    
+      <!--[if !mso]><!-->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" type="text/css">
+        <style type="text/css">
+          @import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap);
+        </style>
+      <!--<![endif]-->
+
+    
+    
+    <style type="text/css">
+      @media only screen and (min-width:480px) {
+        .mj-column-per-100 { width:100% !important; max-width: 100%; }
+      }
+    </style>
+    <style media="screen and (min-width:480px)">
+      .moz-text-html .mj-column-per-100 { width:100% !important; max-width: 100%; }
+    </style>
+    
+    
+  
+    
+    
+    
+  </head>
+  
+      <body  style="word-spacing:normal;background-color:#f4f4f5;">
+        
+        <div
+           aria-roledescription="email" role="article" lang="und" dir="auto" style="word-spacing:normal;background-color:#f4f4f5;"
+        >
+        
+      
+      <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#18181b" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#18181b;background-color:#18181b;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#18181b;background-color:#18181b;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:16px 24px;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:552px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;font-weight:600;line-height:1;text-align:left;color:#ffffff;"
+      >Daily Digest · Sat 23 May</div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:0;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="center" style="font-size:0px;padding:32px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:center;color:#6b7280;"
+      >✓ Nothing due — you have a clear runway today.</div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><![endif]-->
+    
+    
+      </div>
+      </body>
+    
+</html>
+  "
+`;
+
+exports[`composeDigest > cap: more than 20 tasks in today bucket — shows max 20 + extra count 1`] = `
+"<!doctype html>
+<html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+  <head>
+    <title></title>
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+      #outlook a { padding:0; }
+      body { margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%; }
+      table, td { border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt; }
+      img { border:0;height:auto;line-height:100%; outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; }
+      p { display:block;margin:13px 0; }
+    </style>
+    <!--[if mso]>
+    <noscript>
+    <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    </noscript>
+    <![endif]-->
+    <!--[if lte mso 11]>
+    <style type="text/css">
+      .mj-outlook-group-fix { width:100% !important; }
+    </style>
+    <![endif]-->
+    
+      <!--[if !mso]><!-->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" type="text/css">
+        <style type="text/css">
+          @import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap);
+        </style>
+      <!--<![endif]-->
+
+    
+    
+    <style type="text/css">
+      @media only screen and (min-width:480px) {
+        .mj-column-per-100 { width:100% !important; max-width: 100%; }
+      }
+    </style>
+    <style media="screen and (min-width:480px)">
+      .moz-text-html .mj-column-per-100 { width:100% !important; max-width: 100%; }
+    </style>
+    
+    
+  
+    
+    
+    
+  </head>
+  
+      <body  style="word-spacing:normal;background-color:#f4f4f5;">
+        
+        <div
+           aria-roledescription="email" role="article" lang="und" dir="auto" style="word-spacing:normal;background-color:#f4f4f5;"
+        >
+        
+      
+      <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#18181b" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#18181b;background-color:#18181b;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#18181b;background-color:#18181b;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:16px 24px;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:552px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;font-weight:600;line-height:1;text-align:left;color:#ffffff;"
+      >Daily Digest · Sat 23 May</div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:0;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:16px 24px 4px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;"
+      ><span style="background:#3b82f6;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;">Today</span></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 1</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 2</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 3</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 4</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 5</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 6</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 7</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 8</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 9</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 10</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 11</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 12</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 13</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 14</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 15</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 16</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 17</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 18</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 19</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Task 20</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:6px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:12px;line-height:1;text-align:left;color:#9ca3af;"
+      >…and 5 more</div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><![endif]-->
+    
+    
+      </div>
+      </body>
+    
+</html>
+  "
+`;
+
+exports[`composeDigest > full: all 3 buckets populated — html and subject match snapshot 1`] = `"🔴 1 overdue · 1 due today — Sat 23 May"`;
+
+exports[`composeDigest > full: all 3 buckets populated — html and subject match snapshot 2`] = `
+"<!doctype html>
+<html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+  <head>
+    <title></title>
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+      #outlook a { padding:0; }
+      body { margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%; }
+      table, td { border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt; }
+      img { border:0;height:auto;line-height:100%; outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; }
+      p { display:block;margin:13px 0; }
+    </style>
+    <!--[if mso]>
+    <noscript>
+    <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    </noscript>
+    <![endif]-->
+    <!--[if lte mso 11]>
+    <style type="text/css">
+      .mj-outlook-group-fix { width:100% !important; }
+    </style>
+    <![endif]-->
+    
+      <!--[if !mso]><!-->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" type="text/css">
+        <style type="text/css">
+          @import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap);
+        </style>
+      <!--<![endif]-->
+
+    
+    
+    <style type="text/css">
+      @media only screen and (min-width:480px) {
+        .mj-column-per-100 { width:100% !important; max-width: 100%; }
+      }
+    </style>
+    <style media="screen and (min-width:480px)">
+      .moz-text-html .mj-column-per-100 { width:100% !important; max-width: 100%; }
+    </style>
+    
+    
+  
+    
+    
+    
+  </head>
+  
+      <body  style="word-spacing:normal;background-color:#f4f4f5;">
+        
+        <div
+           aria-roledescription="email" role="article" lang="und" dir="auto" style="word-spacing:normal;background-color:#f4f4f5;"
+        >
+        
+      
+      <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#18181b" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#18181b;background-color:#18181b;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#18181b;background-color:#18181b;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:16px 24px;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:552px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;font-weight:600;line-height:1;text-align:left;color:#ffffff;"
+      >Daily Digest · Sat 23 May</div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:0;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:16px 24px 4px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;"
+      ><span style="background:#ef4444;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;">Overdue</span></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Overdue task</strong><span style="color:#6b7280;font-size:12px;"> · Overdue</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:16px 24px 4px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;"
+      ><span style="background:#3b82f6;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;">Today</span></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Today task</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:16px 24px 4px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;"
+      ><span style="background:#6b7280;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;">Tomorrow</span></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Tomorrow task</strong><span style="color:#6b7280;font-size:12px;"> · Tomorrow</span></div></div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><![endif]-->
+    
+    
+      </div>
+      </body>
+    
+</html>
+  "
+`;
+
+exports[`composeDigest > html-injection: escapes HTML in task title — no raw angle brackets in output 1`] = `
+"<!doctype html>
+<html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+  <head>
+    <title></title>
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+      #outlook a { padding:0; }
+      body { margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%; }
+      table, td { border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt; }
+      img { border:0;height:auto;line-height:100%; outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; }
+      p { display:block;margin:13px 0; }
+    </style>
+    <!--[if mso]>
+    <noscript>
+    <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    </noscript>
+    <![endif]-->
+    <!--[if lte mso 11]>
+    <style type="text/css">
+      .mj-outlook-group-fix { width:100% !important; }
+    </style>
+    <![endif]-->
+    
+      <!--[if !mso]><!-->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" type="text/css">
+        <style type="text/css">
+          @import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap);
+        </style>
+      <!--<![endif]-->
+
+    
+    
+    <style type="text/css">
+      @media only screen and (min-width:480px) {
+        .mj-column-per-100 { width:100% !important; max-width: 100%; }
+      }
+    </style>
+    <style media="screen and (min-width:480px)">
+      .moz-text-html .mj-column-per-100 { width:100% !important; max-width: 100%; }
+    </style>
+    
+    
+  
+    
+    
+    
+  </head>
+  
+      <body  style="word-spacing:normal;background-color:#f4f4f5;">
+        
+        <div
+           aria-roledescription="email" role="article" lang="und" dir="auto" style="word-spacing:normal;background-color:#f4f4f5;"
+        >
+        
+      
+      <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#18181b" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#18181b;background-color:#18181b;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#18181b;background-color:#18181b;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:16px 24px;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:552px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;font-weight:600;line-height:1;text-align:left;color:#ffffff;"
+      >Daily Digest · Sat 23 May</div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:0;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:16px 24px 4px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;"
+      ><span style="background:#3b82f6;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;">Today</span></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><![endif]-->
+    
+    
+      </div>
+      </body>
+    
+</html>
+  "
+`;
+
+exports[`composeDigest > no-notes: tasks without notes or entity links — html matches snapshot 1`] = `
+"<!doctype html>
+<html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+  <head>
+    <title></title>
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+      #outlook a { padding:0; }
+      body { margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%; }
+      table, td { border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt; }
+      img { border:0;height:auto;line-height:100%; outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; }
+      p { display:block;margin:13px 0; }
+    </style>
+    <!--[if mso]>
+    <noscript>
+    <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    </noscript>
+    <![endif]-->
+    <!--[if lte mso 11]>
+    <style type="text/css">
+      .mj-outlook-group-fix { width:100% !important; }
+    </style>
+    <![endif]-->
+    
+      <!--[if !mso]><!-->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" type="text/css">
+        <style type="text/css">
+          @import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap);
+        </style>
+      <!--<![endif]-->
+
+    
+    
+    <style type="text/css">
+      @media only screen and (min-width:480px) {
+        .mj-column-per-100 { width:100% !important; max-width: 100%; }
+      }
+    </style>
+    <style media="screen and (min-width:480px)">
+      .moz-text-html .mj-column-per-100 { width:100% !important; max-width: 100%; }
+    </style>
+    
+    
+  
+    
+    
+    
+  </head>
+  
+      <body  style="word-spacing:normal;background-color:#f4f4f5;">
+        
+        <div
+           aria-roledescription="email" role="article" lang="und" dir="auto" style="word-spacing:normal;background-color:#f4f4f5;"
+        >
+        
+      
+      <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#18181b" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#18181b;background-color:#18181b;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#18181b;background-color:#18181b;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:16px 24px;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:552px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;font-weight:600;line-height:1;text-align:left;color:#ffffff;"
+      >Daily Digest · Sat 23 May</div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:0;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:16px 24px 4px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;"
+      ><span style="background:#3b82f6;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;">Today</span></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Bare task</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><![endif]-->
+    
+    
+      </div>
+      </body>
+    
+</html>
+  "
+`;
+
+exports[`composeDigest > rich-task: task with all 4 entity names — html matches snapshot 1`] = `
+"<!doctype html>
+<html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+  <head>
+    <title></title>
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+      #outlook a { padding:0; }
+      body { margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%; }
+      table, td { border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt; }
+      img { border:0;height:auto;line-height:100%; outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; }
+      p { display:block;margin:13px 0; }
+    </style>
+    <!--[if mso]>
+    <noscript>
+    <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    </noscript>
+    <![endif]-->
+    <!--[if lte mso 11]>
+    <style type="text/css">
+      .mj-outlook-group-fix { width:100% !important; }
+    </style>
+    <![endif]-->
+    
+      <!--[if !mso]><!-->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" type="text/css">
+        <style type="text/css">
+          @import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap);
+        </style>
+      <!--<![endif]-->
+
+    
+    
+    <style type="text/css">
+      @media only screen and (min-width:480px) {
+        .mj-column-per-100 { width:100% !important; max-width: 100%; }
+      }
+    </style>
+    <style media="screen and (min-width:480px)">
+      .moz-text-html .mj-column-per-100 { width:100% !important; max-width: 100%; }
+    </style>
+    
+    
+  
+    
+    
+    
+  </head>
+  
+      <body  style="word-spacing:normal;background-color:#f4f4f5;">
+        
+        <div
+           aria-roledescription="email" role="article" lang="und" dir="auto" style="word-spacing:normal;background-color:#f4f4f5;"
+        >
+        
+      
+      <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#18181b" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#18181b;background-color:#18181b;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#18181b;background-color:#18181b;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:16px 24px;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:552px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;font-weight:600;line-height:1;text-align:left;color:#ffffff;"
+      >Daily Digest · Sat 23 May</div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:0;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:16px 24px 4px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;"
+      ><span style="background:#3b82f6;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;">Today</span></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Rich task</strong><span style="color:#6b7280;font-size:12px;"> · Today</span><br/><em style="color:#6b7280;font-size:12px;">Some notes here</em><br/><span style="display:inline-flex;gap:4px;margin-top:2px;"><span style="background:#8b5cf6;color:#fff;border-radius:3px;padding:1px 5px;font-size:11px;">Acme Inc</span> <span style="background:#0ea5e9;color:#fff;border-radius:3px;padding:1px 5px;font-size:11px;">Website Redesign</span> <span style="background:#10b981;color:#fff;border-radius:3px;padding:1px 5px;font-size:11px;">John Doe</span> <span style="background:#f59e0b;color:#fff;border-radius:3px;padding:1px 5px;font-size:11px;">Acme Corp</span></span></div></div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><![endif]-->
+    
+    
+      </div>
+      </body>
+    
+</html>
+  "
+`;
+
+exports[`composeDigest > subject-no-overdue: overdue empty, today has tasks — subject has no red dot 1`] = `"2 due today — Sat 23 May"`;
+
+exports[`composeDigest > today-only: overdue and tomorrow empty — html and subject match snapshot 1`] = `"1 due today — Sat 23 May"`;
+
+exports[`composeDigest > today-only: overdue and tomorrow empty — html and subject match snapshot 2`] = `
+"<!doctype html>
+<html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+  <head>
+    <title></title>
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+      #outlook a { padding:0; }
+      body { margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%; }
+      table, td { border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt; }
+      img { border:0;height:auto;line-height:100%; outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; }
+      p { display:block;margin:13px 0; }
+    </style>
+    <!--[if mso]>
+    <noscript>
+    <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    </noscript>
+    <![endif]-->
+    <!--[if lte mso 11]>
+    <style type="text/css">
+      .mj-outlook-group-fix { width:100% !important; }
+    </style>
+    <![endif]-->
+    
+      <!--[if !mso]><!-->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" type="text/css">
+        <style type="text/css">
+          @import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap);
+        </style>
+      <!--<![endif]-->
+
+    
+    
+    <style type="text/css">
+      @media only screen and (min-width:480px) {
+        .mj-column-per-100 { width:100% !important; max-width: 100%; }
+      }
+    </style>
+    <style media="screen and (min-width:480px)">
+      .moz-text-html .mj-column-per-100 { width:100% !important; max-width: 100%; }
+    </style>
+    
+    
+  
+    
+    
+    
+  </head>
+  
+      <body  style="word-spacing:normal;background-color:#f4f4f5;">
+        
+        <div
+           aria-roledescription="email" role="article" lang="und" dir="auto" style="word-spacing:normal;background-color:#f4f4f5;"
+        >
+        
+      
+      <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#18181b" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#18181b;background-color:#18181b;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#18181b;background-color:#18181b;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:16px 24px;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:552px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;font-weight:600;line-height:1;text-align:left;color:#ffffff;"
+      >Daily Digest · Sat 23 May</div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    
+      
+      <div  style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+        
+        <table
+           align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;"
+        >
+          <tbody>
+            <tr>
+              <td
+                 style="direction:ltr;font-size:0px;padding:0;text-align:center;"
+              >
+                <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]-->
+            
+      <div
+         class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"
+      >
+        
+      <table
+         border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"
+      >
+        <tbody>
+          
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:16px 24px 4px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;"
+      ><span style="background:#3b82f6;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;">Today</span></div>
+    
+                </td>
+              </tr>
+            
+              <tr>
+                <td
+                   align="left" style="font-size:0px;padding:8px 24px;word-break:break-word;"
+                >
+                  
+      <div
+         style="font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;line-height:1;text-align:left;color:#111827;"
+      ><div style="border-bottom:1px solid #f3f4f6;padding-bottom:8px;"><strong>Today only</strong><span style="color:#6b7280;font-size:12px;"> · Today</span></div></div>
+    
+                </td>
+              </tr>
+            
+        </tbody>
+      </table>
+    
+      </div>
+    
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+      </div>
+    
+      
+      <!--[if mso | IE]></td></tr></table><![endif]-->
+    
+    
+      </div>
+      </body>
+    
+</html>
+  "
+`;
