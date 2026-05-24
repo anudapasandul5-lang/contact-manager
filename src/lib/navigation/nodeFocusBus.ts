@@ -25,3 +25,25 @@ export function subscribeFocus(listener: Listener): () => void {
     listeners.delete(listener);
   };
 }
+
+// Priority: contactId > companyId > projectId. businessId = null (no graph node).
+export function resolveTaskNode(task: {
+  contactId?: string | null;
+  companyId?: string | null;
+  projectId?: string | null;
+}): FocusRequest | null {
+  if (task.contactId) return { kind: "contact", id: task.contactId };
+  if (task.companyId) return { kind: "company", id: task.companyId };
+  if (task.projectId) return { kind: "project", id: task.projectId };
+  return null;
+}
+
+// Emitter helper — resolves FK then calls emitFocus.
+export function emitTaskFocus(task: {
+  contactId?: string | null;
+  companyId?: string | null;
+  projectId?: string | null;
+}): void {
+  const req = resolveTaskNode(task);
+  if (req) emitFocus(req);
+}
