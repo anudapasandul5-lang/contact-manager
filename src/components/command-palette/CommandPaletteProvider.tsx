@@ -38,6 +38,10 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
   const disabled = pathname === "/login";
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [taskModalEntityContext, setTaskModalEntityContext] = useState<EntityContext | null>(null);
 
