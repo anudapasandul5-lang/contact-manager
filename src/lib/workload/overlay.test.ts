@@ -24,10 +24,66 @@ function makeTask(overrides: Partial<Task>): Task {
   };
 }
 
-// Helper to create a date at start of day in a timezone
+// Helper to create a date at start of day in a timezone (as UTC)
+// This should return a UTC Date that represents midnight of the given calendar day
+// in the test timezone (America/New_York)
 function dateAtDayStart(year: number, month: number, day: number): Date {
-  const date = new Date(year, month - 1, day);
-  return date;
+  // Use the same logic as zonedDateToUtc to create midnight on that calendar day
+  // For testing, we use "America/New_York" timezone
+  const tz = "America/New_York";
+  // Initial guess: UTC midnight of the calendar day
+  const guess = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+  // Decompose to get what wall-clock time this represents in tz
+  const guessParts = getDatePartsForTest(guess, tz);
+  // Compute the offset
+  const intendedMs = Date.UTC(year, month - 1, day, 0, 0, 0, 0);
+  const guessActualMs = Date.UTC(
+    guessParts.year,
+    guessParts.month - 1,
+    guessParts.day,
+    guessParts.hour,
+    guessParts.minute,
+    guessParts.second,
+    0,
+  );
+  const offsetMs = guessActualMs - intendedMs;
+  return new Date(guess.getTime() - offsetMs);
+}
+
+function getDatePartsForTest(date: Date, tz: string): {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+} {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(date);
+  const get = (type: string): number => {
+    const p = parts.find((x) => x.type === type);
+    if (!p) throw new Error(`Missing ${type} part for tz ${tz}`);
+    return parseInt(p.value, 10);
+  };
+  let hour = get("hour");
+  if (hour === 24) hour = 0;
+  return {
+    year: get("year"),
+    month: get("month"),
+    day: get("day"),
+    hour,
+    minute: get("minute"),
+    second: get("second"),
+  };
 }
 
 describe("computeWorkload", () => {
@@ -276,8 +332,9 @@ describe("computeWorkload", () => {
   // Test 17: due 1 day + 23:59:59 ago → "overdue" (not rotting)
   it("should return 'overdue' for due_date 1 day + 23:59:59 ago (not rotting)", () => {
     const now = dateAtDayStart(2025, 1, 15);
-    // 1 day + 23h59m59s ago
-    const almostTwoDaysAgo = new Date(now.getTime() - (2 * 24 * 60 * 60 * 1000 - 1000));
+    // Jan 13 at 23:59:59 UTC = 18:59:59 NYC = within Jan 13 wall-clock day
+    // Only 1 full calendar day before "today" (Jan 15), so "overdue" not "rotting"
+    const almostTwoDaysAgo = new Date("2025-01-13T23:59:59.000Z");
     const tasks = [
       makeTask({
         contact_id: "node1",
@@ -400,5 +457,20 @@ describe("computeWorkload", () => {
     expect(() => computeWorkload(tasks, ["node1"], invalidNow, tz)).toThrow(
       RangeError,
     );
+  });
+
+  // Test 25: task with defer_date === now is not filtered (boundary: strict greater-than)
+  it("task with defer_date === now is not filtered (boundary: strict greater-than)", () => {
+    const now = dateAtDayStart(2025, 1, 15);
+    const tasks = [
+      makeTask({
+        contact_id: "node1",
+        defer_date: now, // exactly now — NOT deferred
+        due_date: now,   // due today
+      }),
+    ];
+    const result = computeWorkload(tasks, ["node1"], now, tz);
+    expect(result.has("node1")).toBe(true);
+    expect(result.get("node1")).toBe("due-today");
   });
 });
