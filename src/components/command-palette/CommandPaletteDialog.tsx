@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
-import { Building2, FolderKanban, Truck, UserPlus, Users } from "lucide-react";
+import { Building2, CheckSquare, FolderKanban, Truck, UserPlus, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Command,
@@ -18,15 +18,17 @@ import { useNetworkQuery } from "@/lib/hooks/queries/useNetworkQuery";
 import { useCreateContact } from "@/lib/hooks/mutations/useCreateContact";
 import { emitFocus, type FocusableEntityKind } from "@/lib/navigation/nodeFocusBus";
 import type { ContactType } from "@/lib/supabase/types";
+import type { EntityContext } from "@/components/shared/TaskModal";
 
 type Mode = "browse" | "quickAdd";
 
 interface CommandPaletteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  openTaskModal: (ctx?: EntityContext) => void;
 }
 
-export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialogProps) {
+export function CommandPaletteDialog({ open, onOpenChange, openTaskModal }: CommandPaletteDialogProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [mode, setMode] = useState<Mode>("browse");
@@ -165,6 +167,16 @@ export function CommandPaletteDialog({ open, onOpenChange }: CommandPaletteDialo
                     <UserPlus />
                     <span>Add contact...</span>
                     <CommandShortcut>Enter name</CommandShortcut>
+                  </CommandItem>
+                  <CommandItem
+                    value="action-add-task new task add task"
+                    onSelect={() => {
+                      handleOpenChange(false);
+                      openTaskModal();
+                    }}
+                  >
+                    <CheckSquare />
+                    <span>Add task...</span>
                   </CommandItem>
                 </CommandGroup>
 

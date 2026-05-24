@@ -11,11 +11,16 @@ import {
 } from "react";
 import { usePathname } from "next/navigation";
 import { CommandPaletteDialog } from "./CommandPaletteDialog";
+import { TaskModal, type EntityContext } from "@/components/shared/TaskModal";
 
 interface CommandPaletteContextValue {
   open: boolean;
   setOpen: (open: boolean) => void;
   toggle: () => void;
+  taskModalOpen: boolean;
+  taskModalEntityContext: EntityContext | null;
+  openTaskModal: (ctx?: EntityContext) => void;
+  closeTaskModal: () => void;
 }
 
 const CommandPaletteContext = createContext<CommandPaletteContextValue | null>(null);
@@ -32,8 +37,20 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const disabled = pathname === "/login";
   const [open, setOpen] = useState(false);
+  const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [taskModalEntityContext, setTaskModalEntityContext] = useState<EntityContext | null>(null);
 
   const toggle = useCallback(() => setOpen((o) => !o), []);
+
+  const openTaskModal = useCallback((ctx?: EntityContext) => {
+    setTaskModalEntityContext(ctx ?? null);
+    setTaskModalOpen(true);
+  }, []);
+
+  const closeTaskModal = useCallback(() => {
+    setTaskModalOpen(false);
+    setTaskModalEntityContext(null);
+  }, []);
 
   useEffect(() => {
     if (disabled) return;
@@ -56,17 +73,28 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [disabled]);
 
-  // Close when route changes.
   useEffect(() => {
     queueMicrotask(() => setOpen(false));
   }, [pathname]);
 
-  const value = useMemo(() => ({ open, setOpen, toggle }), [open, toggle]);
+  const value = useMemo(
+    () => ({ open, setOpen, toggle, taskModalOpen, taskModalEntityContext, openTaskModal, closeTaskModal }),
+    [open, toggle, taskModalOpen, taskModalEntityContext, openTaskModal, closeTaskModal],
+  );
 
   return (
     <CommandPaletteContext.Provider value={value}>
       {children}
-      {!disabled && <CommandPaletteDialog open={open} onOpenChange={setOpen} />}
+      {!disabled && (
+        <>
+          <CommandPaletteDialog open={open} onOpenChange={setOpen} openTaskModal={openTaskModal} />
+          <TaskModal
+            open={taskModalOpen}
+            onOpenChange={(v) => { if (!v) closeTaskModal(); }}
+            entityContext={taskModalEntityContext ?? undefined}
+          />
+        </>
+      )}
     </CommandPaletteContext.Provider>
   );
 }

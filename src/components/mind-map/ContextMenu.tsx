@@ -15,6 +15,7 @@ import {
   RotateCcw,
   Moon,
   Minimize2,
+  CheckSquare,
 } from "lucide-react";
 
 export interface ContextMenuState {
@@ -23,6 +24,7 @@ export interface ContextMenuState {
   nodeType?: "center" | "company" | "contact" | "project" | "vendor";
   nodeId?: string;
   entityId?: string;
+  entityName?: string;
 }
 
 interface ContextMenuProps {
@@ -44,6 +46,7 @@ interface ContextMenuProps {
   onFitView?: () => void;
   onResetZoom?: () => void;
   onToggleDarkMode?: () => void;
+  onAddTask?: (entityType: "contact" | "company" | "project", entityId: string, entityName: string) => void;
 }
 
 interface MenuItem {
@@ -70,6 +73,7 @@ export function ContextMenu({
   onFitView,
   onResetZoom,
   onToggleDarkMode,
+  onAddTask,
 }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
   const previousPathnameRef = useRef<string | null>(null);
@@ -151,6 +155,13 @@ export function ContextMenu({
     const items: MenuItem[] = [];
     if (onViewDetails) items.push({ icon: Eye, label: "View Details", onClick: () => { onViewDetails(); onClose(); } });
     if (onEdit) items.push({ icon: Pencil, label: "Edit Contact", onClick: () => { onEdit(); onClose(); } });
+    if (onAddTask && menu.entityId && menu.entityName) {
+      items.push({
+        icon: CheckSquare,
+        label: "Add task",
+        onClick: () => { onAddTask("contact", menu.entityId!, menu.entityName!); onClose(); },
+      });
+    }
     groups.push(items);
     if (onDelete) {
       groups.push([{ icon: Trash2, label: "Delete", onClick: () => { onDelete(); onClose(); }, danger: true }]);
@@ -166,6 +177,13 @@ export function ContextMenu({
         onClick: () => { onCollapseContacts(); onClose(); },
       });
     }
+    if (onAddTask && menu.entityId && menu.entityName) {
+      items.push({
+        icon: CheckSquare,
+        label: "Add task",
+        onClick: () => { onAddTask("company", menu.entityId!, menu.entityName!); onClose(); },
+      });
+    }
     groups.push(items);
     if (onDelete) {
       groups.push([{ icon: Trash2, label: "Delete", onClick: () => { onDelete(); onClose(); }, danger: true }]);
@@ -174,6 +192,13 @@ export function ContextMenu({
     const items: MenuItem[] = [];
     if (onViewDetails) items.push({ icon: Eye, label: "View Details", onClick: () => { onViewDetails(); onClose(); } });
     if (onEdit) items.push({ icon: Pencil, label: "Edit Project", onClick: () => { onEdit(); onClose(); } });
+    if (onAddTask && menu.entityId && menu.entityName) {
+      items.push({
+        icon: CheckSquare,
+        label: "Add task",
+        onClick: () => { onAddTask("project", menu.entityId!, menu.entityName!); onClose(); },
+      });
+    }
     groups.push(items);
     if (onDelete) {
       groups.push([{ icon: Trash2, label: "Delete", onClick: () => { onDelete(); onClose(); }, danger: true }]);
