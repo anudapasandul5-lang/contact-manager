@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { resolveTaskNode } from "./nodeFocusBus";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { resolveTaskNode, emitTaskFocus, subscribeFocus } from "./nodeFocusBus";
 
 describe("resolveTaskNode", () => {
   it("returns contact focus when contactId is set", () => {
@@ -34,5 +34,51 @@ describe("resolveTaskNode", () => {
   it("returns null when all FKs are omitted", () => {
     const result = resolveTaskNode({});
     expect(result).toBeNull();
+  });
+
+  it("prefers companyId over projectId when contactId is absent", () => {
+    const result = resolveTaskNode({ companyId: "co1", projectId: "p1" });
+    expect(result).toEqual({ kind: "company", id: "co1" });
+  });
+});
+
+describe("emitTaskFocus", () => {
+  let eventTarget: EventTarget;
+
+  beforeEach(() => {
+    eventTarget = new EventTarget();
+    vi.stubGlobal("window", {
+      addEventListener: eventTarget.addEventListener.bind(eventTarget),
+      removeEventListener: eventTarget.removeEventListener.bind(eventTarget),
+      dispatchEvent: eventTarget.dispatchEvent.bind(eventTarget),
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("calls subscribeFocus listener with resolved contact focus request", () => {
+    const listener = vi.fn();
+    const unsub = subscribeFocus(listener);
+    emitTaskFocus({ contactId: "c-001", companyId: "co-002", projectId: "p-003" });
+    expect(listener).toHaveBeenCalledWith({ kind: "contact", id: "c-001" });
+    unsub();
+  });
+
+  it("calls subscribeFocus listener with company focus when contactId absent", () => {
+    const listener = vi.fn();
+    const unsub = subscribeFocus(listener);
+    emitTaskFocus({ companyId: "co-002", projectId: "p-003" });
+    expect(listener).toHaveBeenCalledWith({ kind: "company", id: "co-002" });
+    unsub();
+  });
+
+  it("does not invoke any listener when all FKs are null", () => {
+    const listener = vi.fn();
+    const unsub = subscribeFocus(listener);
+    emitTaskFocus({ contactId: null, companyId: null, projectId: null });
+    expect(listener).not.toHaveBeenCalled();
+    unsub();
   });
 });

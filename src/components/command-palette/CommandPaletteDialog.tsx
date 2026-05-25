@@ -50,6 +50,18 @@ export function CommandPaletteDialog({ open, onOpenChange, openTaskModal }: Comm
   const { data: network } = useNetworkQuery();
   const { data: tasks, isLoading: tasksLoading, isError: tasksError } = useTasksQuery();
 
+  const focusableTasks = useMemo(
+    () =>
+      !tasksLoading && !tasksError && tasks
+        ? tasks.filter(
+            (t) =>
+              !t.completed_at &&
+              resolveTaskNode({ contactId: t.contact_id, companyId: t.company_id, projectId: t.project_id }) !== null,
+          ).slice(0, 8)
+        : [],
+    [tasks, tasksLoading, tasksError],
+  );
+
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 0);
@@ -252,34 +264,28 @@ export function CommandPaletteDialog({ open, onOpenChange, openTaskModal }: Comm
                   </CommandGroup>
                 )}
 
-                {!tasksLoading && !tasksError && tasks && tasks
-                  .filter((t) => !t.completed_at && resolveTaskNode({ contactId: t.contact_id, companyId: t.company_id, projectId: t.project_id }) !== null)
-                  .slice(0, 8)
-                  .length > 0 && (
+                {focusableTasks.length > 0 && (
                   <CommandGroup heading="Tasks">
-                    {tasks
-                      .filter((t) => !t.completed_at && resolveTaskNode({ contactId: t.contact_id, companyId: t.company_id, projectId: t.project_id }) !== null)
-                      .slice(0, 8)
-                      .map((t) => (
-                        <CommandItem
-                          key={`task-${t.id}`}
-                          value={`task ${t.title}`}
-                          onSelect={() => {
-                            handleOpenChange(false);
-                            const targetPath = "/mind-map";
-                            const doFocus = () => requestAnimationFrame(() => emitTaskFocus({ contactId: t.contact_id, companyId: t.company_id, projectId: t.project_id }));
-                            if (pathname !== targetPath) {
-                              router.push(targetPath);
-                              setTimeout(doFocus, 250);
-                            } else {
-                              doFocus();
-                            }
-                          }}
-                        >
-                          <CheckSquare />
-                          <span className="truncate">{t.title}</span>
-                        </CommandItem>
-                      ))}
+                    {focusableTasks.map((t) => (
+                      <CommandItem
+                        key={`task-${t.id}`}
+                        value={`task ${t.title}`}
+                        onSelect={() => {
+                          handleOpenChange(false);
+                          const targetPath = "/mind-map";
+                          const doFocus = () => requestAnimationFrame(() => emitTaskFocus({ contactId: t.contact_id, companyId: t.company_id, projectId: t.project_id }));
+                          if (pathname !== targetPath) {
+                            router.push(targetPath);
+                            setTimeout(doFocus, 250);
+                          } else {
+                            doFocus();
+                          }
+                        }}
+                      >
+                        <CheckSquare />
+                        <span className="truncate">{t.title}</span>
+                      </CommandItem>
+                    ))}
                   </CommandGroup>
                 )}
               </CommandList>
