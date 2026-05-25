@@ -7,23 +7,25 @@ export interface FocusRequest {
 
 type Listener = (req: FocusRequest) => void;
 
-const listeners = new Set<Listener>();
+const EVENT_NAME = "node-focus-bus";
 
+// Use window events so emitFocus works across webpack chunk boundaries.
 export function emitFocus(req: FocusRequest) {
-  listeners.forEach((fn) => {
-    try {
-      fn(req);
-    } catch {
-      /* ignore listener errors */
-    }
-  });
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: req }));
 }
 
 export function subscribeFocus(listener: Listener): () => void {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
+  if (typeof window === "undefined") return () => {};
+  const handler = (e: Event) => {
+    try {
+      listener((e as CustomEvent<FocusRequest>).detail);
+    } catch {
+      /* ignore listener errors */
+    }
   };
+  window.addEventListener(EVENT_NAME, handler);
+  return () => window.removeEventListener(EVENT_NAME, handler);
 }
 
 // Priority: contactId > companyId > projectId. businessId = null (no graph node).
