@@ -12,6 +12,26 @@ import { ForecastSwimLanes } from "./ForecastSwimLanes";
 type Business = { id: string; name: string; color: string };
 type ForecastData = { buckets: BucketedTasks; businesses: Business[] };
 
+function toDate(v: string | null | undefined): Date | null {
+  return v ? new Date(v) : null;
+}
+
+function deserializeBuckets(raw: BucketedTasks): BucketedTasks {
+  const bucketKeys = Object.keys(raw) as (keyof BucketedTasks)[];
+  const result = { ...raw };
+  for (const key of bucketKeys) {
+    result[key] = raw[key].map((t) => ({
+      ...t,
+      due_date: toDate(t.due_date as unknown as string),
+      defer_date: toDate(t.defer_date as unknown as string),
+      completed_at: toDate(t.completed_at as unknown as string),
+      created_at: new Date(t.created_at as unknown as string),
+      updated_at: new Date(t.updated_at as unknown as string),
+    }));
+  }
+  return result;
+}
+
 type Mode = "columns" | "swimlane";
 
 const STORAGE_KEY = "forecast-mode";
@@ -33,9 +53,10 @@ export function ForecastClient() {
   const { data, isLoading } = useQuery<ForecastData>({
     queryKey: queryKeys.forecast.all,
     queryFn: () =>
-      fetch(`/api/forecast?tz=${encodeURIComponent(TZ)}`).then((r) => {
+      fetch(`/api/forecast?tz=${encodeURIComponent(TZ)}`).then(async (r) => {
         if (!r.ok) throw new Error(r.statusText);
-        return r.json() as Promise<ForecastData>;
+        const json = await r.json() as ForecastData;
+        return { ...json, buckets: deserializeBuckets(json.buckets) };
       }),
     staleTime: 60_000,
   });
