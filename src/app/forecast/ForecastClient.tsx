@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
 import type { BucketedTasks } from "@/lib/forecast/buckets";
 import { ForecastSkeleton } from "./ForecastSkeleton";
+import { ForecastColumns } from "./ForecastColumns";
 
 type Business = { id: string; name: string; color: string };
 type ForecastData = { buckets: BucketedTasks; businesses: Business[] };
@@ -55,11 +56,14 @@ export function ForecastClient() {
 
       {/* View */}
       <div className="flex-1 overflow-hidden">
-        {/* ForecastColumns/ForecastSwimLanes will replace this in Tasks 3 & 4 */}
-        <div className="p-4 text-sm" style={{ color: "var(--clay-text-muted)" }}>
-          {mode === "columns" ? "Column view" : "Swim-lane view"} — {data.businesses.length} businesses,{" "}
-          {Object.values(data.buckets).flat().length} tasks
-        </div>
+        {mode === "columns" ? (
+          <ForecastColumns buckets={data.buckets} businesses={data.businesses} />
+        ) : (
+          // ForecastSwimLanes will be added in Task 4
+          <div className="p-4 text-sm" style={{ color: "var(--clay-text-muted)" }}>
+            Swim-lane mode coming in Task 4
+          </div>
+        )}
       </div>
     </div>
   );
