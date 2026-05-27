@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Circle, CheckCircle, CalendarDots } from "@phosphor-icons/react";
-import { useCommandPalette } from "@/components/command-palette/CommandPaletteProvider";
 import type { Task } from "@/lib/repositories/tasks";
 import { DeferPopover } from "./DeferPopover";
 
@@ -30,10 +29,6 @@ export function ForecastTaskCard({ task, business, onComplete, onDefer }: Foreca
     setTimeout(() => setCompleting(false), 5000);
   }
 
-  function handleCardClick() {
-    openTaskModal();
-  }
-
   return (
     <motion.div
       layout
@@ -41,8 +36,7 @@ export function ForecastTaskCard({ task, business, onComplete, onDefer }: Foreca
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      onClick={handleCardClick}
-      className="rounded-xl p-3 cursor-pointer group"
+      className="rounded-xl p-3 group"
       style={{
         background: "linear-gradient(145deg, var(--clay-card), var(--clay-card-end))",
         boxShadow: "var(--clay-shadow-sm)",

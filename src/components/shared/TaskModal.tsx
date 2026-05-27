@@ -79,7 +79,7 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange} dismissible={false}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add task</DialogTitle>
