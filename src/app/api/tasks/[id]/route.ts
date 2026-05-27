@@ -19,18 +19,34 @@ export async function PATCH(
 
     let task = null;
 
+    // Check if request contains valid fields to update
+    const hasCompleted = body.completed === true;
+    const hasDueDate = "dueDate" in body;
+
+    if (!hasCompleted && !hasDueDate) {
+      const response = NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
+      applySessionCookies(response, auth.resolved);
+      return response;
+    }
+
     if (body.completed === true) {
       task = await completeTask(db, auth.user.id, id);
     } else if ("dueDate" in body) {
       const dueDate = body.dueDate;
-      const patch: { dueDate?: Date } = {};
-      if (typeof dueDate === "string") {
-        patch.dueDate = new Date(dueDate);
-      } else if (dueDate === null) {
-        // Explicitly allow null to clear the due date by casting
-        patch.dueDate = null as unknown as Date;
+      const patch: Record<string, unknown> = {};
+      if (dueDate === null) {
+        // Explicitly allow null to clear the due date
+        patch.dueDate = null;
+      } else if (typeof dueDate === "string") {
+        const d = new Date(dueDate);
+        if (isNaN(d.getTime())) {
+          const response = NextResponse.json({ error: "Invalid dueDate" }, { status: 400 });
+          applySessionCookies(response, auth.resolved);
+          return response;
+        }
+        patch.dueDate = d;
       }
-      task = await updateTask(db, auth.user.id, id, patch);
+      task = await updateTask(db, auth.user.id, id, patch as any);
     }
 
     if (task === null) {
