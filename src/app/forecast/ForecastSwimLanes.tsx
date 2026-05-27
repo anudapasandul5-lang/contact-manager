@@ -90,7 +90,7 @@ export function ForecastSwimLanes({ buckets, businesses }: ForecastSwimLanesProp
         }}
       >
         {/* Lane header spacer */}
-        <div className="flex-shrink-0" style={{ width: 160, minWidth: 160 }} />
+        <div className="flex-shrink-0" style={{ width: 140, minWidth: 140 }} />
         {SWIM_COLUMNS.map(({ key, label, isOverdue }) => (
           <div
             key={key}
@@ -125,8 +125,8 @@ export function ForecastSwimLanes({ buckets, businesses }: ForecastSwimLanesProp
               <div
                 className="flex-shrink-0 flex flex-col justify-center px-3 py-3 gap-1"
                 style={{
-                  width: 160,
-                  minWidth: 160,
+                  width: 140,
+                  minWidth: 140,
                   background: hasColor ? hexToRgba(row.color, 0.15) : "var(--clay-surface)",
                   borderRight: "1px solid var(--clay-header-border)",
                 }}
