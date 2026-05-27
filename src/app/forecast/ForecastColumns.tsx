@@ -47,11 +47,15 @@ export function ForecastColumns({ buckets, businesses }: ForecastColumnsProps) {
 
   const handleComplete = useCallback(
     async (taskId: string) => {
-      await fetch(`/api/tasks/${taskId}`, {
+      const res = await fetch(`/api/tasks/${taskId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ completed: true }),
       });
+      if (!res.ok) {
+        console.error("[ForecastColumns] complete failed", res.status);
+        return;
+      }
       void qc.invalidateQueries({ queryKey: queryKeys.forecast.all });
       void qc.invalidateQueries({ queryKey: queryKeys.tasks.all });
     },
@@ -60,11 +64,15 @@ export function ForecastColumns({ buckets, businesses }: ForecastColumnsProps) {
 
   const handleDefer = useCallback(
     async (taskId: string, newDate: string) => {
-      await fetch(`/api/tasks/${taskId}`, {
+      const res = await fetch(`/api/tasks/${taskId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dueDate: newDate }),
       });
+      if (!res.ok) {
+        console.error("[ForecastColumns] defer failed", res.status);
+        return;
+      }
       void qc.invalidateQueries({ queryKey: queryKeys.forecast.all });
       void qc.invalidateQueries({ queryKey: queryKeys.tasks.all });
     },
@@ -192,7 +200,7 @@ export function ForecastColumns({ buckets, businesses }: ForecastColumnsProps) {
                     <span className="text-xs">No tasks</span>
                   </div>
                 ) : (
-                  <AnimatePresence>
+                  <AnimatePresence initial={false}>
                     {tasks.map((task) => (
                       <ForecastTaskCard
                         key={task.id}

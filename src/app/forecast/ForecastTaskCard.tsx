@@ -26,6 +26,8 @@ export function ForecastTaskCard({ task, business, onComplete, onDefer }: Foreca
     e.stopPropagation();
     setCompleting(true);
     onComplete(task.id);
+    // Auto-reset after 5s in case parent mutation fails and card stays mounted
+    setTimeout(() => setCompleting(false), 5000);
   }
 
   function handleCardClick() {
