@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
@@ -36,12 +37,8 @@ export function useCommandPalette(): CommandPaletteContextValue {
 export function CommandPaletteProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const disabled = pathname === "/login";
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [taskModalEntityContext, setTaskModalEntityContext] = useState<EntityContext | null>(null);
 
