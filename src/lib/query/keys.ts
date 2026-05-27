@@ -25,4 +25,7 @@ export const queryKeys = {
   introRequests: {
     all: ["intro-requests"] as const,
   },
+  forecast: {
+    all: ["forecast"] as const,
+  },
 } as const;
