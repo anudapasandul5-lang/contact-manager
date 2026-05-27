@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { Network, Users, Sun, Moon, LogOut } from "lucide-react";
+import { Network, Users, Calendar, Sun, Moon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
 import { fetchAllNetworkData } from "@/lib/db/queries";
@@ -30,6 +30,7 @@ function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number) {
 const tabs = [
   { href: "/mind-map", label: "Mind Map", icon: Network },
   { href: "/contacts", label: "Contacts", icon: Users },
+  { href: "/forecast", label: "Forecast", icon: Calendar },
 ];
 
 export function Header({ avatarUrl, displayName, email }: HeaderProps) {
