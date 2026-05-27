@@ -12,6 +12,7 @@ type ForecastData = { buckets: BucketedTasks; businesses: Business[] };
 type Mode = "columns" | "swimlane";
 
 const STORAGE_KEY = "forecast-mode";
+const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export function ForecastClient() {
   // Load mode from localStorage (client-only)
@@ -26,12 +27,13 @@ export function ForecastClient() {
     localStorage.setItem(STORAGE_KEY, newMode);
   };
 
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
   const { data, isLoading } = useQuery<ForecastData>({
     queryKey: queryKeys.forecast.all,
     queryFn: () =>
-      fetch(`/api/forecast?tz=${encodeURIComponent(tz)}`).then((r) => r.json()),
+      fetch(`/api/forecast?tz=${encodeURIComponent(TZ)}`).then((r) => {
+        if (!r.ok) throw new Error(r.statusText);
+        return r.json() as Promise<ForecastData>;
+      }),
     staleTime: 60_000,
   });
 
