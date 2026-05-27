@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateRequest, applySessionCookies } from "@/lib/auth/session";
-import { getDb } from "@/lib/db";
-import { updateTask, completeTask } from "@/lib/repositories/tasks";
+import { getSupabaseServer } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -15,11 +14,8 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = (await request.json()) as Record<string, unknown>;
-    const db = getDb();
+    const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
 
-    let task = null;
-
-    // Check if request contains valid fields to update
     const hasCompleted = body.completed === true;
     const hasDueDate = "dueDate" in body;
 
@@ -29,14 +25,49 @@ export async function PATCH(
       return response;
     }
 
-    if (body.completed === true) {
-      task = await completeTask(db, auth.user.id, id);
-    } else if ("dueDate" in body) {
+    let task = null;
+
+    if (hasCompleted) {
+      const { data: existing } = await supabase
+        .from("tasks")
+        .select("completed_at")
+        .eq("id", id)
+        .eq("user_id", auth.user.id)
+        .maybeSingle();
+
+      if (!existing) {
+        const response = NextResponse.json({ error: "Task not found" }, { status: 404 });
+        applySessionCookies(response, auth.resolved);
+        return response;
+      }
+
+      if (existing.completed_at !== null) {
+        // Already completed — idempotent, return full row
+        const { data } = await supabase
+          .from("tasks")
+          .select("*")
+          .eq("id", id)
+          .eq("user_id", auth.user.id)
+          .maybeSingle();
+        task = data;
+      } else {
+        const now = new Date().toISOString();
+        const { data, error } = await supabase
+          .from("tasks")
+          .update({ completed_at: now, updated_at: now })
+          .eq("id", id)
+          .eq("user_id", auth.user.id)
+          .select()
+          .single();
+        if (error) throw new Error(error.message);
+        task = data;
+      }
+    } else if (hasDueDate) {
       const dueDate = body.dueDate;
-      const patch: Record<string, unknown> = {};
+      let dueDateValue: string | null;
+
       if (dueDate === null) {
-        // Explicitly allow null to clear the due date
-        patch.dueDate = null;
+        dueDateValue = null;
       } else if (typeof dueDate === "string") {
         const d = new Date(dueDate);
         if (isNaN(d.getTime())) {
@@ -44,9 +75,23 @@ export async function PATCH(
           applySessionCookies(response, auth.resolved);
           return response;
         }
-        patch.dueDate = d;
+        dueDateValue = d.toISOString();
+      } else {
+        const response = NextResponse.json({ error: "Invalid dueDate" }, { status: 400 });
+        applySessionCookies(response, auth.resolved);
+        return response;
       }
-      task = await updateTask(db, auth.user.id, id, patch as any);
+
+      const { data, error } = await supabase
+        .from("tasks")
+        .update({ due_date: dueDateValue, updated_at: new Date().toISOString() })
+        .eq("id", id)
+        .eq("user_id", auth.user.id)
+        .select()
+        .maybeSingle();
+
+      if (error) throw new Error(error.message);
+      task = data;
     }
 
     if (task === null) {

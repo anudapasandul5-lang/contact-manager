@@ -221,19 +221,19 @@ CREATE POLICY contact_businesses_select_own
   ON "contact_businesses"
   FOR SELECT
   TO authenticated
-  USING (contact_id IN (SELECT id FROM contacts WHERE user_id = auth.uid()::text));
+  USING (contact_id IN (SELECT id FROM contacts WHERE user_id = auth.uid()));
 
 CREATE POLICY contact_businesses_insert_own
   ON "contact_businesses"
   FOR INSERT
   TO authenticated
-  WITH CHECK (contact_id IN (SELECT id FROM contacts WHERE user_id = auth.uid()::text));
+  WITH CHECK (contact_id IN (SELECT id FROM contacts WHERE user_id = auth.uid()));
 
 CREATE POLICY contact_businesses_delete_own
   ON "contact_businesses"
   FOR DELETE
   TO authenticated
-  USING (contact_id IN (SELECT id FROM contacts WHERE user_id = auth.uid()::text));
+  USING (contact_id IN (SELECT id FROM contacts WHERE user_id = auth.uid()));
 
 -- RLS: company_businesses (joins through companies)
 ALTER TABLE "company_businesses" ENABLE ROW LEVEL SECURITY;
@@ -246,19 +246,19 @@ CREATE POLICY company_businesses_select_own
   ON "company_businesses"
   FOR SELECT
   TO authenticated
-  USING (company_id IN (SELECT id FROM companies WHERE user_id = auth.uid()::text));
+  USING (company_id IN (SELECT id FROM companies WHERE user_id = auth.uid()));
 
 CREATE POLICY company_businesses_insert_own
   ON "company_businesses"
   FOR INSERT
   TO authenticated
-  WITH CHECK (company_id IN (SELECT id FROM companies WHERE user_id = auth.uid()::text));
+  WITH CHECK (company_id IN (SELECT id FROM companies WHERE user_id = auth.uid()));
 
 CREATE POLICY company_businesses_delete_own
   ON "company_businesses"
   FOR DELETE
   TO authenticated
-  USING (company_id IN (SELECT id FROM companies WHERE user_id = auth.uid()::text));
+  USING (company_id IN (SELECT id FROM companies WHERE user_id = auth.uid()));
 
 -- RLS: vendor_businesses (joins through vendors)
 ALTER TABLE "vendor_businesses" ENABLE ROW LEVEL SECURITY;
@@ -271,19 +271,19 @@ CREATE POLICY vendor_businesses_select_own
   ON "vendor_businesses"
   FOR SELECT
   TO authenticated
-  USING (vendor_id IN (SELECT id FROM vendors WHERE user_id = auth.uid()::text));
+  USING (vendor_id IN (SELECT id FROM vendors WHERE user_id = auth.uid()));
 
 CREATE POLICY vendor_businesses_insert_own
   ON "vendor_businesses"
   FOR INSERT
   TO authenticated
-  WITH CHECK (vendor_id IN (SELECT id FROM vendors WHERE user_id = auth.uid()::text));
+  WITH CHECK (vendor_id IN (SELECT id FROM vendors WHERE user_id = auth.uid()));
 
 CREATE POLICY vendor_businesses_delete_own
   ON "vendor_businesses"
   FOR DELETE
   TO authenticated
-  USING (vendor_id IN (SELECT id FROM vendors WHERE user_id = auth.uid()::text));
+  USING (vendor_id IN (SELECT id FROM vendors WHERE user_id = auth.uid()));
 
 -- updated_at trigger for tasks
 CREATE OR REPLACE TRIGGER set_tasks_updated_at

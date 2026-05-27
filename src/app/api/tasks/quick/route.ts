@@ -1,9 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getDb } from "@/lib/db";
-import { createTask } from "@/lib/repositories/tasks";
+import { createClient } from "@supabase/supabase-js";
 import { normalizeCapture } from "@/lib/capture/service";
 
 export const runtime = "nodejs";
+
+function getServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) throw new Error("Supabase service config missing");
+  return createClient(url, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+}
 
 export async function POST(request: NextRequest) {
   const apiKey = request.headers.get("X-Api-Key");
@@ -23,7 +31,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "title is required" }, { status: 400 });
     }
 
-    const db = getDb();
     const input = normalizeCapture({
       source: "ios-shortcut",
       payload: {
@@ -31,9 +38,34 @@ export async function POST(request: NextRequest) {
         notes: typeof body.notes === "string" ? body.notes : undefined,
       },
     });
-    const task = await createTask(db, userId, input);
 
-    return NextResponse.json(task, { status: 201 });
+    const supabase = getServiceClient();
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("tasks")
+      .insert({
+        id: crypto.randomUUID(),
+        user_id: userId,
+        title: input.title,
+        notes: input.notes ?? null,
+        project_id: null,
+        contact_id: null,
+        company_id: null,
+        business_id: null,
+        defer_date: null,
+        due_date: null,
+        parent_task_id: null,
+        recurrence_rule: null,
+        completed_at: null,
+        created_at: now,
+        updated_at: now,
+      })
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error("[api/tasks/quick POST]", error);
     const message = error instanceof Error ? error.message : "Failed to create task";

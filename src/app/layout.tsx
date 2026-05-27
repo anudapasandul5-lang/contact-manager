@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { FloatingAddButton } from "@/components/shared/FloatingAddButton";
 import { QueryProvider } from "@/lib/query/QueryProvider";
+import { CommandPaletteProvider } from "@/components/command-palette/CommandPaletteProvider";
 
 export const metadata: Metadata = {
   title: "Contact Manager",
@@ -24,8 +25,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <QueryProvider>
-          {children}
-          <FloatingAddButton />
+          <CommandPaletteProvider>
+            {children}
+            <FloatingAddButton />
+          </CommandPaletteProvider>
         </QueryProvider>
       </body>
     </html>
