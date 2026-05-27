@@ -6,6 +6,8 @@ import { queryKeys } from "@/lib/query/keys";
 import type { BucketedTasks } from "@/lib/forecast/buckets";
 import { ForecastSkeleton } from "./ForecastSkeleton";
 import { ForecastColumns } from "./ForecastColumns";
+import { ModeToggle } from "./ModeToggle";
+import { ForecastSwimLanes } from "./ForecastSwimLanes";
 
 type Business = { id: string; name: string; color: string };
 type ForecastData = { buckets: BucketedTasks; businesses: Business[] };
@@ -50,8 +52,7 @@ export function ForecastClient() {
           background: "linear-gradient(145deg, var(--clay-card), var(--clay-card-alt))",
         }}
       >
-        {/* ModeToggle placeholder — will be replaced in Task 4 */}
-        <div data-testid="mode-toggle-placeholder" />
+        <ModeToggle mode={mode} onToggle={() => handleModeToggle(mode === "columns" ? "swimlane" : "columns")} />
       </div>
 
       {/* View */}
@@ -59,10 +60,7 @@ export function ForecastClient() {
         {mode === "columns" ? (
           <ForecastColumns buckets={data.buckets} businesses={data.businesses} />
         ) : (
-          // ForecastSwimLanes will be added in Task 4
-          <div className="p-4 text-sm" style={{ color: "var(--clay-text-muted)" }}>
-            Swim-lane mode coming in Task 4
-          </div>
+          <ForecastSwimLanes buckets={data.buckets} businesses={data.businesses} />
         )}
       </div>
     </div>
