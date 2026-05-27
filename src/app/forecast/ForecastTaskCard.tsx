@@ -18,7 +18,6 @@ function formatDate(date: Date): string {
 }
 
 export function ForecastTaskCard({ task, business, onComplete, onDefer }: ForecastTaskCardProps) {
-  const { openTaskModal } = useCommandPalette();
   const [completing, setCompleting] = useState(false);
 
   function handleComplete(e: React.MouseEvent) {
