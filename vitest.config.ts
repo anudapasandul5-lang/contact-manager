@@ -14,6 +14,11 @@ export default defineConfig({
     globals: true,
     environment: "node",
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    // Set SKIP_INTEGRATION_TESTS=true in CI when Supabase DB is not reachable.
+    // Integration tests (repositories/**) require a live DB; unit tests do not.
+    exclude: process.env.SKIP_INTEGRATION_TESTS === "true"
+      ? ["**/node_modules/**", "src/lib/repositories/**/*.test.ts"]
+      : ["**/node_modules/**"],
     setupFiles: ["src/lib/test/setup.ts"],
     env: {
       NODE_ENV: "test",

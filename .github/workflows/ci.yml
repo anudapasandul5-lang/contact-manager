@@ -30,8 +30,6 @@ jobs:
 
       - name: Test
         run: npx vitest run --exclude "src/lib/repositories/**"
-        env:
-          DATABASE_URL_TEST: ${{ secrets.DATABASE_URL_TEST }}
 
   build:
     runs-on: ubuntu-latest
