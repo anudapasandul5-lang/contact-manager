@@ -43,6 +43,7 @@ export function useCreateTask() {
     onSuccess: () => {
       toast.success("Task created");
       qc.invalidateQueries({ queryKey: queryKeys.tasks.all });
+      qc.invalidateQueries({ queryKey: queryKeys.forecast.all });
     },
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : "Couldn't save task.");
