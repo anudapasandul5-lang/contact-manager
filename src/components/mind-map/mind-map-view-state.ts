@@ -8,6 +8,7 @@ import {
 import type { FocusSource } from "./focus-view";
 import { getFilterCategoryForNode, type FilterCategory } from "./node-filters";
 import type { RingState } from "@/lib/workload/overlay";
+import { worstState } from "@/lib/workload/overlay";
 
 const FILTER_FADE_OPACITY = 0.18;
 
@@ -220,8 +221,22 @@ export function computeMindMapDisplayState({
       const companyId = node.id.replace("company-", "");
       const isCollapsed = effectiveCollapsedCompanies.has(companyId);
       const hiddenCount = hiddenCountByCompany.get(companyId) ?? 0;
-      const ringState = workloadMap?.get(companyId) ?? "none";
-      const taskCount = countMap?.get(companyId) ?? 0;
+      let ringState: RingState = workloadMap?.get(companyId) ?? "none";
+      let taskCount = countMap?.get(companyId) ?? 0;
+      if (isCollapsed && workloadMap) {
+        for (const n of nodes) {
+          if (n.type !== "contact") continue;
+          const companyIds = (n.data.companyIds ?? []) as string[];
+          const parentCompanyId = n.data.parentCompanyId as string | undefined;
+          const belongsHere = parentCompanyId === companyId || companyIds.includes(companyId);
+          if (!belongsHere) continue;
+          const contactId = n.data.contactId as string | undefined;
+          if (!contactId) continue;
+          const contactRing = workloadMap.get(contactId) ?? "none";
+          ringState = worstState(ringState, contactRing);
+          if (countMap) taskCount += countMap.get(contactId) ?? 0;
+        }
+      }
       const isQuiet = rottingOnly && ringState !== "rotting"
         ? true
         : presentation.isQuiet;
