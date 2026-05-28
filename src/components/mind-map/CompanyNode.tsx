@@ -4,6 +4,8 @@ import { Handle, Position } from "@xyflow/react";
 import type { NodeProps } from "@xyflow/react";
 import { Building2, ChevronDown, ChevronUp, Users } from "lucide-react";
 import { EntityAvatar } from "@/components/shared/EntityAvatar";
+import type { RingState } from "@/lib/workload/overlay";
+import { RingIndicator } from "./RingIndicator";
 
 interface CompanyNodeData {
   label: string;
@@ -16,6 +18,8 @@ interface CompanyNodeData {
   hiddenCount?: number;
   onCollapse?: () => void;
   isFocusAnchor?: boolean;
+  ringState?: RingState;
+  taskCount?: number;
   [key: string]: unknown;
 }
 
@@ -51,12 +55,35 @@ export function CompanyNode({ data }: NodeProps) {
     hiddenCount = 0,
     onCollapse,
     isFocusAnchor = false,
+    ringState = "none",
+    taskCount = 0,
   } = data as CompanyNodeData;
   const clay = getClayStyle(color);
   const animScale = typeof data._animScale === "number" ? data._animScale : 1;
+  const ringVisible = ringState !== "none" && ringState !== "active";
 
   return (
-    <div style={{ transform: `scale(${animScale})`, transformOrigin: "center" }}>
+    <div style={{ transform: `scale(${animScale})`, transformOrigin: "center", position: "relative" }}>
+      <RingIndicator state={ringState} size={60} />
+      {ringVisible && taskCount > 0 && (
+        <span
+          style={{
+            position: "absolute",
+            top: -6,
+            left: -6,
+            zIndex: 1,
+            background: "#1e293b",
+            color: "#fff",
+            fontSize: 10,
+            fontWeight: 700,
+            borderRadius: 999,
+            padding: "1px 5px",
+            lineHeight: "14px",
+          }}
+        >
+          {taskCount}
+        </span>
+      )}
       <div
         style={{
           display: "flex",

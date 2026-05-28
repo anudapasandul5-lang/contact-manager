@@ -4,6 +4,8 @@ import { Handle, Position } from "@xyflow/react";
 import type { NodeProps } from "@xyflow/react";
 import { EntityAvatar } from "@/components/shared/EntityAvatar";
 import type { ContactType } from "@/lib/supabase/types";
+import type { RingState } from "@/lib/workload/overlay";
+import { RingIndicator } from "./RingIndicator";
 
 const typeConfig: Record<ContactType, {
   bg: string;
@@ -80,6 +82,8 @@ interface ContactNodeData {
   showLabel?: boolean;
   isNeighborhoodActive?: boolean;
   isNeighborhoodDimmed?: boolean;
+  ringState?: RingState;
+  taskCount?: number;
   [key: string]: unknown;
 }
 
@@ -97,12 +101,35 @@ export function ContactNode({ data }: NodeProps) {
     showLabel = true,
     isNeighborhoodActive = false,
     isNeighborhoodDimmed = false,
+    ringState = "none",
+    taskCount = 0,
   } = data as ContactNodeData;
   const cfg = typeConfig[contactType];
   const animScale = typeof data._animScale === "number" ? data._animScale : 1;
+  const ringVisible = ringState !== "none" && ringState !== "active";
 
   return (
-    <div style={{ transform: `scale(${animScale})`, transformOrigin: "center" }}>
+    <div style={{ transform: `scale(${animScale})`, transformOrigin: "center", position: "relative" }}>
+      <RingIndicator state={ringState} size={52} />
+      {ringVisible && taskCount > 0 && (
+        <span
+          style={{
+            position: "absolute",
+            top: -6,
+            right: -6,
+            zIndex: 1,
+            background: "#1e293b",
+            color: "#fff",
+            fontSize: 10,
+            fontWeight: 700,
+            borderRadius: 999,
+            padding: "1px 5px",
+            lineHeight: "14px",
+          }}
+        >
+          {taskCount}
+        </span>
+      )}
       <div
         style={{
           display: "flex",
