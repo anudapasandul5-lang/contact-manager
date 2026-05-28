@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, Briefcase, Pencil, FolderOpen } from "lucide-react";
+import { Mail, Phone, Briefcase, Pencil, FolderOpen, Activity, AlertTriangle } from "lucide-react";
 import { EntityAvatar } from "@/components/shared/EntityAvatar";
 import { toast } from "sonner";
 import { CenterNode } from "./CenterNode";
@@ -56,6 +56,7 @@ import { useCommandPalette } from "@/components/command-palette/CommandPalettePr
 import type { GravityTarget } from "./GravityOverlay";
 import { shouldCollapseNodeDuringMapCollapse } from "./collapse-behavior";
 import { useTheme } from "@/hooks/useTheme";
+import { useWorkloadOverlay } from "@/hooks/use-workload-overlay";
 import {
   buildNeighborhoodNodeIds,
   buildSearchResults,
@@ -825,6 +826,10 @@ function MindMapCanvasInner() {
   const previousSubsetNodeIdsRef = useRef<Set<string>>(new Set());
   const selectedSubsetNodeIdsRef = useRef<Set<string>>(new Set());
   const [focusTargets] = useState<Set<GravityTarget>>(new Set());
+  const [showWorkload, setShowWorkload] = useState(false);
+  const [rottingOnly, setRottingOnly] = useState(false);
+
+  const overlay = useWorkloadOverlay(nodes, showWorkload);
 
   const companyContacts = useMemo(() => {
     if (!selectedCompany || !networkData) return [];
@@ -1386,6 +1391,9 @@ function MindMapCanvasInner() {
     animationPhase,
     onCollapseCompany,
     onCollapseProject,
+    workloadMap: overlay?.workloadMap ?? null,
+    countMap: overlay?.countMap ?? null,
+    rottingOnly,
   }), [
     nodes,
     edges,
@@ -1409,6 +1417,8 @@ function MindMapCanvasInner() {
     selectedSubsetNodeIds,
     mapCollapsed,
     animationPhase,
+    overlay,
+    rottingOnly,
   ]);
   const refreshNodeInternalIds = useMemo(
     () => collectNodeInternalsRefreshIds(displayNodes, displayEdges),
@@ -1842,6 +1852,75 @@ function MindMapCanvasInner() {
         inactiveCategories={inactiveCategories}
         onToggle={onToggleFilterCategory}
       />
+
+      {/* WorkloadOverlay + RottenFilter toolbar buttons */}
+      <div style={{
+        position: "absolute",
+        bottom: "155px",
+        right: !isCompactContactRail && isContactRailVisible ? "408px" : "12px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "6px",
+        zIndex: 5,
+      }}>
+        <button
+          type="button"
+          onClick={() => {
+            setShowWorkload(prev => !prev)
+            if (showWorkload) setRottingOnly(false)
+          }}
+          aria-label="Toggle workload overlay"
+          aria-pressed={showWorkload}
+          style={{
+            background: showWorkload ? "rgba(99,102,241,0.18)" : "rgba(99,102,241,0.08)",
+            border: showWorkload ? "1.5px solid rgba(99,102,241,0.6)" : "1.5px solid rgba(99,102,241,0.35)",
+            borderRadius: "16px",
+            padding: "7px 14px",
+            fontSize: "12px",
+            fontWeight: 700,
+            color: showWorkload ? "#4f46e5" : "#818cf8",
+            boxShadow: "0 2px 8px rgba(99,102,241,0.15)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            whiteSpace: "nowrap",
+            transition: "all 0.15s",
+          }}
+        >
+          <Activity size={14} />
+          Workload
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setRottingOnly(prev => !prev)}
+          disabled={!showWorkload}
+          aria-label="Show only rotting nodes"
+          aria-pressed={rottingOnly}
+          aria-disabled={!showWorkload}
+          style={{
+            background: rottingOnly ? "rgba(220,38,38,0.15)" : "rgba(220,38,38,0.06)",
+            border: rottingOnly ? "1.5px solid rgba(220,38,38,0.5)" : "1.5px solid rgba(220,38,38,0.25)",
+            borderRadius: "16px",
+            padding: "7px 14px",
+            fontSize: "12px",
+            fontWeight: 700,
+            color: !showWorkload ? "#fca5a5" : rottingOnly ? "#dc2626" : "#ef4444",
+            boxShadow: "0 2px 8px rgba(220,38,38,0.10)",
+            cursor: !showWorkload ? "not-allowed" : "pointer",
+            opacity: !showWorkload ? 0.5 : 1,
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            whiteSpace: "nowrap",
+            transition: "all 0.15s",
+          }}
+        >
+          <AlertTriangle size={14} />
+          Rotting
+        </button>
+      </div>
 
       {/* Re-organize button — bottom right, above Controls */}
       <button
