@@ -1861,7 +1861,7 @@ function MindMapCanvasInner() {
         display: "flex",
         flexDirection: "column",
         gap: "6px",
-        zIndex: 5,
+        zIndex: 55,
       }}>
         <button
           type="button"
