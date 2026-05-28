@@ -75,8 +75,6 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [disabled]);
 
-  useEffect(() => { setMounted(true); }, []); // eslint-disable-line react-hooks/set-state-in-effect
-
   useEffect(() => {
     queueMicrotask(() => setOpen(false));
   }, [pathname]);
