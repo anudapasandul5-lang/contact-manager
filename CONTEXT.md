@@ -58,3 +58,6 @@ paint a visible ring.
 ### RottenFilter
 Secondary toggle (only active when WorkloadOverlay is on) that dims all nodes whose RingState is not
 `rotting`. Used for "who needs attention right now?" scanning. Reuses existing `isQuiet` dim mechanism.
+
+### BubbleUp
+When a company node is collapsed on the mind-map, its ring and badge count reflect the worst urgency across all linked contacts' tasks plus its own direct tasks. Has no effect when the company is expanded (contacts show their own rings).
