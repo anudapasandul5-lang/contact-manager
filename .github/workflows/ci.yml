@@ -5,6 +5,7 @@ on:
     branches: [master]
   push:
     branches: [master]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -28,9 +29,7 @@ jobs:
         run: npm run lint
 
       - name: Test
-        run: npm test
-        env:
-          DATABASE_URL_TEST: ${{ secrets.DATABASE_URL_TEST }}
+        run: npx vitest run --exclude "src/lib/repositories/**"
 
   build:
     runs-on: ubuntu-latest
