@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { computeWorkload } from "@/lib/workload/overlay"
 import type { RingState } from "@/lib/workload/overlay"
@@ -38,37 +39,39 @@ export function useWorkloadOverlay(
     staleTime: 60_000,
   })
 
-  if (!enabled || !data) return null
+  return useMemo(() => {
+    if (!enabled || !data) return null
 
-  // Parse dates defensively (cache may have raw strings from other consumers)
-  const tasks = data.map(parseTask)
+    // Parse dates defensively (cache may have raw strings from other consumers)
+    const tasks = data.map(parseTask)
 
-  // Extract raw entity IDs from nodes (strip prefix from company nodes)
-  const entityIds: string[] = []
-  for (const node of nodes) {
-    if (node.type === "contact") {
-      const id = node.data.contactId as string | undefined
-      if (id) entityIds.push(id)
-    } else if (node.type === "company") {
-      entityIds.push(node.id.replace("company-", ""))
+    // Extract raw entity IDs from nodes (strip prefix from company nodes)
+    const entityIds: string[] = []
+    for (const node of nodes) {
+      if (node.type === "contact") {
+        const id = node.data.contactId as string | undefined
+        if (id) entityIds.push(id)
+      } else if (node.type === "company") {
+        entityIds.push(node.id.replace("company-", ""))
+      }
     }
-  }
 
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-  const workloadMap = computeWorkload(tasks, entityIds, new Date(), tz)
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const workloadMap = computeWorkload(tasks, entityIds, new Date(), tz)
 
-  // Build countMap: count open tasks per entity (contact_id or company_id match)
-  const countMap = new Map<string, number>()
-  const entityIdSet = new Set(entityIds)
-  for (const task of tasks) {
-    if (task.completed_at) continue  // skip completed
-    if (task.contact_id && entityIdSet.has(task.contact_id)) {
-      countMap.set(task.contact_id, (countMap.get(task.contact_id) ?? 0) + 1)
+    // Build countMap: count open tasks per entity (contact_id or company_id match)
+    const countMap = new Map<string, number>()
+    const entityIdSet = new Set(entityIds)
+    for (const task of tasks) {
+      if (task.completed_at) continue
+      if (task.contact_id && entityIdSet.has(task.contact_id)) {
+        countMap.set(task.contact_id, (countMap.get(task.contact_id) ?? 0) + 1)
+      }
+      if (task.company_id && entityIdSet.has(task.company_id)) {
+        countMap.set(task.company_id, (countMap.get(task.company_id) ?? 0) + 1)
+      }
     }
-    if (task.company_id && entityIdSet.has(task.company_id)) {
-      countMap.set(task.company_id, (countMap.get(task.company_id) ?? 0) + 1)
-    }
-  }
 
-  return { workloadMap, countMap }
+    return { workloadMap, countMap }
+  }, [enabled, data, nodes])
 }
