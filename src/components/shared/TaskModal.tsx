@@ -113,7 +113,11 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
           {entityContext?.type !== "project" && (
             <Select value={projectId} onValueChange={(v) => setProjectId(v ?? INBOX_SENTINEL)}>
               <SelectTrigger>
-                <SelectValue placeholder="None — goes to Inbox" />
+                <SelectValue>
+                  {projectId === INBOX_SENTINEL
+                    ? "None — goes to Inbox"
+                    : (projects.find((p) => p.id === projectId)?.name ?? "None — goes to Inbox")}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={INBOX_SENTINEL}>None — goes to Inbox</SelectItem>
