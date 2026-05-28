@@ -4,6 +4,8 @@ import { Handle, Position } from "@xyflow/react";
 import type { NodeProps } from "@xyflow/react";
 import { Building2, ChevronDown, ChevronUp, Users } from "lucide-react";
 import { EntityAvatar } from "@/components/shared/EntityAvatar";
+import type { RingState } from "@/lib/workload/overlay";
+import { RingIndicator } from "./RingIndicator";
 
 interface CompanyNodeData {
   label: string;
@@ -16,6 +18,8 @@ interface CompanyNodeData {
   hiddenCount?: number;
   onCollapse?: () => void;
   isFocusAnchor?: boolean;
+  ringState?: RingState;
+  taskCount?: number;
   [key: string]: unknown;
 }
 
@@ -51,12 +55,34 @@ export function CompanyNode({ data }: NodeProps) {
     hiddenCount = 0,
     onCollapse,
     isFocusAnchor = false,
+    ringState = "none",
+    taskCount = 0,
   } = data as CompanyNodeData;
   const clay = getClayStyle(color);
   const animScale = typeof data._animScale === "number" ? data._animScale : 1;
+  const ringVisible = ringState !== "none" && ringState !== "active";
 
   return (
-    <div style={{ transform: `scale(${animScale})`, transformOrigin: "center" }}>
+    <div style={{ transform: `scale(${animScale})`, transformOrigin: "center", position: "relative" }}>
+      {ringVisible && taskCount > 0 && (
+        <span
+          style={{
+            position: "absolute",
+            top: -6,
+            left: -6,
+            zIndex: 1,
+            background: "#1e293b",
+            color: "#fff",
+            fontSize: 10,
+            fontWeight: 700,
+            borderRadius: 999,
+            padding: "1px 5px",
+            lineHeight: "14px",
+          }}
+        >
+          {taskCount}
+        </span>
+      )}
       <div
         style={{
           display: "flex",
@@ -77,46 +103,50 @@ export function CompanyNode({ data }: NodeProps) {
         <Handle type="target" position={Position.Left} style={{ opacity: 0, width: 1, height: 1 }} />
         <Handle type="source" position={Position.Right} style={{ opacity: 0, width: 1, height: 1 }} />
 
-        <EntityAvatar
-          name={label}
-          imageUrl={logoUrl}
-          className="rounded-[14px]"
-          imageFit="contain"
-          imageInset={4}
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 14,
-            background: `linear-gradient(145deg, ${clay.icon}, ${clay.icon})`,
-            color: "#ffffff",
-            flexShrink: 0,
-          }}
-          imageFrameStyle={{
-            width: "100%",
-            height: "100%",
-            borderRadius: 14,
-            background: "rgba(255,255,255,0.92)",
-            boxShadow: "inset 1px 1px 3px rgba(255,255,255,0.72), inset -1px -1px 2px rgba(0,0,0,0.08)",
-          }}
-          fallback={
-            <div
+        <div style={{ width: 44, height: 44, position: "relative", display: "inline-block", flexShrink: 0 }}>
+          <RingIndicator state={ringState} size={44} />
+          <div style={{ position: "absolute", top: 4, left: 4 }}>
+            <EntityAvatar
+              name={label}
+              imageUrl={logoUrl}
+              className="rounded-[14px]"
+              imageFit="contain"
+              imageInset={4}
               style={{
-                width: "100%",
-                height: "100%",
+                width: 36,
+                height: 36,
                 borderRadius: 14,
                 background: `linear-gradient(145deg, ${clay.icon}, ${clay.icon})`,
                 color: "#ffffff",
-                display: "grid",
-                placeItems: "center",
-                fontSize: 11,
-                fontWeight: 800,
-                letterSpacing: "0.04em",
               }}
-            >
-              {initials}
-            </div>
-          }
-        />
+              imageFrameStyle={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 14,
+                background: "rgba(255,255,255,0.92)",
+                boxShadow: "inset 1px 1px 3px rgba(255,255,255,0.72), inset -1px -1px 2px rgba(0,0,0,0.08)",
+              }}
+              fallback={
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: 14,
+                    background: `linear-gradient(145deg, ${clay.icon}, ${clay.icon})`,
+                    color: "#ffffff",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  {initials}
+                </div>
+              }
+            />
+          </div>
+        </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0, flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>

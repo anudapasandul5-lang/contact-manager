@@ -7,6 +7,8 @@ import {
 } from "./declutter";
 import type { FocusSource } from "./focus-view";
 import { getFilterCategoryForNode, type FilterCategory } from "./node-filters";
+import type { RingState } from "@/lib/workload/overlay";
+import { worstState } from "@/lib/workload/overlay";
 
 const FILTER_FADE_OPACITY = 0.18;
 
@@ -35,6 +37,9 @@ export interface ComputeMindMapDisplayStateOptions {
   animationPhase: AnimationPhase;
   onCollapseCompany: (companyId: string) => void;
   onCollapseProject: (projectId: string) => void;
+  workloadMap?: Map<string, RingState> | null;
+  countMap?: Map<string, number> | null;
+  rottingOnly?: boolean;
 }
 
 export interface MindMapDisplayState {
@@ -69,6 +74,9 @@ export function computeMindMapDisplayState({
   animationPhase,
   onCollapseCompany,
   onCollapseProject,
+  workloadMap = null,
+  countMap = null,
+  rottingOnly = false,
 }: ComputeMindMapDisplayStateOptions): MindMapDisplayState {
   const hiddenNodeIds = new Set<string>();
   const selectedFilterNodeIds = new Set(selectedSubsetNodeIds);
@@ -185,6 +193,12 @@ export function computeMindMapDisplayState({
 
     if (node.type === "contact") {
       const isHidden = hiddenNodeIds.has(node.id);
+      const contactId = node.data.contactId as string | undefined;
+      const ringState = contactId ? (workloadMap?.get(contactId) ?? "none") : "none";
+      const taskCount = contactId ? (countMap?.get(contactId) ?? 0) : 0;
+      const isQuiet = rottingOnly && ringState !== "rotting"
+        ? true
+        : presentation.isQuiet;
       return {
         ...node,
         hidden: isHidden,
@@ -192,11 +206,13 @@ export function computeMindMapDisplayState({
         data: {
           ...node.data,
           searchMatch: searchMatchIds.has(node.id),
-          isQuiet: presentation.isQuiet,
+          isQuiet,
           showLabel: presentation.showLabel,
           isNeighborhoodActive: presentation.isNeighborhoodActive,
           isNeighborhoodDimmed: presentation.isNeighborhoodDimmed,
           isFocusAnchor: activeNeighborhoodNodeId === node.id,
+          ringState,
+          taskCount,
         },
       };
     }
@@ -205,6 +221,25 @@ export function computeMindMapDisplayState({
       const companyId = node.id.replace("company-", "");
       const isCollapsed = effectiveCollapsedCompanies.has(companyId);
       const hiddenCount = hiddenCountByCompany.get(companyId) ?? 0;
+      let ringState: RingState = workloadMap?.get(companyId) ?? "none";
+      let taskCount = countMap?.get(companyId) ?? 0;
+      if (isCollapsed && workloadMap) {
+        for (const n of nodes) {
+          if (n.type !== "contact") continue;
+          const companyIds = (n.data.companyIds ?? []) as string[];
+          const parentCompanyId = n.data.parentCompanyId as string | undefined;
+          const belongsHere = parentCompanyId === companyId || companyIds.includes(companyId);
+          if (!belongsHere) continue;
+          const contactId = n.data.contactId as string | undefined;
+          if (!contactId) continue;
+          const contactRing = workloadMap.get(contactId) ?? "none";
+          ringState = worstState(ringState, contactRing);
+          if (countMap) taskCount += countMap.get(contactId) ?? 0;
+        }
+      }
+      const isQuiet = rottingOnly && ringState !== "rotting"
+        ? true
+        : presentation.isQuiet;
       return {
         ...node,
         style: animStyle(node, baseOpacity),
@@ -216,6 +251,9 @@ export function computeMindMapDisplayState({
           isNeighborhoodActive: presentation.isNeighborhoodActive,
           isNeighborhoodDimmed: presentation.isNeighborhoodDimmed,
           isFocusAnchor: activeNeighborhoodNodeId === node.id,
+          ringState,
+          taskCount,
+          isQuiet,
         },
       };
     }

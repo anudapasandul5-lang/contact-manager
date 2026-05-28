@@ -96,3 +96,98 @@ it("computeMindMapDisplayState hides tucked company projections and reports hidd
 
   assert.equal(edge?.hidden, true);
 });
+
+describe("company bubble-up ring logic", () => {
+  const baseOptions = {
+    edges: [],
+    effectiveCollapsedProjects: new Set<string>(),
+    hoveredNodeId: null,
+    connectedNodeIds: new Set<string>(),
+    connectedEdgeIds: new Set<string>(),
+    searchMatchIds: new Set<string>(),
+    searchFocusedNodeId: null,
+    currentZoomLevel: 1,
+    neighborhoodNodeIds: new Set<string>(),
+    activeNeighborhoodSource: null as null,
+    activeNeighborhoodNodeId: null,
+    inactiveCategories: new Set<import("@/components/mind-map/node-filters").FilterCategory>(),
+    hasFocusedSubset: false,
+    companyFocusCollapsedNodeIds: new Set<string>(),
+    focusTargets: new Set<import("@/components/mind-map/GravityOverlay").GravityTarget>(),
+    selectedSubsetNodeIds: new Set<string>(),
+    mapCollapsed: false,
+    animationPhase: "idle" as const,
+    onCollapseCompany: () => {},
+    onCollapseProject: () => {},
+  };
+
+  function makeNodes() {
+    return [
+      createNode({ id: "center", type: "center" }),
+      createNode({ id: "company-acme", type: "company", data: { label: "Acme" } }),
+      createNode({
+        id: "contact-alice::company-acme",
+        type: "contact",
+        data: {
+          label: "Alice",
+          contactId: "alice",
+          companyIds: ["acme"],
+          parentCompanyId: "acme",
+        },
+      }),
+    ];
+  }
+
+  it("collapsed company bubbles up worse contact ring state", () => {
+    const nodes = makeNodes();
+    const workloadMap = new Map([
+      ["acme", "none" as import("@/lib/workload/overlay").RingState],
+      ["alice", "overdue" as import("@/lib/workload/overlay").RingState],
+    ]);
+    const result = computeMindMapDisplayState({
+      ...baseOptions,
+      nodes,
+      effectiveCollapsedCompanies: new Set(["acme"]),
+      workloadMap,
+    });
+    const companyNode = result.displayNodes.find((n) => n.id === "company-acme");
+    expect(companyNode?.data.ringState).toBe("overdue");
+  });
+
+  it("expanded company does NOT bubble up contact ring state", () => {
+    const nodes = makeNodes();
+    const workloadMap = new Map([
+      ["acme", "none" as import("@/lib/workload/overlay").RingState],
+      ["alice", "overdue" as import("@/lib/workload/overlay").RingState],
+    ]);
+    const result = computeMindMapDisplayState({
+      ...baseOptions,
+      nodes,
+      effectiveCollapsedCompanies: new Set(), // expanded
+      workloadMap,
+    });
+    const companyNode = result.displayNodes.find((n) => n.id === "company-acme");
+    expect(companyNode?.data.ringState).toBe("none");
+  });
+
+  it("collapsed company taskCount sums direct company tasks + contact tasks", () => {
+    const nodes = makeNodes();
+    const workloadMap = new Map([
+      ["acme", "none" as import("@/lib/workload/overlay").RingState],
+      ["alice", "none" as import("@/lib/workload/overlay").RingState],
+    ]);
+    const countMap = new Map([
+      ["acme", 2],
+      ["alice", 3],
+    ]);
+    const result = computeMindMapDisplayState({
+      ...baseOptions,
+      nodes,
+      effectiveCollapsedCompanies: new Set(["acme"]),
+      workloadMap,
+      countMap,
+    });
+    const companyNode = result.displayNodes.find((n) => n.id === "company-acme");
+    expect(companyNode?.data.taskCount).toBe(5);
+  });
+});

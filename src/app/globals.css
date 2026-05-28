@@ -272,3 +272,8 @@ body[data-contact-panel-open="true"] .floating-add-root {
   pointer-events: none;
   transform: translateY(12px) scale(0.96);
 }
+
+/* ── WorkloadOverlay ring animation ──────────────── */
+@keyframes ring-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.5 } }
+.ring-pulse { animation: ring-pulse 2s ease-in-out infinite }
+@media (prefers-reduced-motion: reduce) { .ring-pulse { animation: none } }
