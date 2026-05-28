@@ -43,3 +43,18 @@ The `/forecast` page — the daily-driver task view. Two modes stored in `localS
   Row backgrounds are tinted with the business color (8% opacity body, 15% opacity header cell).
   Drop "later" and "noDate" — swim-lane is a workload-imbalance view, not a backlog.
 Clicking a task card opens `TaskModal` (full edit). Checkbox = complete inline. Date on card = defer via popover date input.
+
+### WorkloadOverlay
+Mind-map overlay toggle that paints a colored SVG ring on Contact and Company nodes to indicate
+each node's worst open-task urgency. Driven by `computeWorkload()` in `src/lib/workload/overlay.ts`.
+Rings appear only on nodes with ≥1 open task; nodes with no tasks or only future-dated tasks show no ring.
+
+### RingState
+The urgency tier a node is assigned by `computeWorkload()`. Seven values (priority order):
+`rotting` > `overdue` > `due-today` > `due-tomorrow` > `due-this-week` > `active` > `none`.
+`none` = no open tasks. `active` = tasks exist but none urgent. Only `rotting` through `due-this-week`
+paint a visible ring.
+
+### RottenFilter
+Secondary toggle (only active when WorkloadOverlay is on) that dims all nodes whose RingState is not
+`rotting`. Used for "who needs attention right now?" scanning. Reuses existing `isQuiet` dim mechanism.
