@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { Task } from "@/lib/repositories/tasks";
-import { computeWorkload, type RingState } from "./overlay";
+import { computeWorkload } from "./overlay";
 
 // Helper to create minimal Task object for testing
 function makeTask(overrides: Partial<Task>): Task {

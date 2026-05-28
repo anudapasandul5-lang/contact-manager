@@ -15,8 +15,9 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { useNetworkQuery } from "@/lib/hooks/queries/useNetworkQuery";
+import { useTasksQuery } from "@/lib/hooks/queries/useTasksQuery";
 import { useCreateContact } from "@/lib/hooks/mutations/useCreateContact";
-import { emitFocus, type FocusableEntityKind } from "@/lib/navigation/nodeFocusBus";
+import { emitFocus, emitTaskFocus, resolveTaskNode, type FocusableEntityKind } from "@/lib/navigation/nodeFocusBus";
 import type { ContactType } from "@/lib/supabase/types";
 import type { EntityContext } from "@/components/shared/TaskModal";
 
@@ -47,6 +48,19 @@ export function CommandPaletteDialog({ open, onOpenChange, openTaskModal }: Comm
     };
   }, []);
   const { data: network } = useNetworkQuery();
+  const { data: tasks, isLoading: tasksLoading, isError: tasksError } = useTasksQuery();
+
+  const focusableTasks = useMemo(
+    () =>
+      !tasksLoading && !tasksError && tasks
+        ? tasks.filter(
+            (t) =>
+              !t.completed_at &&
+              resolveTaskNode({ contactId: t.contact_id, companyId: t.company_id, projectId: t.project_id }) !== null,
+          ).slice(0, 8)
+        : [],
+    [tasks, tasksLoading, tasksError],
+  );
 
   useEffect(() => {
     if (open) {
@@ -245,6 +259,31 @@ export function CommandPaletteDialog({ open, onOpenChange, openTaskModal }: Comm
                       >
                         <Truck />
                         <span className="truncate">{v.name}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+
+                {focusableTasks.length > 0 && (
+                  <CommandGroup heading="Tasks">
+                    {focusableTasks.map((t) => (
+                      <CommandItem
+                        key={`task-${t.id}`}
+                        value={`task ${t.title}`}
+                        onSelect={() => {
+                          handleOpenChange(false);
+                          const targetPath = "/mind-map";
+                          const doFocus = () => requestAnimationFrame(() => emitTaskFocus({ contactId: t.contact_id, companyId: t.company_id, projectId: t.project_id }));
+                          if (pathname !== targetPath) {
+                            router.push(targetPath);
+                            setTimeout(doFocus, 250);
+                          } else {
+                            doFocus();
+                          }
+                        }}
+                      >
+                        <CheckSquare />
+                        <span className="truncate">{t.title}</span>
                       </CommandItem>
                     ))}
                   </CommandGroup>

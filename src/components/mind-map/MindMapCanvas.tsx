@@ -93,6 +93,7 @@ import { buildArcLayout, buildSortedRingLayout, buildTieredArcLayout, sortByLabe
 import { buildCompanyClusterGraph } from "./company-clusters";
 import { createReorganizedGraphState } from "./reorganize-layout";
 import { computeMindMapDisplayState } from "./mind-map-view-state";
+import { subscribeFocus } from "@/lib/navigation/nodeFocusBus";
 
 const StatsOverlay = dynamic(() => import("./StatsOverlay").then((m) => m.StatsOverlay), { ssr: false });
 const SearchOverlay = dynamic(() => import("./SearchOverlay").then((m) => m.SearchOverlay), { ssr: false });
@@ -771,6 +772,7 @@ function MindMapCanvasInner() {
   const { data: networkData, isError } = useNetworkQuery();
   const { openTaskModal } = useCommandPalette();
   const prevNetworkDataRef = useRef<NetworkData | null>(null);
+  const networkDataRef = useRef(networkData);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -959,6 +961,26 @@ function MindMapCanvasInner() {
   useEffect(() => {
     nodesRef.current = nodes;
   }, [nodes]);
+
+  useEffect(() => {
+    networkDataRef.current = networkData;
+  }, [networkData]);
+
+  useEffect(() => {
+    return subscribeFocus((req) => {
+      const nodeId = `${req.kind}-${req.id}`;
+      setActiveNeighborhoodNodeId(nodeId);
+      setActiveNeighborhoodSource("manual");
+
+      if (req.kind === "contact") {
+        const contact = networkDataRef.current?.contacts.find((c) => c.id === req.id) ?? null;
+        if (contact) {
+          setRailCollapsed(false);
+          setSelectedContact(contact);
+        }
+      }
+    });
+  }, []); // stable subscription — uses ref for fresh networkData
 
   const saveRelationship = useCallback(async (payload: {
     source_contact_id: string;

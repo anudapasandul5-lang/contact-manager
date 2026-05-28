@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
@@ -36,7 +37,7 @@ export function useCommandPalette(): CommandPaletteContextValue {
 export function CommandPaletteProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const disabled = pathname === "/login";
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const [open, setOpen] = useState(false);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [taskModalEntityContext, setTaskModalEntityContext] = useState<EntityContext | null>(null);
@@ -73,8 +74,6 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [disabled]);
-
-  useEffect(() => { setMounted(true); }, []); // eslint-disable-line react-hooks/set-state-in-effect
 
   useEffect(() => {
     queueMicrotask(() => setOpen(false));
