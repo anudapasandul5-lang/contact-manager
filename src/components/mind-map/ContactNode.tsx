@@ -110,7 +110,6 @@ export function ContactNode({ data }: NodeProps) {
 
   return (
     <div style={{ transform: `scale(${animScale})`, transformOrigin: "center", position: "relative" }}>
-      <RingIndicator state={ringState} size={52} />
       {ringVisible && taskCount > 0 && (
         <span
           style={{
@@ -150,38 +149,42 @@ export function ContactNode({ data }: NodeProps) {
         <Handle type="target" position={Position.Left} style={{ opacity: 0, width: 1, height: 1 }} />
         <Handle type="source" position={Position.Right} style={{ opacity: 0, width: 1, height: 1 }} />
 
-        <EntityAvatar
-          name={label}
-          imageUrl={photoUrl}
-          className="rounded-full"
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: "50%",
-            background: cfg.avatarBg,
-            boxShadow: `0 2px 6px rgba(${cfg.shadow},0.35)`,
-            flexShrink: 0,
-          }}
-          fallback={
-            <div
+        <div style={{ width: 40, height: 40, position: "relative", display: "inline-block", flexShrink: 0 }}>
+          <RingIndicator state={ringState} size={40} />
+          <div style={{ position: "absolute", top: 4, left: 4 }}>
+            <EntityAvatar
+              name={label}
+              imageUrl={photoUrl}
+              className="rounded-full"
               style={{
-                width: "100%",
-                height: "100%",
+                width: 32,
+                height: 32,
                 borderRadius: "50%",
                 background: cfg.avatarBg,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 11,
-                fontWeight: 800,
-                color: "#ffffff",
-                letterSpacing: "-0.02em",
+                boxShadow: `0 2px 6px rgba(${cfg.shadow},0.35)`,
               }}
-            >
-              {initials}
-            </div>
-          }
-        />
+              fallback={
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "50%",
+                    background: cfg.avatarBg,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 11,
+                    fontWeight: 800,
+                    color: "#ffffff",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {initials}
+                </div>
+              }
+            />
+          </div>
+        </div>
 
         {showLabel && (
           <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>

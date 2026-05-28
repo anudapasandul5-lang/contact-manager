@@ -64,7 +64,6 @@ export function CompanyNode({ data }: NodeProps) {
 
   return (
     <div style={{ transform: `scale(${animScale})`, transformOrigin: "center", position: "relative" }}>
-      <RingIndicator state={ringState} size={60} />
       {ringVisible && taskCount > 0 && (
         <span
           style={{
@@ -104,46 +103,50 @@ export function CompanyNode({ data }: NodeProps) {
         <Handle type="target" position={Position.Left} style={{ opacity: 0, width: 1, height: 1 }} />
         <Handle type="source" position={Position.Right} style={{ opacity: 0, width: 1, height: 1 }} />
 
-        <EntityAvatar
-          name={label}
-          imageUrl={logoUrl}
-          className="rounded-[14px]"
-          imageFit="contain"
-          imageInset={4}
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 14,
-            background: `linear-gradient(145deg, ${clay.icon}, ${clay.icon})`,
-            color: "#ffffff",
-            flexShrink: 0,
-          }}
-          imageFrameStyle={{
-            width: "100%",
-            height: "100%",
-            borderRadius: 14,
-            background: "rgba(255,255,255,0.92)",
-            boxShadow: "inset 1px 1px 3px rgba(255,255,255,0.72), inset -1px -1px 2px rgba(0,0,0,0.08)",
-          }}
-          fallback={
-            <div
+        <div style={{ width: 44, height: 44, position: "relative", display: "inline-block", flexShrink: 0 }}>
+          <RingIndicator state={ringState} size={44} />
+          <div style={{ position: "absolute", top: 4, left: 4 }}>
+            <EntityAvatar
+              name={label}
+              imageUrl={logoUrl}
+              className="rounded-[14px]"
+              imageFit="contain"
+              imageInset={4}
               style={{
-                width: "100%",
-                height: "100%",
+                width: 36,
+                height: 36,
                 borderRadius: 14,
                 background: `linear-gradient(145deg, ${clay.icon}, ${clay.icon})`,
                 color: "#ffffff",
-                display: "grid",
-                placeItems: "center",
-                fontSize: 11,
-                fontWeight: 800,
-                letterSpacing: "0.04em",
               }}
-            >
-              {initials}
-            </div>
-          }
-        />
+              imageFrameStyle={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 14,
+                background: "rgba(255,255,255,0.92)",
+                boxShadow: "inset 1px 1px 3px rgba(255,255,255,0.72), inset -1px -1px 2px rgba(0,0,0,0.08)",
+              }}
+              fallback={
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: 14,
+                    background: `linear-gradient(145deg, ${clay.icon}, ${clay.icon})`,
+                    color: "#ffffff",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  {initials}
+                </div>
+              }
+            />
+          </div>
+        </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0, flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
