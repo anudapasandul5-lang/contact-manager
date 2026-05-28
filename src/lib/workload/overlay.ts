@@ -165,24 +165,24 @@ function determineRingState(
   return "active";
 }
 
+export const RING_PRIORITY: Record<RingState, number> = {
+  rotting: 6,
+  overdue: 5,
+  "due-today": 4,
+  "due-tomorrow": 3,
+  "due-this-week": 2,
+  active: 1,
+  none: 0,
+};
+
 /**
  * Return the "worst" ring state (worst = most urgent).
  * Priority order: rotting > overdue > due-today > due-tomorrow > due-this-week > active > none
  */
-function worstState(a: RingState | undefined, b: RingState): RingState {
+export function worstState(a: RingState | undefined, b: RingState): RingState {
   if (a === undefined) return b;
 
-  const priority: Record<RingState, number> = {
-    rotting: 6,
-    overdue: 5,
-    "due-today": 4,
-    "due-tomorrow": 3,
-    "due-this-week": 2,
-    active: 1,
-    none: 0,
-  };
-
-  return priority[a] >= priority[b] ? a : b;
+  return RING_PRIORITY[a] >= RING_PRIORITY[b] ? a : b;
 }
 
 // ─── TZ helpers ───────────────────────────────────────────────────────────────
