@@ -20,6 +20,7 @@ export function DeferPopover({ taskId, currentDate, onDefer, children }: DeferPo
 
   useEffect(() => {
     if (!open) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
