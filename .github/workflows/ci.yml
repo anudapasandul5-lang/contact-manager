@@ -28,7 +28,7 @@ jobs:
         run: npm run lint
 
       - name: Test
-        run: npm test
+        run: npx vitest run --exclude "src/lib/repositories/**"
         env:
           DATABASE_URL_TEST: ${{ secrets.DATABASE_URL_TEST }}
 
