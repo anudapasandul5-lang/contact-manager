@@ -1,5 +1,6 @@
 import "@/env";
 import type { Metadata } from "next";
+import "@xyflow/react/dist/style.css";
 import "./globals.css";
 import { FloatingAddButton } from "@/components/shared/FloatingAddButton";
 import { QueryProvider } from "@/lib/query/QueryProvider";
