@@ -93,7 +93,7 @@ import { buildArcLayout, buildSortedRingLayout, buildTieredArcLayout, sortByLabe
 import { buildCompanyClusterGraph } from "./company-clusters";
 import { createReorganizedGraphState } from "./reorganize-layout";
 import { computeMindMapDisplayState } from "./mind-map-view-state";
-import { emitFocus, subscribeFocus, type FocusableEntityKind } from "@/lib/navigation/nodeFocusBus";
+import { subscribeFocus } from "@/lib/navigation/nodeFocusBus";
 
 const StatsOverlay = dynamic(() => import("./StatsOverlay").then((m) => m.StatsOverlay), { ssr: false });
 const SearchOverlay = dynamic(() => import("./SearchOverlay").then((m) => m.SearchOverlay), { ssr: false });
