@@ -1,9 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { and, eq } from "drizzle-orm";
 import { authenticateRequest, applySessionCookies } from "@/lib/auth/session";
-import { getDb } from "@/lib/db";
-import * as schema from "@/lib/db/schema";
-import { createTask, listTasks } from "@/lib/repositories/tasks";
+import { getSupabaseServer } from "@/lib/supabase/server";
 import { normalizeCapture } from "@/lib/capture/service";
 
 export const runtime = "nodejs";
@@ -19,16 +16,35 @@ export async function GET(request: NextRequest) {
     const parentTaskId = searchParams.get("parentTaskId");
     const completed = searchParams.get("completed");
 
-    const db = getDb();
-    const tasks = await listTasks(db, auth.user.id, {
-      projectId: projectId === "null" ? null : (projectId ?? undefined),
-      businessId: businessId ?? undefined,
-      parentTaskId: parentTaskId === "null" ? null : (parentTaskId ?? undefined),
-      completed:
-        completed === "true" ? true : completed === "false" ? false : undefined,
-    });
+    const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
+    let query = supabase.from("tasks").select("*").eq("user_id", auth.user.id);
 
-    const response = NextResponse.json(tasks);
+    if (projectId === "null") {
+      query = query.is("project_id", null);
+    } else if (projectId !== null) {
+      query = query.eq("project_id", projectId);
+    }
+
+    if (businessId !== null) {
+      query = query.eq("business_id", businessId);
+    }
+
+    if (parentTaskId === "null") {
+      query = query.is("parent_task_id", null);
+    } else if (parentTaskId !== null) {
+      query = query.eq("parent_task_id", parentTaskId);
+    }
+
+    if (completed === "false") {
+      query = query.is("completed_at", null);
+    } else if (completed === "true") {
+      query = query.not("completed_at", "is", null);
+    }
+
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+
+    const response = NextResponse.json(data ?? []);
     applySessionCookies(response, auth.resolved);
     return response;
   } catch (error) {
@@ -63,21 +79,16 @@ export async function POST(request: NextRequest) {
       companyId: typeof body.companyId === "string" ? body.companyId : undefined,
     };
 
-    const db = getDb();
+    const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
 
-    // FK ownership check: projectId must belong to this user
     if (payload.projectId) {
-      const rows = await db
-        .select({ id: schema.projects.id })
-        .from(schema.projects)
-        .where(
-          and(
-            eq(schema.projects.id, payload.projectId),
-            eq(schema.projects.user_id, auth.user.id),
-          ),
-        )
-        .limit(1);
-      if (rows.length === 0) {
+      const { data: proj } = await supabase
+        .from("projects")
+        .select("id")
+        .eq("id", payload.projectId)
+        .eq("user_id", auth.user.id)
+        .maybeSingle();
+      if (!proj) {
         const response = NextResponse.json({ error: "projectId not found" }, { status: 400 });
         applySessionCookies(response, auth.resolved);
         return response;
@@ -85,9 +96,32 @@ export async function POST(request: NextRequest) {
     }
 
     const input = normalizeCapture({ source: "cmd-k", payload });
-    const task = await createTask(db, auth.user.id, input);
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("tasks")
+      .insert({
+        id: crypto.randomUUID(),
+        user_id: auth.user.id,
+        title: input.title,
+        notes: input.notes ?? null,
+        project_id: input.projectId ?? null,
+        contact_id: input.contactId ?? null,
+        company_id: input.companyId ?? null,
+        business_id: input.businessId ?? null,
+        defer_date: input.deferDate?.toISOString() ?? null,
+        due_date: input.dueDate?.toISOString() ?? null,
+        parent_task_id: input.parentTaskId ?? null,
+        recurrence_rule: input.recurrenceRule ?? null,
+        completed_at: null,
+        created_at: now,
+        updated_at: now,
+      })
+      .select()
+      .single();
 
-    const response = NextResponse.json(task, { status: 201 });
+    if (error) throw new Error(error.message);
+
+    const response = NextResponse.json(data, { status: 201 });
     applySessionCookies(response, auth.resolved);
     return response;
   } catch (error) {

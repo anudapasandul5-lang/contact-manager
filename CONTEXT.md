@@ -28,3 +28,18 @@ Sending via Resend + cron wiring is deferred to Module 13 (DigestSender).
 A `Task` record enriched with pre-resolved entity names (`businessName`, `projectName`,
 `contactName`, `companyName`). The caller resolves IDs to names before calling
 `composeDigest()`. The composer is pure — no DB access, no lookups.
+
+### ForecastBucket
+One of six time-based categories tasks are sorted into: `overdue`, `today`, `tomorrow`,
+`thisWeek`, `later`, `noDate`. Computed by `bucketize()` in `src/lib/forecast/buckets.ts`
+(pure, no I/O). The API route `/api/forecast` returns pre-bucketed JSON so the client
+never runs TZ math.
+
+### ForecastView
+The `/forecast` page — the daily-driver task view. Two modes stored in `localStorage`:
+- **Column mode** (default): 6 vertical columns (one per ForecastBucket), each independently
+  scrollable. Business filter chips above the columns multi-select which businesses are shown.
+- **Swim-lane mode**: rows = businesses, 4 columns (overdue / today / tomorrow / thisWeek).
+  Row backgrounds are tinted with the business color (8% opacity body, 15% opacity header cell).
+  Drop "later" and "noDate" — swim-lane is a workload-imbalance view, not a backlog.
+Clicking a task card opens `TaskModal` (full edit). Checkbox = complete inline. Date on card = defer via popover date input.

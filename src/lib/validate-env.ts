@@ -1,7 +1,6 @@
 const REQUIRED = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-  "DATABASE_URL",
 ] as const;
 
 type RequiredVar = (typeof REQUIRED)[number];
