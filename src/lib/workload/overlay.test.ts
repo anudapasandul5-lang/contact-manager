@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { Task } from "@/lib/repositories/tasks";
-import { computeWorkload } from "./overlay";
+import { computeWorkload, worstState, RING_PRIORITY } from "./overlay";
 
 // Helper to create minimal Task object for testing
 function makeTask(overrides: Partial<Task>): Task {
@@ -472,5 +472,93 @@ describe("computeWorkload", () => {
     const result = computeWorkload(tasks, ["node1"], now, tz);
     expect(result.has("node1")).toBe(true);
     expect(result.get("node1")).toBe("due-today");
+  });
+});
+
+describe("worstState (exported)", () => {
+  // Test worstState with undefined first argument
+  it("should return b when a is undefined", () => {
+    expect(worstState(undefined, "due-today")).toBe("due-today");
+    expect(worstState(undefined, "rotting")).toBe("rotting");
+  });
+
+  // Test priority ordering
+  it("should return rotting when comparing rotting vs any other state", () => {
+    expect(worstState("rotting", "active")).toBe("rotting");
+    expect(worstState("active", "rotting")).toBe("rotting");
+    expect(worstState("rotting", "due-today")).toBe("rotting");
+  });
+
+  it("should return overdue when comparing overdue vs lower priority states", () => {
+    expect(worstState("overdue", "active")).toBe("overdue");
+    expect(worstState("active", "overdue")).toBe("overdue");
+    expect(worstState("overdue", "none")).toBe("overdue");
+  });
+
+  it("should return due-today when comparing due-today vs lower priority states", () => {
+    expect(worstState("due-today", "active")).toBe("due-today");
+    expect(worstState("active", "due-today")).toBe("due-today");
+    expect(worstState("due-today", "none")).toBe("due-today");
+  });
+
+  it("should return same state when both are equal priority", () => {
+    expect(worstState("active", "active")).toBe("active");
+    expect(worstState("due-tomorrow", "due-tomorrow")).toBe("due-tomorrow");
+    expect(worstState("none", "none")).toBe("none");
+  });
+
+  it("should return active when comparing active vs none", () => {
+    expect(worstState("active", "none")).toBe("active");
+    expect(worstState("none", "active")).toBe("active");
+  });
+
+  // Test full priority chain
+  it("should respect full priority chain", () => {
+    const states: Array<"rotting" | "overdue" | "due-today" | "due-tomorrow" | "due-this-week" | "active" | "none"> = [
+      "none",
+      "active",
+      "due-this-week",
+      "due-tomorrow",
+      "due-today",
+      "overdue",
+      "rotting",
+    ];
+    for (let i = 0; i < states.length; i++) {
+      for (let j = 0; j < states.length; j++) {
+        const result = worstState(states[i], states[j]);
+        const expectedIdx = Math.max(i, j);
+        expect(result).toBe(states[expectedIdx]);
+      }
+    }
+  });
+});
+
+describe("RING_PRIORITY (exported)", () => {
+  it("should export RING_PRIORITY with correct values", () => {
+    expect(RING_PRIORITY).toEqual({
+      rotting: 6,
+      overdue: 5,
+      "due-today": 4,
+      "due-tomorrow": 3,
+      "due-this-week": 2,
+      active: 1,
+      none: 0,
+    });
+  });
+
+  it("should have all RingState values represented", () => {
+    const states: Array<"rotting" | "overdue" | "due-today" | "due-tomorrow" | "due-this-week" | "active" | "none"> = [
+      "rotting",
+      "overdue",
+      "due-today",
+      "due-tomorrow",
+      "due-this-week",
+      "active",
+      "none",
+    ];
+    for (const state of states) {
+      expect(RING_PRIORITY[state]).toBeDefined();
+      expect(typeof RING_PRIORITY[state]).toBe("number");
+    }
   });
 });
