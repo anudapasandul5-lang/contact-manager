@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest"
 import { parseTask } from "./use-workload-overlay"
 import { computeWorkload } from "@/lib/workload/overlay"
 
