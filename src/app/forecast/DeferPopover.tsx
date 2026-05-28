@@ -19,7 +19,6 @@ export function DeferPopover({ taskId, currentDate, onDefer, children }: DeferPo
     : today;
 
   useEffect(() => {
-    if (!open) return;
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
@@ -27,7 +26,7 @@ export function DeferPopover({ taskId, currentDate, onDefer, children }: DeferPo
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
+  }, []);
 
   return (
     <div ref={ref} style={{ position: "relative", display: "inline-block" }}>

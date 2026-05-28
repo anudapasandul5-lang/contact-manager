@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
 import type { BucketedTasks } from "@/lib/forecast/buckets";
@@ -38,12 +38,11 @@ const STORAGE_KEY = "forecast-mode";
 const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export function ForecastClient() {
-  // Load mode from localStorage (client-only)
-  const [mode, setMode] = useState<Mode>("columns");
-  useEffect(() => {
+  const [mode, setMode] = useState<Mode>(() => {
+    if (typeof window === "undefined") return "columns";
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "swimlane" || stored === "columns") setMode(stored);
-  }, []);
+    return stored === "swimlane" || stored === "columns" ? stored : "columns";
+  });
 
   const handleModeToggle = (newMode: Mode) => {
     setMode(newMode);
