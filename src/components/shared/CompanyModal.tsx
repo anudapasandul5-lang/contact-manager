@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query/keys";
 import {
   Dialog,
   DialogContent,
@@ -62,6 +64,7 @@ interface CompanyModalProps {
 }
 
 export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }: CompanyModalProps) {
+  const qc = useQueryClient();
   const existingCompanyId = company?.id ?? null;
   const [name, setName] = useState("");
   const [industry, setIndustry] = useState("");
@@ -221,18 +224,23 @@ export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }
     onSaved();
     onOpenChange(false);
 
-    // Fire API in background; dispatch data-changed when settled
     fetch(`/api/companies/${companyId}`, { method: "DELETE" })
       .then((res) => {
         if (!res.ok) {
           // Delete failed — reload to restore the node
-          window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+          qc.invalidateQueries({ queryKey: queryKeys.companies.all });
+          qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
+          qc.invalidateQueries({ queryKey: queryKeys.network.all });
         } else {
-          window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+          qc.invalidateQueries({ queryKey: queryKeys.companies.all });
+          qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
+          qc.invalidateQueries({ queryKey: queryKeys.network.all });
         }
       })
       .catch(() => {
-        window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+        qc.invalidateQueries({ queryKey: queryKeys.companies.all });
+        qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
+        qc.invalidateQueries({ queryKey: queryKeys.network.all });
       });
   }
 
@@ -348,7 +356,9 @@ export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }
         try {
           await syncMedia(savedCompanyId);
         } catch (mediaSyncError) {
-          window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+          qc.invalidateQueries({ queryKey: queryKeys.companies.all });
+          qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
+          qc.invalidateQueries({ queryKey: queryKeys.network.all });
           onSaved();
           setMediaError(mediaSyncError instanceof Error ? mediaSyncError.message : "Failed to update logo.");
           setMediaStatus("Company saved. You can retry the logo upload.");
@@ -356,7 +366,9 @@ export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }
         }
       }
 
-      window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+      qc.invalidateQueries({ queryKey: queryKeys.companies.all });
+      qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
+      qc.invalidateQueries({ queryKey: queryKeys.network.all });
       onSaved();
       onOpenChange(false);
     } catch {

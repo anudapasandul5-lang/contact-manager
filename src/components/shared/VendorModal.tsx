@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query/keys";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +35,7 @@ interface VendorModalProps {
 const PRESET_COLORS = ["#f97316", "#ea580c", "#fb923c", "#fdba74", "#c2410c", "#f59e0b"];
 
 export function VendorModal({ open, onOpenChange, vendor, onSaved }: VendorModalProps) {
+  const qc = useQueryClient();
   const [name, setName] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [notes, setNotes] = useState("");
@@ -166,7 +169,8 @@ export function VendorModal({ open, onOpenChange, vendor, onSaved }: VendorModal
         return;
       }
 
-      window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+      qc.invalidateQueries({ queryKey: queryKeys.vendors.all });
+      qc.invalidateQueries({ queryKey: queryKeys.network.all });
       onSaved();
       onOpenChange(false);
     } catch {
@@ -189,7 +193,8 @@ export function VendorModal({ open, onOpenChange, vendor, onSaved }: VendorModal
         return;
       }
 
-      window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+      qc.invalidateQueries({ queryKey: queryKeys.vendors.all });
+      qc.invalidateQueries({ queryKey: queryKeys.network.all });
       onSaved();
       onOpenChange(false);
     } catch {

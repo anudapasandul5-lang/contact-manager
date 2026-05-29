@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query/keys";
 import {
   Dialog,
   DialogContent,
@@ -63,6 +65,7 @@ interface ProjectModalProps {
 }
 
 export function ProjectModal({ open, onOpenChange, project, onSaved }: ProjectModalProps) {
+  const qc = useQueryClient();
   const NONE_COMPANY_VALUE = "__none__";
   const existingProjectId = project?.id ?? null;
   const [name, setName] = useState("");
@@ -329,7 +332,8 @@ export function ProjectModal({ open, onOpenChange, project, onSaved }: ProjectMo
         try {
           await syncMedia(savedProjectId);
         } catch (mediaSyncError) {
-          window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+          qc.invalidateQueries({ queryKey: queryKeys.projects.all });
+          qc.invalidateQueries({ queryKey: queryKeys.network.all });
           onSaved();
           setMediaError(mediaSyncError instanceof Error ? mediaSyncError.message : "Failed to update logo.");
           setMediaStatus("Project saved. You can retry the logo upload.");
@@ -337,7 +341,8 @@ export function ProjectModal({ open, onOpenChange, project, onSaved }: ProjectMo
         }
       }
 
-      window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+      qc.invalidateQueries({ queryKey: queryKeys.projects.all });
+      qc.invalidateQueries({ queryKey: queryKeys.network.all });
       onSaved();
       onOpenChange(false);
     } catch {

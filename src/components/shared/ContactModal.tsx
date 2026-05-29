@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query/keys";
 import {
   Dialog,
   DialogContent,
@@ -55,6 +57,7 @@ interface ContactModalProps {
 }
 
 export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactModalProps) {
+  const qc = useQueryClient();
   const existingContactId = contact?.id ?? null;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -250,7 +253,8 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
         try {
           await syncMedia(savedContactId);
         } catch (mediaSyncError) {
-          window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+          qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
+          qc.invalidateQueries({ queryKey: queryKeys.network.all });
           onSaved();
           setMediaError(mediaSyncError instanceof Error ? mediaSyncError.message : "Failed to update photo.");
           setMediaStatus("Contact saved. You can retry the photo upload.");
@@ -258,7 +262,8 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
         }
       }
 
-      window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+      qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
+      qc.invalidateQueries({ queryKey: queryKeys.network.all });
       onSaved();
       if (addAnother) {
         if (flashTimerRef.current) clearTimeout(flashTimerRef.current);

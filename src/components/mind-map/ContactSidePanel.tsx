@@ -1,6 +1,8 @@
 "use client";
 
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query/keys";
 import {
   Briefcase,
   CalendarClock,
@@ -223,6 +225,7 @@ export function ContactSidePanel({
   onFollowUpComplete,
   onToggleRailCollapsed,
 }: ContactSidePanelProps) {
+  const qc = useQueryClient();
   const shouldRenderPanel = isCompactViewport ? isVisible : true;
   const isSelectedMode = !!contact;
   const shouldHideFloatingActions = Boolean(contact) || (isCompactViewport && isVisible);
@@ -335,7 +338,7 @@ export function ContactSidePanel({
 
       setCreateDraft(createFollowUpDraft(contact));
       setLocalNotice({ tone: "success", message: "Next touch created." });
-      window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+      qc.invalidateQueries({ queryKey: queryKeys.network.all });
     } catch (error) {
       setLocalNotice({
         tone: "error",
@@ -390,7 +393,7 @@ export function ContactSidePanel({
       setNextDraft(createFollowUpDraft(contact));
       setShowNextDraft(false);
       setLocalNotice({ tone: "success", message: "Follow-up completed and next touch scheduled." });
-      window.dispatchEvent(new CustomEvent("contact-manager:data-changed"));
+      qc.invalidateQueries({ queryKey: queryKeys.network.all });
     } catch (error) {
       setLocalNotice({
         tone: "error",
