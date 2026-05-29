@@ -80,8 +80,8 @@ describe("POST /api/crons/task-recurrence", () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ updated: 2 });
     expect(mockUpdate).toHaveBeenCalledTimes(2);
-    expect((mockUpdate.mock.calls[0] as [{ due_date: string }])[0].due_date).toBe(next1.toISOString());
-    expect((mockUpdate.mock.calls[1] as [{ due_date: string }])[0].due_date).toBe(next2.toISOString());
+    expect((mockUpdate.mock.calls[0] as unknown as [{ due_date: string }])[0].due_date).toBe(next1.toISOString());
+    expect((mockUpdate.mock.calls[1] as unknown as [{ due_date: string }])[0].due_date).toBe(next2.toISOString());
   });
 
   it("5. nextInstance returns null → skipped, { updated: 0 }", async () => {
