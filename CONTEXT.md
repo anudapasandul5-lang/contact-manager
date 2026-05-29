@@ -19,10 +19,24 @@ Tasks, projects, and follow-ups belong to a single business (1:N). Contacts/comp
 attach to multiple businesses (M:N via junction tables).
 
 ### Digest
-Daily email sent at 7am containing tasks from three buckets: overdue, today, and tomorrow.
+Daily email sent at a configured time (default 7am Muscat, `DIGEST_TIMEZONE` env var) to every
+registered user. Contains tasks from three buckets: overdue, today, tomorrow.
+Only sent if at least one bucket is non-empty — no "all clear" emails.
 Composed by `composeDigest()` in `src/lib/digest/composer.ts` as pure MJML→HTML.
-Sending via Resend + cron wiring is deferred to Module 13 (DigestSender).
+Sent by `DigestSender` (`/api/crons/digest`) via Resend. Sender name: "Daily Digest".
 `DigestTask` objects are pre-enriched by the caller before being passed in.
+
+### DigestSender
+The cron route at `/api/crons/digest`. On each invocation:
+1. Fetches all registered users via `auth.admin.listUsers()`.
+2. For each user, queries their incomplete tasks where `due_date IS NOT NULL`,
+   `defer_date IS NULL OR defer_date <= now`, and `due_date < start of day-after-tomorrow UTC`.
+3. Enriches tasks with entity names via PostgREST join (projects, businesses, contacts, companies).
+4. Builds `DigestBuckets` (overdue / today / tomorrow) using UTC midnight boundaries.
+5. Skips user if all buckets empty.
+6. Calls `composeDigest(buckets, now, tz, displayName)` → `{subject, html}`.
+7. Sends via Resend. On Resend failure: logs error, continues to next user.
+Returns `{ sent: N, failed: N, skipped: N }`.
 
 ### DigestTask
 A `Task` record enriched with pre-resolved entity names (`businessName`, `projectName`,
