@@ -333,6 +333,7 @@ export function ProjectModal({ open, onOpenChange, project, onSaved }: ProjectMo
           await syncMedia(savedProjectId);
         } catch (mediaSyncError) {
           qc.invalidateQueries({ queryKey: queryKeys.projects.all });
+          qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
           qc.invalidateQueries({ queryKey: queryKeys.network.all });
           onSaved();
           setMediaError(mediaSyncError instanceof Error ? mediaSyncError.message : "Failed to update logo.");
@@ -342,6 +343,7 @@ export function ProjectModal({ open, onOpenChange, project, onSaved }: ProjectMo
       }
 
       qc.invalidateQueries({ queryKey: queryKeys.projects.all });
+      qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
       qc.invalidateQueries({ queryKey: queryKeys.network.all });
       onSaved();
       onOpenChange(false);
