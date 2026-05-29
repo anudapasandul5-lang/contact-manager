@@ -104,6 +104,7 @@ export async function composeDigest(
   buckets: DigestBuckets,
   now: Date,
   tz: string,
+  displayName?: string,
 ): Promise<{ subject: string; html: string }> {
   // Validate inputs
   if (isNaN(now.getTime())) throw new RangeError("now is invalid Date");
@@ -142,6 +143,10 @@ export async function composeDigest(
       </mj-text>`
     : `${overdueSection}${todaySection}${tomorrowSection}`;
 
+  const greetingLine = displayName && displayName.trim()
+    ? `<mj-text color="#ffffff" font-size="14px">Hi ${esc(displayName)},</mj-text>`
+    : "";
+
   const template = `
 <mjml>
   <mj-head>
@@ -154,6 +159,7 @@ export async function composeDigest(
     <mj-section background-color="#18181b" padding="16px 24px">
       <mj-column>
         <mj-text color="#ffffff" font-size="14px" font-weight="600">Daily Digest · ${esc(dateStr)}</mj-text>
+        ${greetingLine}
       </mj-column>
     </mj-section>
     <mj-section background-color="#ffffff" padding="0">
