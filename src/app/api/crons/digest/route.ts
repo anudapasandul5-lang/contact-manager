@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
       const { data: tasks, error: tasksError } = await supabase
         .from("tasks")
         .select(
-          `id, title, notes, due_date, projects(name), businesses(name), contacts(first_name, last_name), companies(name)`,
+          `id, title, notes, due_date, projects(name), businesses(name), contacts(name), companies(name)`,
         )
         .eq("user_id", user.id)
         .is("completed_at", null)
@@ -110,9 +110,7 @@ export async function GET(request: NextRequest) {
         notes: (t.notes as string | null) ?? null,
         projectName: (t.projects as unknown as { name: string } | null)?.name,
         businessName: (t.businesses as unknown as { name: string } | null)?.name,
-        contactName: t.contacts
-          ? `${(t.contacts as unknown as { first_name: string; last_name: string }).first_name} ${(t.contacts as unknown as { first_name: string; last_name: string }).last_name}`.trim()
-          : undefined,
+        contactName: (t.contacts as unknown as { name: string } | null)?.name,
         companyName: (t.companies as unknown as { name: string } | null)?.name,
       }));
 
