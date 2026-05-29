@@ -70,7 +70,7 @@ export function bucketize(tasks: Task[], now: Date, tz: string): BucketedTasks {
 // ─── TZ helpers ───────────────────────────────────────────────────────────────
 
 /** Returns the wall-clock start of `date`'s day in `tz`, as a UTC Date. */
-function startOfDay(date: Date, tz: string): Date {
+export function startOfDay(date: Date, tz: string): Date {
   const parts = getDateParts(date, tz);
   return zonedDateToUtc(parts.year, parts.month, parts.day, 0, 0, 0, tz);
 }
@@ -82,7 +82,7 @@ function endOfDay(date: Date, tz: string): Date {
 }
 
 /** Adds N wall-clock days to a UTC Date, recomputing in `tz`. */
-function addDaysWallClock(date: Date, days: number, tz: string): Date {
+export function addDaysWallClock(date: Date, days: number, tz: string): Date {
   const parts = getDateParts(date, tz);
   return zonedDateToUtc(parts.year, parts.month, parts.day + days, parts.hour, parts.minute, parts.second, tz);
 }

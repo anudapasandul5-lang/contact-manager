@@ -118,4 +118,14 @@ describe("composeDigest", () => {
     expect(result.html).toContain("and 5 more");
     expect(result.html).toMatchSnapshot();
   });
+
+  it("displayName: injects greeting when provided", async () => {
+    const result = await composeDigest(emptyBuckets(), NOW, TZ, "Anuda");
+    expect(result.html).toContain("Hi Anuda,");
+  });
+
+  it("displayName: no greeting when omitted", async () => {
+    const result = await composeDigest(emptyBuckets(), NOW, TZ);
+    expect(result.html).not.toContain("Hi ");
+  });
 });
