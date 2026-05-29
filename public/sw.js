@@ -28,6 +28,11 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
+  // Non-GET requests (Server Actions, form POSTs) must pass through — cache.put() would throw
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     caches.open(CACHE_NAME).then(function(cache) {
       return cache.match(event.request).then(function(cachedResponse) {
