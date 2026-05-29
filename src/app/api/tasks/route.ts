@@ -1,7 +1,9 @@
+import { z } from "zod";
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateRequest, applySessionCookies } from "@/lib/auth/session";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { normalizeCapture } from "@/lib/capture/service";
+import { validateRrule } from "@/lib/recurrence/engine";
 
 export const runtime = "nodejs";
 
@@ -56,6 +58,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
+const postBodySchema = z.object({
+  recurrenceRule: z.string().nullable().optional(),
+});
+
 export async function POST(request: NextRequest) {
   const auth = await authenticateRequest(request);
   if (!auth.user) return auth.response;
@@ -67,6 +73,28 @@ export async function POST(request: NextRequest) {
       const response = NextResponse.json({ error: "title is required" }, { status: 400 });
       applySessionCookies(response, auth.resolved);
       return response;
+    }
+
+    const parsed = postBodySchema.safeParse(body);
+    if (!parsed.success) {
+      const response = NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid request" },
+        { status: 400 }
+      );
+      applySessionCookies(response, auth.resolved);
+      return response;
+    }
+
+    const recurrenceRuleRaw = parsed.data.recurrenceRule;
+    const recurrenceRule = !recurrenceRuleRaw || recurrenceRuleRaw.trim() === "" ? null : recurrenceRuleRaw;
+
+    if (recurrenceRule !== null) {
+      const validation = validateRrule(recurrenceRule);
+      if (!validation.ok) {
+        const response = NextResponse.json({ error: validation.error }, { status: 400 });
+        applySessionCookies(response, auth.resolved);
+        return response;
+      }
     }
 
     const payload = {
@@ -111,7 +139,7 @@ export async function POST(request: NextRequest) {
         defer_date: input.deferDate?.toISOString() ?? null,
         due_date: input.dueDate?.toISOString() ?? null,
         parent_task_id: input.parentTaskId ?? null,
-        recurrence_rule: input.recurrenceRule ?? null,
+        recurrence_rule: recurrenceRule,
         completed_at: null,
         created_at: now,
         updated_at: now,

@@ -12,9 +12,10 @@ export interface CreateTaskMutationInput {
   businessId?: string;
   contactId?: string;
   companyId?: string;
+  recurrenceRule?: string | null;
 }
 
-async function postTask(input: CreateTaskMutationInput): Promise<{ id: string }> {
+export async function postTask(input: CreateTaskMutationInput): Promise<{ id: string }> {
   const res = await fetch("/api/tasks", {
     method: "POST",
     credentials: "include",
@@ -27,6 +28,7 @@ async function postTask(input: CreateTaskMutationInput): Promise<{ id: string }>
       businessId: input.businessId ?? null,
       contactId: input.contactId ?? null,
       companyId: input.companyId ?? null,
+      recurrenceRule: input.recurrenceRule ?? null,
     }),
   });
   if (!res.ok) {

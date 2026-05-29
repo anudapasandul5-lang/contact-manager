@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Circle, CheckCircle, CalendarDots } from "@phosphor-icons/react";
+import { ArrowsClockwise, Circle, CheckCircle, CalendarDots } from "@phosphor-icons/react";
 import type { Task } from "@/lib/repositories/tasks";
 import { DeferPopover } from "./DeferPopover";
 
@@ -70,6 +70,15 @@ export function ForecastTaskCard({ task, business, onComplete, onDefer }: Foreca
         >
           {task.title}
         </span>
+
+        {task.recurrence_rule !== null && (
+          <ArrowsClockwise
+            size={12}
+            className="flex-shrink-0 mt-0.5"
+            style={{ color: "var(--clay-text-muted)" }}
+            aria-label="Recurring task"
+          />
+        )}
 
         {business && (
           <span
