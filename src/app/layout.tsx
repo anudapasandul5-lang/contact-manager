@@ -5,10 +5,16 @@ import "./globals.css";
 import { FloatingAddButton } from "@/components/shared/FloatingAddButton";
 import { QueryProvider } from "@/lib/query/QueryProvider";
 import { CommandPaletteProvider } from "@/components/command-palette/CommandPaletteProvider";
+import { ServiceWorkerRegistrar } from "@/components/shared/ServiceWorkerRegistrar";
 
 export const metadata: Metadata = {
   title: "Contact Manager",
   description: "Mind map network visualizer for your contacts",
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'apple-mobile-web-app-title': 'Contacts',
+  },
 };
 
 export default function RootLayout({
@@ -31,6 +37,7 @@ export default function RootLayout({
             <FloatingAddButton />
           </CommandPaletteProvider>
         </QueryProvider>
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   );

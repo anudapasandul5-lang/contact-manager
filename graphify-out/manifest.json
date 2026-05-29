@@ -1,0 +1,932 @@
+{
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\env.test.ts": {
+    "mtime": 1778405245.4458942,
+    "ast_hash": "8feeb9c94c5b6cde84d59693e9a204ac",
+    "semantic_hash": "8feeb9c94c5b6cde84d59693e9a204ac"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\env.ts": {
+    "mtime": 1775845163.1129627,
+    "ast_hash": "71c387a69226071202dc1cbb8b338a7e",
+    "semantic_hash": "71c387a69226071202dc1cbb8b338a7e"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\layout.tsx": {
+    "mtime": 1777707974.7356622,
+    "ast_hash": "49d4a569c875cb9187613d12e7794cd9",
+    "semantic_hash": "49d4a569c875cb9187613d12e7794cd9"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\page.tsx": {
+    "mtime": 1773903902.0,
+    "ast_hash": "df75a95df7b83851296de9488f8553e1",
+    "semantic_hash": "df75a95df7b83851296de9488f8553e1"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\auth\\google\\callback\\route.ts": {
+    "mtime": 1775824850.3294299,
+    "ast_hash": "83166169868a7e82783c496042468f44",
+    "semantic_hash": "83166169868a7e82783c496042468f44"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\auth\\google\\start\\route.ts": {
+    "mtime": 1775824850.3284304,
+    "ast_hash": "933d91e4b7195199fa1bcf21e32e62f2",
+    "semantic_hash": "933d91e4b7195199fa1bcf21e32e62f2"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\auth\\sign-in\\route.ts": {
+    "mtime": 1774897138.0076315,
+    "ast_hash": "48652a01c98659336f82b056148e3b2e",
+    "semantic_hash": "48652a01c98659336f82b056148e3b2e"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\auth\\sign-out\\route.ts": {
+    "mtime": 1774615155.6289327,
+    "ast_hash": "4397141490ab7a28b2e0a1daae6d0c1a",
+    "semantic_hash": "4397141490ab7a28b2e0a1daae6d0c1a"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\auth\\sign-up\\route.ts": {
+    "mtime": 1774897138.0066292,
+    "ast_hash": "d2bfe1dffda390de47d5a5582029b6cb",
+    "semantic_hash": "d2bfe1dffda390de47d5a5582029b6cb"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\companies\\route.ts": {
+    "mtime": 1775841063.7557511,
+    "ast_hash": "e249058ace1542a34fb92ce6678f27e7",
+    "semantic_hash": "e249058ace1542a34fb92ce6678f27e7"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\companies\\[id]\\route.ts": {
+    "mtime": 1776406775.8015745,
+    "ast_hash": "8708e50913bbb9059fabd3a965fcfe12",
+    "semantic_hash": "8708e50913bbb9059fabd3a965fcfe12"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\contacts\\route.ts": {
+    "mtime": 1775841370.9731233,
+    "ast_hash": "f63c2678307e4b0f7ca08fc99b4a5a50",
+    "semantic_hash": "f63c2678307e4b0f7ca08fc99b4a5a50"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\contacts\\[id]\\route.ts": {
+    "mtime": 1776425331.6529696,
+    "ast_hash": "98af9012a341d126791c54be00ccce50",
+    "semantic_hash": "98af9012a341d126791c54be00ccce50"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\follow-ups\\contract.test.ts": {
+    "mtime": 1778405245.411555,
+    "ast_hash": "3da75ee866533c7b71cacff4b2913ef4",
+    "semantic_hash": "3da75ee866533c7b71cacff4b2913ef4"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\follow-ups\\route.ts": {
+    "mtime": 1776427904.5785964,
+    "ast_hash": "b1e6d6c0a429ba7ba145b6cd7712d280",
+    "semantic_hash": "b1e6d6c0a429ba7ba145b6cd7712d280"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\follow-ups\\shared.ts": {
+    "mtime": 1776427904.579595,
+    "ast_hash": "0f4de0259699455931f25c3c651b7d0c",
+    "semantic_hash": "0f4de0259699455931f25c3c651b7d0c"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\follow-ups\\[id]\\route.ts": {
+    "mtime": 1776427904.577597,
+    "ast_hash": "e43cbdd4e706a2cc55bfca021ff1e2fa",
+    "semantic_hash": "e43cbdd4e706a2cc55bfca021ff1e2fa"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\follow-ups\\[id]\\complete\\route.ts": {
+    "mtime": 1776427904.577597,
+    "ast_hash": "7447533d17be2656b5db116ba7af90fd",
+    "semantic_hash": "7447533d17be2656b5db116ba7af90fd"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\intro-path\\route.ts": {
+    "mtime": 1775050053.8628213,
+    "ast_hash": "3f0c21435a849f1510477e8ddbd7a2d4",
+    "semantic_hash": "3f0c21435a849f1510477e8ddbd7a2d4"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\intro-requests\\route.ts": {
+    "mtime": 1775050053.8628213,
+    "ast_hash": "7b4184309eebfdc22b75a1e86f1a8f23",
+    "semantic_hash": "7b4184309eebfdc22b75a1e86f1a8f23"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\intro-requests\\[id]\\route.ts": {
+    "mtime": 1775050053.8628213,
+    "ast_hash": "d550ae8f394f1cea81608fd8254b65fd",
+    "semantic_hash": "d550ae8f394f1cea81608fd8254b65fd"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\media\\route.ts": {
+    "mtime": 1775841063.7567568,
+    "ast_hash": "a3281f1bf41093c008fdfe973b128492",
+    "semantic_hash": "a3281f1bf41093c008fdfe973b128492"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\network\\route.ts": {
+    "mtime": 1777658125.2607806,
+    "ast_hash": "a630b332edcaf8b3663e0f8e052b20be",
+    "semantic_hash": "a630b332edcaf8b3663e0f8e052b20be"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\profile\\route.ts": {
+    "mtime": 1777021944.295671,
+    "ast_hash": "e386055768d342d41e638d2250e66fae",
+    "semantic_hash": "e386055768d342d41e638d2250e66fae"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\profile\\avatar\\route.ts": {
+    "mtime": 1777025877.9794705,
+    "ast_hash": "98e40a55c6dd880d1e0e82fcb376d6eb",
+    "semantic_hash": "98e40a55c6dd880d1e0e82fcb376d6eb"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\projects\\route.ts": {
+    "mtime": 1775841063.7557511,
+    "ast_hash": "71857bff982ec16629b47df667ee7e17",
+    "semantic_hash": "71857bff982ec16629b47df667ee7e17"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\projects\\[id]\\route.ts": {
+    "mtime": 1776425331.6539588,
+    "ast_hash": "c28e2bb88c15955f6e9be2c8a173de9e",
+    "semantic_hash": "c28e2bb88c15955f6e9be2c8a173de9e"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\relationships\\route.ts": {
+    "mtime": 1775050053.861707,
+    "ast_hash": "6c080bf0b9e0028b980a11ae86e66f50",
+    "semantic_hash": "6c080bf0b9e0028b980a11ae86e66f50"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\relationships\\[id]\\route.ts": {
+    "mtime": 1775050053.8628213,
+    "ast_hash": "d66753c750671958e10bcc02ac410bab",
+    "semantic_hash": "d66753c750671958e10bcc02ac410bab"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\tasks\\route.ts": {
+    "mtime": 1779535500.9087138,
+    "ast_hash": "de8de2d54776c25ce6ea0c3ecdc9684d",
+    "semantic_hash": "de8de2d54776c25ce6ea0c3ecdc9684d"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\tasks\\quick\\route.ts": {
+    "mtime": 1779535807.921886,
+    "ast_hash": "e26f95104c4f4021c119dd5a2ec730ec",
+    "semantic_hash": "e26f95104c4f4021c119dd5a2ec730ec"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\vendors\\route.ts": {
+    "mtime": 1777026281.8603995,
+    "ast_hash": "59f2b86433fab3a2cb706a582de315a0",
+    "semantic_hash": "59f2b86433fab3a2cb706a582de315a0"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\api\\vendors\\[id]\\route.ts": {
+    "mtime": 1777026495.1251137,
+    "ast_hash": "c6326a12cc4f3800a456f20bbe45b6c3",
+    "semantic_hash": "c6326a12cc4f3800a456f20bbe45b6c3"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\contacts\\error.tsx": {
+    "mtime": 1777667566.7914424,
+    "ast_hash": "aa0d7cbe85688b41f7182bc86b7e8919",
+    "semantic_hash": "aa0d7cbe85688b41f7182bc86b7e8919"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\contacts\\page.tsx": {
+    "mtime": 1777667356.0616665,
+    "ast_hash": "3570b90f68a3dd7cec460fcc86bdf5ad",
+    "semantic_hash": "3570b90f68a3dd7cec460fcc86bdf5ad"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\login\\page.tsx": {
+    "mtime": 1776406775.8055735,
+    "ast_hash": "dab0c8244e979517e1c5b76fb9abf1d0",
+    "semantic_hash": "dab0c8244e979517e1c5b76fb9abf1d0"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\mind-map\\error.tsx": {
+    "mtime": 1777667561.5518837,
+    "ast_hash": "aa0d7cbe85688b41f7182bc86b7e8919",
+    "semantic_hash": "aa0d7cbe85688b41f7182bc86b7e8919"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\mind-map\\MindMapCanvasClient.tsx": {
+    "mtime": 1777706964.057441,
+    "ast_hash": "05e114208869af44afc744922c459730",
+    "semantic_hash": "05e114208869af44afc744922c459730"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\mind-map\\page.tsx": {
+    "mtime": 1777706964.0584416,
+    "ast_hash": "63e9e8bcb6053f4b2fded61a845b95eb",
+    "semantic_hash": "63e9e8bcb6053f4b2fded61a845b95eb"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\profile\\page.tsx": {
+    "mtime": 1777022590.420095,
+    "ast_hash": "a69d9f714e55b5c82fec045049651374",
+    "semantic_hash": "a69d9f714e55b5c82fec045049651374"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\app\\profile\\ProfileForm.tsx": {
+    "mtime": 1777025890.0510647,
+    "ast_hash": "d0ba2b71cc4f11f50a30246733621d32",
+    "semantic_hash": "d0ba2b71cc4f11f50a30246733621d32"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\auth\\LoginForm.tsx": {
+    "mtime": 1775836873.0008316,
+    "ast_hash": "74dc61c352c8d0ca2300e9f3475f924a",
+    "semantic_hash": "74dc61c352c8d0ca2300e9f3475f924a"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\auth\\LoginFormView.test.tsx": {
+    "mtime": 1778405245.4125545,
+    "ast_hash": "f547a5817be56f2b4b0a5d6b42340ae6",
+    "semantic_hash": "f547a5817be56f2b4b0a5d6b42340ae6"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\auth\\LoginFormView.tsx": {
+    "mtime": 1776406775.8075738,
+    "ast_hash": "617df94905cf8b7b9f475ce1279b03b1",
+    "semantic_hash": "617df94905cf8b7b9f475ce1279b03b1"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\command-palette\\CommandPaletteDialog.tsx": {
+    "mtime": 1779536555.6177137,
+    "ast_hash": "be778bd850d05ced52dcfb79a65eb1a9",
+    "semantic_hash": "be778bd850d05ced52dcfb79a65eb1a9"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\command-palette\\CommandPaletteProvider.tsx": {
+    "mtime": 1779536889.2687662,
+    "ast_hash": "ee2316cfe4661dd0cdf6c1e4eee5811f",
+    "semantic_hash": "ee2316cfe4661dd0cdf6c1e4eee5811f"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\contacts\\ContactCard.tsx": {
+    "mtime": 1777373704.9810474,
+    "ast_hash": "0ae89e84590a5796bcf0a40fa38ebd48",
+    "semantic_hash": "0ae89e84590a5796bcf0a40fa38ebd48"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\contacts\\ContactsGrid.tsx": {
+    "mtime": 1777706906.260826,
+    "ast_hash": "89cf5842e7bfd907365650f384ba3e84",
+    "semantic_hash": "89cf5842e7bfd907365650f384ba3e84"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\contacts\\ContactsGridSkeleton.tsx": {
+    "mtime": 1777667364.493709,
+    "ast_hash": "aa3931f2e0944580ff64ec3890bbdbef",
+    "semantic_hash": "aa3931f2e0944580ff64ec3890bbdbef"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\contacts\\directory-items.test.ts": {
+    "mtime": 1778405245.414554,
+    "ast_hash": "d6616468e97227c06023abc0cf3bd788",
+    "semantic_hash": "d6616468e97227c06023abc0cf3bd788"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\contacts\\directory-items.ts": {
+    "mtime": 1777372883.171636,
+    "ast_hash": "135085ed6f63766bde688d582ad01b10",
+    "semantic_hash": "135085ed6f63766bde688d582ad01b10"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\contacts\\StatsBar.tsx": {
+    "mtime": 1777475299.0248568,
+    "ast_hash": "352c768b867ebe37f21a4f64560fcd2f",
+    "semantic_hash": "352c768b867ebe37f21a4f64560fcd2f"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\contacts\\VendorBusinessCard.tsx": {
+    "mtime": 1776406775.809574,
+    "ast_hash": "9ae559fde4f456e728e9b6998b8ff4e1",
+    "semantic_hash": "9ae559fde4f456e728e9b6998b8ff4e1"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\CenterNode.tsx": {
+    "mtime": 1777693485.5973766,
+    "ast_hash": "398fb2efa1b76ebe15dd774e439c09ae",
+    "semantic_hash": "398fb2efa1b76ebe15dd774e439c09ae"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\collapse-behavior.test.ts": {
+    "mtime": 1778405245.416555,
+    "ast_hash": "41f9639b2a652cf7c27510bc36cb91b1",
+    "semantic_hash": "41f9639b2a652cf7c27510bc36cb91b1"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\collapse-behavior.ts": {
+    "mtime": 1775057388.8211355,
+    "ast_hash": "d5205c61cf07e3566d8b21c2b3afe425",
+    "semantic_hash": "d5205c61cf07e3566d8b21c2b3afe425"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\company-clusters.test.ts": {
+    "mtime": 1778405245.4185536,
+    "ast_hash": "42cf5018dae63188e02421542ac361e1",
+    "semantic_hash": "42cf5018dae63188e02421542ac361e1"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\company-clusters.ts": {
+    "mtime": 1777706906.2628276,
+    "ast_hash": "b1cb4a1d8d378eb9c44066029b946ace",
+    "semantic_hash": "b1cb4a1d8d378eb9c44066029b946ace"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\company-collapse-state.test.ts": {
+    "mtime": 1778405245.420554,
+    "ast_hash": "c7dd81ee556b8eed49d9d393a1becc42",
+    "semantic_hash": "c7dd81ee556b8eed49d9d393a1becc42"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\CompanyNode.tsx": {
+    "mtime": 1776406775.8120818,
+    "ast_hash": "b2bc480a8e2105b8c4ad309c552c4424",
+    "semantic_hash": "b2bc480a8e2105b8c4ad309c552c4424"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\ContactNode.tsx": {
+    "mtime": 1777373192.2952614,
+    "ast_hash": "e268aaf2e7ca0463712f08d381385103",
+    "semantic_hash": "e268aaf2e7ca0463712f08d381385103"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\ContactSidePanel.tsx": {
+    "mtime": 1777373210.997684,
+    "ast_hash": "c1884b6906bf5e785508a7890dc92bbc",
+    "semantic_hash": "c1884b6906bf5e785508a7890dc92bbc"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\ContextMenu.tsx": {
+    "mtime": 1779537025.4313211,
+    "ast_hash": "9e52619a1fff73fb9ab73b6d60b01c7e",
+    "semantic_hash": "9e52619a1fff73fb9ab73b6d60b01c7e"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\declutter.test.ts": {
+    "mtime": 1778405245.422887,
+    "ast_hash": "fb1f2a924e0f7d1a64da4da4848caa0b",
+    "semantic_hash": "fb1f2a924e0f7d1a64da4da4848caa0b"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\declutter.ts": {
+    "mtime": 1775731656.1073055,
+    "ast_hash": "c9a204d876d09da8c5aa315dbf6af220",
+    "semantic_hash": "c9a204d876d09da8c5aa315dbf6af220"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\edge-visibility.test.ts": {
+    "mtime": 1778405245.4238968,
+    "ast_hash": "0907d09fb2e2f6b6efa7e066bcfa8dd5",
+    "semantic_hash": "0907d09fb2e2f6b6efa7e066bcfa8dd5"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\edge-visibility.ts": {
+    "mtime": 1774949343.2566695,
+    "ast_hash": "d1b107c65a781cd1a07f330610552068",
+    "semantic_hash": "d1b107c65a781cd1a07f330610552068"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\FilterOverlay.tsx": {
+    "mtime": 1776406775.8156133,
+    "ast_hash": "f689ee0e5fd49d26b4b35e6a4a83b34f",
+    "semantic_hash": "f689ee0e5fd49d26b4b35e6a4a83b34f"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\focus-view.test.ts": {
+    "mtime": 1778405245.4258866,
+    "ast_hash": "7faaa07751aabc7e3ef209f6bffa0a1f",
+    "semantic_hash": "7faaa07751aabc7e3ef209f6bffa0a1f"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\focus-view.ts": {
+    "mtime": 1776765855.3989034,
+    "ast_hash": "be334aaf532383eaa3eb112fefef4951",
+    "semantic_hash": "be334aaf532383eaa3eb112fefef4951"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\follow-up-helpers.test.ts": {
+    "mtime": 1778405245.4278884,
+    "ast_hash": "1fd6b0cc08a7bc49cef29fe71f581fc2",
+    "semantic_hash": "1fd6b0cc08a7bc49cef29fe71f581fc2"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\follow-up-helpers.ts": {
+    "mtime": 1776427904.5825968,
+    "ast_hash": "c08d66acc44d06551d2b1b795a40515b",
+    "semantic_hash": "c08d66acc44d06551d2b1b795a40515b"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\GravityOverlay.tsx": {
+    "mtime": 1776766137.733859,
+    "ast_hash": "6ed32d1fbc3a8b7d90163b95e5f0e933",
+    "semantic_hash": "6ed32d1fbc3a8b7d90163b95e5f0e933"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\layout-memory.test.ts": {
+    "mtime": 1778405245.428888,
+    "ast_hash": "162141d43c9b255b3a147f0802f52425",
+    "semantic_hash": "162141d43c9b255b3a147f0802f52425"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\layout-memory.ts": {
+    "mtime": 1776771169.6801562,
+    "ast_hash": "17c2554e1ce4af430278790f1848c9fc",
+    "semantic_hash": "17c2554e1ce4af430278790f1848c9fc"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\MapController.tsx": {
+    "mtime": 1777476662.026918,
+    "ast_hash": "b7c5e8de72ed12dd507d3e93c1483780",
+    "semantic_hash": "b7c5e8de72ed12dd507d3e93c1483780"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\mind-map-view-state.test.ts": {
+    "mtime": 1778405245.4308877,
+    "ast_hash": "3fbae2bdf9f30004104b6e88819f54da",
+    "semantic_hash": "3fbae2bdf9f30004104b6e88819f54da"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\mind-map-view-state.ts": {
+    "mtime": 1777894291.5108025,
+    "ast_hash": "c4a3e996bdfc92877c473d72c881d25f",
+    "semantic_hash": "c4a3e996bdfc92877c473d72c881d25f"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\MindMapCanvas.tsx": {
+    "mtime": 1779537074.3488238,
+    "ast_hash": "748c853725903762dec84df924bdd0b5",
+    "semantic_hash": "748c853725903762dec84df924bdd0b5"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\MindMapSkeleton.tsx": {
+    "mtime": 1777667059.2531748,
+    "ast_hash": "8625ba192329c973a621616e90110261",
+    "semantic_hash": "8625ba192329c973a621616e90110261"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\network-graph-loader.ts": {
+    "mtime": 1777026147.8861718,
+    "ast_hash": "1cd6e10859b17b4029eef29f6d7b8397",
+    "semantic_hash": "1cd6e10859b17b4029eef29f6d7b8397"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\node-equality.ts": {
+    "mtime": 1776423653.9219966,
+    "ast_hash": "027f852db556ccedcd89558f3ca5fe5a",
+    "semantic_hash": "027f852db556ccedcd89558f3ca5fe5a"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\node-filters.test.ts": {
+    "mtime": 1778405245.4318876,
+    "ast_hash": "ad5399370cbd0001c420c60d0575f851",
+    "semantic_hash": "ad5399370cbd0001c420c60d0575f851"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\node-filters.ts": {
+    "mtime": 1775731656.1083062,
+    "ast_hash": "bd0dc3e67350ce34bc16db8fae62f38d",
+    "semantic_hash": "bd0dc3e67350ce34bc16db8fae62f38d"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\node-internals.test.ts": {
+    "mtime": 1778405245.4338868,
+    "ast_hash": "c10789707d6956385191c8cb9671b3d1",
+    "semantic_hash": "c10789707d6956385191c8cb9671b3d1"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\node-internals.ts": {
+    "mtime": 1776406775.8276167,
+    "ast_hash": "ddfa8c745ddd5756cbd64f90f329a6b0",
+    "semantic_hash": "ddfa8c745ddd5756cbd64f90f329a6b0"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\project-collapse-state.test.ts": {
+    "mtime": 1778405245.4348948,
+    "ast_hash": "90d3de5a3e0c4f9c6dc845aac6da1905",
+    "semantic_hash": "90d3de5a3e0c4f9c6dc845aac6da1905"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\ProjectNode.tsx": {
+    "mtime": 1776406775.8186142,
+    "ast_hash": "a8f0a037f861044e89e7e275a7f3a7b1",
+    "semantic_hash": "a8f0a037f861044e89e7e275a7f3a7b1"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\radial-layout.test.ts": {
+    "mtime": 1778405245.4368892,
+    "ast_hash": "e6545d1c663ec1c40d2f2be50eb6340d",
+    "semantic_hash": "e6545d1c663ec1c40d2f2be50eb6340d"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\radial-layout.ts": {
+    "mtime": 1775728160.3706365,
+    "ast_hash": "538dc8d1110f2d028fc8fd8bcc68b8ab",
+    "semantic_hash": "538dc8d1110f2d028fc8fd8bcc68b8ab"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\RelationshipManager.tsx": {
+    "mtime": 1777026019.1355393,
+    "ast_hash": "bb07e4c311693623cddfa4e8049fda91",
+    "semantic_hash": "bb07e4c311693623cddfa4e8049fda91"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\reorganize-layout.test.ts": {
+    "mtime": 1778405245.438891,
+    "ast_hash": "e8ec544ba6f18977a844d626102d9663",
+    "semantic_hash": "e8ec544ba6f18977a844d626102d9663"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\reorganize-layout.ts": {
+    "mtime": 1777026065.5815232,
+    "ast_hash": "e6adaa511830aee12ad18a48e0c56398",
+    "semantic_hash": "e6adaa511830aee12ad18a48e0c56398"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\SearchOverlay.tsx": {
+    "mtime": 1776406775.8206134,
+    "ast_hash": "9b076b041bd5726ad43b691182525741",
+    "semantic_hash": "9b076b041bd5726ad43b691182525741"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\StatsOverlay.tsx": {
+    "mtime": 1776406775.8216133,
+    "ast_hash": "e98dd2d793b54dc48237b530b6445271",
+    "semantic_hash": "e98dd2d793b54dc48237b530b6445271"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\vendor-graph.test.ts": {
+    "mtime": 1778405245.4398866,
+    "ast_hash": "377f944a1c655c9b090fe4d1f128a66b",
+    "semantic_hash": "377f944a1c655c9b090fe4d1f128a66b"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\vendor-graph.ts": {
+    "mtime": 1774955601.9280913,
+    "ast_hash": "f320c09b79ad836c352cb8b0eb5df0b9",
+    "semantic_hash": "f320c09b79ad836c352cb8b0eb5df0b9"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\VendorNode.tsx": {
+    "mtime": 1776406775.8216133,
+    "ast_hash": "e6bca41b29c835593bdd3257a1e6447a",
+    "semantic_hash": "e6bca41b29c835593bdd3257a1e6447a"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\VendorPersonNode.tsx": {
+    "mtime": 1776406775.8226137,
+    "ast_hash": "918cd2b5ec88de7087362e540cf3f8d4",
+    "semantic_hash": "918cd2b5ec88de7087362e540cf3f8d4"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\WarmIntroOverlay.tsx": {
+    "mtime": 1777026019.1928008,
+    "ast_hash": "79dd5b30e9f82173aa8ea50bd3fcb621",
+    "semantic_hash": "79dd5b30e9f82173aa8ea50bd3fcb621"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\mind-map\\WelcomeOverlay.tsx": {
+    "mtime": 1776406775.824613,
+    "ast_hash": "1ea99ea9a013647831909ac72f454370",
+    "semantic_hash": "1ea99ea9a013647831909ac72f454370"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\CompanyModal.tsx": {
+    "mtime": 1777373269.313993,
+    "ast_hash": "d672bce954c239526edab0769ca8ab14",
+    "semantic_hash": "d672bce954c239526edab0769ca8ab14"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\ConfirmDialog.tsx": {
+    "mtime": 1776406775.830614,
+    "ast_hash": "7b0d691d1e65f5d6c6d067d60f6df040",
+    "semantic_hash": "7b0d691d1e65f5d6c6d067d60f6df040"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\ContactModal.tsx": {
+    "mtime": 1777375803.4972124,
+    "ast_hash": "4afda0796239b5cd3df2e24350ea484c",
+    "semantic_hash": "4afda0796239b5cd3df2e24350ea484c"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\entity-media-render.test.tsx": {
+    "mtime": 1778405245.442894,
+    "ast_hash": "6285f2f46af197c1d398cfb376faf8d3",
+    "semantic_hash": "6285f2f46af197c1d398cfb376faf8d3"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\EntityAvatar.tsx": {
+    "mtime": 1776240394.5787518,
+    "ast_hash": "30c39bb096c8c6be6353d01dc2200c0a",
+    "semantic_hash": "30c39bb096c8c6be6353d01dc2200c0a"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\EntityImageField.tsx": {
+    "mtime": 1776406775.8326132,
+    "ast_hash": "16aa259440f83aad55524aebc6642f9a",
+    "semantic_hash": "16aa259440f83aad55524aebc6642f9a"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\FloatingAddButton.tsx": {
+    "mtime": 1777668350.764023,
+    "ast_hash": "f01d15070ff639753137bd5c6deddebb",
+    "semantic_hash": "f01d15070ff639753137bd5c6deddebb"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\Header.tsx": {
+    "mtime": 1777693475.3060265,
+    "ast_hash": "63b78080748b93c7d22dc7b69a249970",
+    "semantic_hash": "63b78080748b93c7d22dc7b69a249970"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\HeaderWithProfile.tsx": {
+    "mtime": 1777022500.105731,
+    "ast_hash": "82793a72892a793997194704452f7e11",
+    "semantic_hash": "82793a72892a793997194704452f7e11"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\ProjectModal.tsx": {
+    "mtime": 1777373296.8401203,
+    "ast_hash": "a641bec05bbd6d3800b7f006dd728da5",
+    "semantic_hash": "a641bec05bbd6d3800b7f006dd728da5"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\TaskModal.tsx": {
+    "mtime": 1779536350.812414,
+    "ast_hash": "a9bd5cb23c9a1abb84ed70758533309a",
+    "semantic_hash": "a9bd5cb23c9a1abb84ed70758533309a"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\shared\\VendorModal.tsx": {
+    "mtime": 1776406775.8356137,
+    "ast_hash": "ede019e85b56e5202f1d95094eedb72b",
+    "semantic_hash": "ede019e85b56e5202f1d95094eedb72b"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\ui\\badge.tsx": {
+    "mtime": 1773903708.0,
+    "ast_hash": "e4ec840217040d5630ee6ed7213a1d72",
+    "semantic_hash": "e4ec840217040d5630ee6ed7213a1d72"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\ui\\button.tsx": {
+    "mtime": 1773903656.0,
+    "ast_hash": "b5fc0a11441b60e0cec7fb47aeeb448c",
+    "semantic_hash": "b5fc0a11441b60e0cec7fb47aeeb448c"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\ui\\card.tsx": {
+    "mtime": 1773903708.0,
+    "ast_hash": "f493f1f077059a080b2c475873def5c0",
+    "semantic_hash": "f493f1f077059a080b2c475873def5c0"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\ui\\command.tsx": {
+    "mtime": 1776423653.9219966,
+    "ast_hash": "54b5729473b7ec34da4f2230d2ae2cf2",
+    "semantic_hash": "54b5729473b7ec34da4f2230d2ae2cf2"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\ui\\dialog.test.tsx": {
+    "mtime": 1778405245.4438996,
+    "ast_hash": "d964b1217183b072eaf02685ceac9e43",
+    "semantic_hash": "d964b1217183b072eaf02685ceac9e43"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\ui\\dialog.tsx": {
+    "mtime": 1776406775.836614,
+    "ast_hash": "83e4cfb93c8e3d34a29d3a65ed5b89da",
+    "semantic_hash": "83e4cfb93c8e3d34a29d3a65ed5b89da"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\ui\\input.tsx": {
+    "mtime": 1773903708.0,
+    "ast_hash": "0607b02d99a2e92f9509223f36ccc6ec",
+    "semantic_hash": "0607b02d99a2e92f9509223f36ccc6ec"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\ui\\select.tsx": {
+    "mtime": 1773903708.0,
+    "ast_hash": "ab95f478cb74d1906b07425c15b124cc",
+    "semantic_hash": "ab95f478cb74d1906b07425c15b124cc"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\ui\\tabs.tsx": {
+    "mtime": 1773903708.0,
+    "ast_hash": "9161c69918d047fc67bcbf1cf896f930",
+    "semantic_hash": "9161c69918d047fc67bcbf1cf896f930"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\components\\ui\\textarea.tsx": {
+    "mtime": 1773903708.0,
+    "ast_hash": "d448d2a90e48542e51b93a1189127bf2",
+    "semantic_hash": "d448d2a90e48542e51b93a1189127bf2"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\hooks\\useTheme.ts": {
+    "mtime": 1774874450.0608144,
+    "ast_hash": "91e84783e0e443d0c61f9c365dbaf163",
+    "semantic_hash": "91e84783e0e443d0c61f9c365dbaf163"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\utils.ts": {
+    "mtime": 1773903656.0,
+    "ast_hash": "5a6fd53fdcf2be529e9cc0b718fde352",
+    "semantic_hash": "5a6fd53fdcf2be529e9cc0b718fde352"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\validate-env.ts": {
+    "mtime": 1775845163.1259568,
+    "ast_hash": "833e2aa7e81d82a29480938075fda13d",
+    "semantic_hash": "833e2aa7e81d82a29480938075fda13d"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\api\\validation.test.ts": {
+    "mtime": 1778405245.447896,
+    "ast_hash": "8fa1ce26718852ce77a20f91bd0844c9",
+    "semantic_hash": "8fa1ce26718852ce77a20f91bd0844c9"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\api\\validation.ts": {
+    "mtime": 1777374661.0490253,
+    "ast_hash": "f20c0a0da91b866357469683adfeaa20",
+    "semantic_hash": "f20c0a0da91b866357469683adfeaa20"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\auth\\form.test.ts": {
+    "mtime": 1778405245.4488955,
+    "ast_hash": "07237400d3202e93089b56eca9deb394",
+    "semantic_hash": "07237400d3202e93089b56eca9deb394"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\auth\\form.ts": {
+    "mtime": 1774897138.0066292,
+    "ast_hash": "1d98765fe3eb5b92a2a5d23e73675a02",
+    "semantic_hash": "1d98765fe3eb5b92a2a5d23e73675a02"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\auth\\google-flow.test.ts": {
+    "mtime": 1778405245.4508948,
+    "ast_hash": "31a11f63b19f0514fb97882c733b5382",
+    "semantic_hash": "31a11f63b19f0514fb97882c733b5382"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\auth\\google-flow.ts": {
+    "mtime": 1776789103.369485,
+    "ast_hash": "baa91ad5abbeadacda5ccc98e8b9259f",
+    "semantic_hash": "baa91ad5abbeadacda5ccc98e8b9259f"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\auth\\oauth.test.ts": {
+    "mtime": 1778405245.4528947,
+    "ast_hash": "1ca57dba60e4439511a0f3bb16b41666",
+    "semantic_hash": "1ca57dba60e4439511a0f3bb16b41666"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\auth\\oauth.ts": {
+    "mtime": 1775820330.6497338,
+    "ast_hash": "dfb6206f3c0b0dabfa65e8a9651267ff",
+    "semantic_hash": "dfb6206f3c0b0dabfa65e8a9651267ff"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\auth\\server-guards.ts": {
+    "mtime": 1777657461.2633467,
+    "ast_hash": "f4f062d73be345f1c6f4328fee1bb8eb",
+    "semantic_hash": "f4f062d73be345f1c6f4328fee1bb8eb"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\auth\\session.ts": {
+    "mtime": 1777657457.1070943,
+    "ast_hash": "5c7838b6426064ab4928bb027b195d90",
+    "semantic_hash": "5c7838b6426064ab4928bb027b195d90"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\capture\\service.test.ts": {
+    "mtime": 1779535155.4051566,
+    "ast_hash": "6d591312636e12269b4a9e527122b965",
+    "semantic_hash": "6d591312636e12269b4a9e527122b965"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\capture\\service.ts": {
+    "mtime": 1779535150.7057917,
+    "ast_hash": "d90df5906d280a1b1d68f383f59d9620",
+    "semantic_hash": "d90df5906d280a1b1d68f383f59d9620"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\db\\index.ts": {
+    "mtime": 1779534529.6170273,
+    "ast_hash": "951d2bbdbfb7c88968205d63d697b936",
+    "semantic_hash": "951d2bbdbfb7c88968205d63d697b936"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\db\\queries.ts": {
+    "mtime": 1776373896.429597,
+    "ast_hash": "b625478860174060135480749473c92d",
+    "semantic_hash": "b625478860174060135480749473c92d"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\db\\schema.ts": {
+    "mtime": 1778405245.4549162,
+    "ast_hash": "78d504a7b6e14f804a6eea3d14b4e5e4",
+    "semantic_hash": "78d504a7b6e14f804a6eea3d14b4e5e4"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\forecast\\buckets.test.ts": {
+    "mtime": 1778410143.575147,
+    "ast_hash": "5d00e0821cf9ab22e0b5b7327f70c0ad",
+    "semantic_hash": "5d00e0821cf9ab22e0b5b7327f70c0ad"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\forecast\\buckets.ts": {
+    "mtime": 1778410143.5766335,
+    "ast_hash": "c239c6546678b6300d2726be5ef2b2ea",
+    "semantic_hash": "c239c6546678b6300d2726be5ef2b2ea"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\hooks\\mutations\\useCreateContact.ts": {
+    "mtime": 1777373868.7509363,
+    "ast_hash": "c1301c5fc3956f3960bc1813423e4ff0",
+    "semantic_hash": "c1301c5fc3956f3960bc1813423e4ff0"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\hooks\\mutations\\useCreateTask.ts": {
+    "mtime": 1779535956.121655,
+    "ast_hash": "6011ddf1e89adbeb5e03c0072a9b6a45",
+    "semantic_hash": "6011ddf1e89adbeb5e03c0072a9b6a45"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\hooks\\mutations\\useDeleteCompany.ts": {
+    "mtime": 1777694363.905785,
+    "ast_hash": "cacd298a10384e49595d37d2f3f5e89b",
+    "semantic_hash": "cacd298a10384e49595d37d2f3f5e89b"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\hooks\\mutations\\useDeleteContact.ts": {
+    "mtime": 1777693926.9280028,
+    "ast_hash": "4b55a5fae175662004b2a98244545554",
+    "semantic_hash": "4b55a5fae175662004b2a98244545554"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\hooks\\mutations\\useDeleteVendor.ts": {
+    "mtime": 1777694642.2857566,
+    "ast_hash": "db4aa233a6c00403ca51f5adf7c2fcdf",
+    "semantic_hash": "db4aa233a6c00403ca51f5adf7c2fcdf"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\hooks\\mutations\\useUpdateCompany.ts": {
+    "mtime": 1777694375.2249422,
+    "ast_hash": "9e756c8c03e653312bed69c2d82b7532",
+    "semantic_hash": "9e756c8c03e653312bed69c2d82b7532"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\hooks\\mutations\\useUpdateContact.ts": {
+    "mtime": 1777694133.494959,
+    "ast_hash": "35e6f300365e5467d50cc9e606cdcf62",
+    "semantic_hash": "35e6f300365e5467d50cc9e606cdcf62"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\hooks\\mutations\\useUpdateVendor.ts": {
+    "mtime": 1777694903.3141496,
+    "ast_hash": "0c7e282a9eec2679205c8a4ce5878069",
+    "semantic_hash": "0c7e282a9eec2679205c8a4ce5878069"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\hooks\\queries\\useContactsQuery.ts": {
+    "mtime": 1776423653.9239957,
+    "ast_hash": "0059e08b998a8dddf9533a20e3f2c466",
+    "semantic_hash": "0059e08b998a8dddf9533a20e3f2c466"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\hooks\\queries\\useNetworkQuery.ts": {
+    "mtime": 1777667312.9846408,
+    "ast_hash": "3db0e64d07284321efbfa0fc6e8cc7ab",
+    "semantic_hash": "3db0e64d07284321efbfa0fc6e8cc7ab"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\intro\\graph.ts": {
+    "mtime": 1775050304.7907603,
+    "ast_hash": "96ac64ac9d0d21d66654a6e05f7841ca",
+    "semantic_hash": "96ac64ac9d0d21d66654a6e05f7841ca"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\media\\client.ts": {
+    "mtime": 1775841063.7567568,
+    "ast_hash": "b4b25d14f76ae2a72c26efa9b544e65f",
+    "semantic_hash": "b4b25d14f76ae2a72c26efa9b544e65f"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\media\\media.test.ts": {
+    "mtime": 1778405245.4569254,
+    "ast_hash": "58182c35ebe6f99a9df29b7121869aa6",
+    "semantic_hash": "58182c35ebe6f99a9df29b7121869aa6"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\media\\media.ts": {
+    "mtime": 1777021247.186359,
+    "ast_hash": "24c3f437752998aed00a1f1e265dd015",
+    "semantic_hash": "24c3f437752998aed00a1f1e265dd015"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\navigation\\nodeFocusBus.ts": {
+    "mtime": 1776423653.924995,
+    "ast_hash": "7f3eef5b95d9e95d74269b346829cc1a",
+    "semantic_hash": "7f3eef5b95d9e95d74269b346829cc1a"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\query\\keys.ts": {
+    "mtime": 1779534697.7833257,
+    "ast_hash": "43bdee1fe2d0a7bbc35c6e438e13557a",
+    "semantic_hash": "43bdee1fe2d0a7bbc35c6e438e13557a"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\query\\QueryProvider.tsx": {
+    "mtime": 1777658818.592367,
+    "ast_hash": "551c8b38799b556d848a7ea65de3719d",
+    "semantic_hash": "551c8b38799b556d848a7ea65de3719d"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\recurrence\\engine.test.ts": {
+    "mtime": 1778410143.5766335,
+    "ast_hash": "2533a6bfa22c44d71cd20d1fb64c8a33",
+    "semantic_hash": "2533a6bfa22c44d71cd20d1fb64c8a33"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\recurrence\\engine.ts": {
+    "mtime": 1778410143.5776393,
+    "ast_hash": "2c5b7352da251b3531a695367421fdcb",
+    "semantic_hash": "2c5b7352da251b3531a695367421fdcb"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\repositories\\businesses.test.ts": {
+    "mtime": 1778405245.458925,
+    "ast_hash": "24e7e0e3c488fc58bbc59630e5b808fc",
+    "semantic_hash": "24e7e0e3c488fc58bbc59630e5b808fc"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\repositories\\businesses.ts": {
+    "mtime": 1778405245.4599254,
+    "ast_hash": "89079c8db0884fe74f2afdef3780441f",
+    "semantic_hash": "89079c8db0884fe74f2afdef3780441f"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\repositories\\tasks.test.ts": {
+    "mtime": 1778405245.4619453,
+    "ast_hash": "986dbc265b6b64007ec96a4b71c374eb",
+    "semantic_hash": "986dbc265b6b64007ec96a4b71c374eb"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\repositories\\tasks.ts": {
+    "mtime": 1778405245.462925,
+    "ast_hash": "cd7fef78e140479d0dff86e5a939d535",
+    "semantic_hash": "cd7fef78e140479d0dff86e5a939d535"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\subtasks\\tree.test.ts": {
+    "mtime": 1778410143.5776393,
+    "ast_hash": "74b7c5f8901ac63e325805b5482a41f4",
+    "semantic_hash": "74b7c5f8901ac63e325805b5482a41f4"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\subtasks\\tree.ts": {
+    "mtime": 1778410143.5787637,
+    "ast_hash": "98320ee565cca346fb972a279b6782e5",
+    "semantic_hash": "98320ee565cca346fb972a279b6782e5"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\client.ts": {
+    "mtime": 1773904140.0,
+    "ast_hash": "dae2ca44eb1244345f8490232382f266",
+    "semantic_hash": "dae2ca44eb1244345f8490232382f266"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\config.ts": {
+    "mtime": 1774615155.6249318,
+    "ast_hash": "bc1db2ca69845bcc09df25a599160d46",
+    "semantic_hash": "bc1db2ca69845bcc09df25a599160d46"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\contact-mutations.test.ts": {
+    "mtime": 1778405245.4649363,
+    "ast_hash": "077939eaa640091595a8a3731203e876",
+    "semantic_hash": "077939eaa640091595a8a3731203e876"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\contact-mutations.ts": {
+    "mtime": 1777025943.9319122,
+    "ast_hash": "facbdff38b96be84e28089a62a1141d0",
+    "semantic_hash": "facbdff38b96be84e28089a62a1141d0"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\entity-media-migration.test.ts": {
+    "mtime": 1778405245.466925,
+    "ast_hash": "abad7ae50338b88d9a8803acbcf901bd",
+    "semantic_hash": "abad7ae50338b88d9a8803acbcf901bd"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\network.test.ts": {
+    "mtime": 1778405245.4679253,
+    "ast_hash": "e32d801fdba8f57faf19cd1f96db8662",
+    "semantic_hash": "e32d801fdba8f57faf19cd1f96db8662"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\network.ts": {
+    "mtime": 1777657089.862651,
+    "ast_hash": "a3505b23d8b4aec9f28269065a9b4391",
+    "semantic_hash": "a3505b23d8b4aec9f28269065a9b4391"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\ownership-migration.test.ts": {
+    "mtime": 1778405245.4689267,
+    "ast_hash": "253db3b89aa32585c57224356061d9a2",
+    "semantic_hash": "253db3b89aa32585c57224356061d9a2"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\server.ts": {
+    "mtime": 1774615278.4726346,
+    "ast_hash": "6c9340265b33bbdcf3addb1f239d1b6a",
+    "semantic_hash": "6c9340265b33bbdcf3addb1f239d1b6a"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\types.ts": {
+    "mtime": 1777372608.548143,
+    "ast_hash": "34bf039a68036727b4acfddcebfec7b9",
+    "semantic_hash": "34bf039a68036727b4acfddcebfec7b9"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\vendor-mutations.test.ts": {
+    "mtime": 1778405245.470925,
+    "ast_hash": "f05f12c42742a695450e2e087687c42e",
+    "semantic_hash": "f05f12c42742a695450e2e087687c42e"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\vendor-mutations.ts": {
+    "mtime": 1777025943.991206,
+    "ast_hash": "38a5184fac28115fb85936751df72bff",
+    "semantic_hash": "38a5184fac28115fb85936751df72bff"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\supabase\\vendor-rls-migration.test.ts": {
+    "mtime": 1778405245.4729314,
+    "ast_hash": "7fa0e7ec2deeba6da4d8bd946903f64f",
+    "semantic_hash": "7fa0e7ec2deeba6da4d8bd946903f64f"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\test\\db-helper.ts": {
+    "mtime": 1778405245.4739325,
+    "ast_hash": "846ac5c271b9bc84d04f3536966f816c",
+    "semantic_hash": "846ac5c271b9bc84d04f3536966f816c"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\test\\server-only-mock.ts": {
+    "mtime": 1778405245.4749248,
+    "ast_hash": "fc6c9e9c788a57dc8ea69c42b69652e3",
+    "semantic_hash": "fc6c9e9c788a57dc8ea69c42b69652e3"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\test\\setup.ts": {
+    "mtime": 1778405245.4759252,
+    "ast_hash": "1a7f606f3310630df690d0828afa05e0",
+    "semantic_hash": "1a7f606f3310630df690d0828afa05e0"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\lib\\test\\smoke.test.ts": {
+    "mtime": 1778405245.4769254,
+    "ast_hash": "9e96523dc6428e2c40001f7f14c8277e",
+    "semantic_hash": "9e96523dc6428e2c40001f7f14c8277e"
+  },
+  "C:\\Users\\anuda\\OneDrive\\Desktop\\Mindmap website\\contact-manager\\src\\types\\pg.d.ts": {
+    "mtime": 1774615545.7371974,
+    "ast_hash": "ae09e6341c12a07ffd021e399159f042",
+    "semantic_hash": "ae09e6341c12a07ffd021e399159f042"
+  }
+}
