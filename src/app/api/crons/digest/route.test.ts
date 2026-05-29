@@ -30,14 +30,14 @@ vi.mock("@/lib/digest/composer", () => ({
 }));
 
 // ── Import after mocks ────────────────────────────────────────────────────────
-import { POST, buildDigestBuckets } from "./route";
+import { GET, buildDigestBuckets } from "./route";
 import { NextRequest } from "next/server";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function makeRequest(secret = "test-secret"): NextRequest {
   return new NextRequest("http://localhost/api/crons/digest", {
-    method: "POST",
+    method: "GET",
     headers: { Authorization: `Bearer ${secret}` },
   });
 }
@@ -110,7 +110,7 @@ describe("buildDigestBuckets", () => {
 
 // ── Route integration tests ───────────────────────────────────────────────────
 
-describe("POST /api/crons/digest", () => {
+describe("GET /api/crons/digest", () => {
   beforeEach(() => {
     vi.stubEnv("CRON_SECRET", "test-secret");
     vi.stubEnv("RESEND_API_KEY", "re_test_key");
@@ -132,7 +132,7 @@ describe("POST /api/crons/digest", () => {
   });
 
   it("user with no tasks → skipped, Resend not called", async () => {
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     const json = await res.json();
     expect(json).toMatchObject({ sent: 0, skipped: 1, failed: 0 });
     expect(mockMailSend).not.toHaveBeenCalled();
@@ -152,7 +152,7 @@ describe("POST /api/crons/digest", () => {
       },
     ]);
 
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     const json = await res.json();
     expect(json).toMatchObject({ sent: 1, skipped: 0, failed: 0 });
     expect(mockMailSend).toHaveBeenCalledWith(
@@ -188,7 +188,7 @@ describe("POST /api/crons/digest", () => {
       .mockRejectedValueOnce(new Error("SMTP failure"))
       .mockResolvedValueOnce({ data: { id: "ok" }, error: null });
 
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     const json = await res.json();
     expect(json).toMatchObject({ sent: 1, failed: 1, skipped: 0 });
   });
@@ -197,7 +197,7 @@ describe("POST /api/crons/digest", () => {
     vi.stubEnv("RESEND_API_KEY", "");
     // Also delete so the guard triggers (empty string is falsy)
     process.env.RESEND_API_KEY = "";
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     expect(res.status).toBe(500);
     const json = await res.json();
     expect(json.error).toMatch(/RESEND_API_KEY/);
@@ -205,7 +205,7 @@ describe("POST /api/crons/digest", () => {
 
   it("listUsers throws → 500", async () => {
     mockListUsers.mockResolvedValue({ data: null, error: { message: "DB error" } });
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     expect(res.status).toBe(500);
     const json = await res.json();
     expect(json.error).toBe("DB error");
@@ -220,7 +220,7 @@ describe("POST /api/crons/digest", () => {
       },
       error: null,
     });
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     const json = await res.json();
     expect(json).toMatchObject({ sent: 0, skipped: 0, failed: 0 });
     expect(mockMailSend).not.toHaveBeenCalled();

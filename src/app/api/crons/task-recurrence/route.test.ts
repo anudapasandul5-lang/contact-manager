@@ -23,7 +23,7 @@ vi.mock("@/lib/recurrence/engine", () => ({
   nextInstance: mockNextInstance,
 }));
 
-import { POST } from "./route";
+import { GET as POST } from "./route";
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function makeRequest(authHeader?: string): NextRequest {

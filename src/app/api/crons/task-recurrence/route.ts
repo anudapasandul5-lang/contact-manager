@@ -4,7 +4,7 @@ import { nextInstance } from "@/lib/recurrence/engine";
 
 export const runtime = "nodejs";
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("Authorization");
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
