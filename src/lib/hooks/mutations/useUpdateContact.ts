@@ -1,16 +1,22 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { queryKeys } from "@/lib/query/keys";
-import type { NetworkData } from "@/lib/supabase/types";
-import type { CreateContactInput } from "./useCreateContact";
+import type { ContactType, NetworkData } from "@/lib/supabase/types";
 
-export interface UpdateContactInput extends CreateContactInput {
+export interface UpdateContactInput {
   id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  role: string | null;
+  bio: string | null;
+  type: ContactType;
+  companyIds: string[];
+  projectIds: string[];
 }
 
-async function updateContact(input: UpdateContactInput): Promise<void> {
+export async function updateContact(input: UpdateContactInput): Promise<void> {
   const { id, ...body } = input;
   const res = await fetch(`/api/contacts/${id}`, {
     method: "PUT",
@@ -37,7 +43,7 @@ export function useUpdateContact() {
           ...old,
           contacts: old.contacts.map((c) =>
             c.id === input.id
-              ? { ...c, name: input.name, email: input.email ?? c.email, phone: input.phone ?? c.phone, role: input.role ?? c.role, notes: input.notes ?? c.notes, bio: input.bio ?? c.bio }
+              ? { ...c, name: input.name, email: input.email ?? c.email, phone: input.phone ?? c.phone, role: input.role ?? c.role, bio: input.bio ?? c.bio, type: input.type }
               : c,
           ),
         };
@@ -48,7 +54,6 @@ export function useUpdateContact() {
       if (context?.previous) {
         qc.setQueryData(queryKeys.network.all, context.previous);
       }
-      toast.error(err instanceof Error ? err.message : "Couldn't update contact.");
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: queryKeys.network.all });

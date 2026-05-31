@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { queryKeys } from "@/lib/query/keys";
 import type { NetworkData } from "@/lib/supabase/types";
 
@@ -11,9 +10,19 @@ export interface UpdateVendorInput {
   specialty?: string | null;
   notes?: string | null;
   color?: string | null;
+  companyIds: string[];
+  projectIds: string[];
+  people: {
+    id: string | null;
+    name: string;
+    role: string | null;
+    email: string | null;
+    phone: string | null;
+    bio: string | null;
+  }[];
 }
 
-async function updateVendor(input: UpdateVendorInput): Promise<void> {
+export async function updateVendor(input: UpdateVendorInput): Promise<void> {
   const { id, ...body } = input;
   const res = await fetch(`/api/vendors/${id}`, {
     method: "PUT",
@@ -57,7 +66,6 @@ export function useUpdateVendor() {
       if (context?.previous) {
         qc.setQueryData(queryKeys.network.all, context.previous);
       }
-      toast.error(err instanceof Error ? err.message : "Couldn't update vendor.");
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: queryKeys.network.all });
