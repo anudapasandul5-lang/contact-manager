@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
+import { useUpdateCompany } from "@/lib/hooks/mutations/useUpdateCompany";
 import {
   Dialog,
   DialogContent,
@@ -65,6 +66,7 @@ interface CompanyModalProps {
 
 export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }: CompanyModalProps) {
   const qc = useQueryClient();
+  const updateCompany = useUpdateCompany();
   const existingCompanyId = company?.id ?? null;
   const [name, setName] = useState("");
   const [industry, setIndustry] = useState("");
@@ -256,27 +258,45 @@ export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }
       return;
     }
 
+    const isEdit = Boolean(activeCompanyId);
     setSaving(true);
     setError(null);
     setMediaError(null);
     try {
-      const method = activeCompanyId ? "PUT" : "POST";
-      const url = activeCompanyId ? `/api/companies/${activeCompanyId}` : "/api/companies";
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), industry: industry.trim(), color, is_owned: isOwned }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) {
-        setError(data?.error || "Failed to save.");
-        return;
-      }
-
-      const savedCompanyId = activeCompanyId ?? data?.id;
-      if (!savedCompanyId) {
-        setError("Company saved, but the company id was missing.");
-        return;
+      let savedCompanyId: string;
+      if (activeCompanyId) {
+        // EDIT PATH — use hook for optimistic update + rollback
+        try {
+          await updateCompany.mutateAsync({
+            id: activeCompanyId,
+            name: name.trim(),
+            industry: industry.trim(),
+            color,
+            is_owned: isOwned,
+          });
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "Failed to save.");
+          return;
+        }
+        savedCompanyId = activeCompanyId;
+      } else {
+        // CREATE PATH — keep raw fetch
+        const res = await fetch("/api/companies", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: name.trim(), industry: industry.trim(), color, is_owned: isOwned }),
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+          setError((data as { error?: string } | null)?.error || "Failed to save.");
+          return;
+        }
+        const newId = (data as { id?: string } | null)?.id;
+        if (!newId) {
+          setError("Company saved, but the company id was missing.");
+          return;
+        }
+        savedCompanyId = newId;
       }
       setPersistedCompanyId(savedCompanyId);
 
@@ -358,7 +378,7 @@ export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }
         } catch (mediaSyncError) {
           qc.invalidateQueries({ queryKey: queryKeys.companies.all });
           qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
-          qc.invalidateQueries({ queryKey: queryKeys.network.all });
+          if (!isEdit) void qc.invalidateQueries({ queryKey: queryKeys.network.all });
           onSaved();
           setMediaError(mediaSyncError instanceof Error ? mediaSyncError.message : "Failed to update logo.");
           setMediaStatus("Company saved. You can retry the logo upload.");
@@ -368,7 +388,7 @@ export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }
 
       qc.invalidateQueries({ queryKey: queryKeys.companies.all });
       qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
-      qc.invalidateQueries({ queryKey: queryKeys.network.all });
+      if (!isEdit) void qc.invalidateQueries({ queryKey: queryKeys.network.all });
       onSaved();
       onOpenChange(false);
     } catch {
