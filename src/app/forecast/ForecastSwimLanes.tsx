@@ -174,6 +174,7 @@ export function ForecastSwimLanes({ buckets, businesses }: ForecastSwimLanesProp
                             business={businesses.find((b) => b.id === task.business_id)}
                             onComplete={handleComplete}
                             onDefer={handleDefer}
+                            onOpen={() => {}}
                           />
                         ))}
                       </AnimatePresence>

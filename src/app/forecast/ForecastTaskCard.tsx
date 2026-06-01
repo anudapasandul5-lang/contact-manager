@@ -11,13 +11,14 @@ interface ForecastTaskCardProps {
   business?: { id: string; name: string; color: string };
   onComplete: (taskId: string) => void;
   onDefer: (taskId: string, newDate: string) => void;
+  onOpen: (task: Task) => void;
 }
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
 }
 
-export function ForecastTaskCard({ task, business, onComplete, onDefer }: ForecastTaskCardProps) {
+export function ForecastTaskCard({ task, business, onComplete, onDefer, onOpen }: ForecastTaskCardProps) {
   const [completing, setCompleting] = useState(false);
 
   function handleComplete(e: React.MouseEvent) {
@@ -35,7 +36,11 @@ export function ForecastTaskCard({ task, business, onComplete, onDefer }: Foreca
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="rounded-xl p-3 group"
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen(task)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(task); } }}
+      className="rounded-xl p-3 group cursor-pointer"
       style={{
         background: "linear-gradient(145deg, var(--clay-card), var(--clay-card-end))",
         boxShadow: "var(--clay-shadow-sm)",
@@ -107,7 +112,7 @@ export function ForecastTaskCard({ task, business, onComplete, onDefer }: Foreca
 
       {/* Row 2: due date (if present) */}
       {task.due_date && (
-        <div className="flex items-center gap-1 mt-1.5 ml-6">
+        <div className="flex items-center gap-1 mt-1.5 ml-6" onClick={(e) => e.stopPropagation()}>
           <DeferPopover
             taskId={task.id}
             currentDate={task.due_date}

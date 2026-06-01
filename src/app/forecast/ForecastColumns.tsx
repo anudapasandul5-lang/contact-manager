@@ -8,6 +8,7 @@ import { queryKeys } from "@/lib/query/keys";
 import type { BucketedTasks, Bucket } from "@/lib/forecast/buckets";
 import type { Task } from "@/lib/repositories/tasks";
 import { ForecastTaskCard } from "./ForecastTaskCard";
+import { TaskModal } from "@/components/shared/TaskModal";
 
 type Business = { id: string; name: string; color: string };
 
@@ -28,6 +29,7 @@ const COLUMN_CONFIG: { bucket: Bucket; label: string; isOverdue?: boolean }[] = 
 export function ForecastColumns({ buckets, businesses }: ForecastColumnsProps) {
   const qc = useQueryClient();
   const [selectedBizIds, setSelectedBizIds] = useState<Set<string>>(new Set());
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   function toggleBiz(bizId: string) {
     setSelectedBizIds((prev) => {
@@ -208,6 +210,7 @@ export function ForecastColumns({ buckets, businesses }: ForecastColumnsProps) {
                         business={businesses.find((b) => b.id === task.business_id) ?? undefined}
                         onComplete={handleComplete}
                         onDefer={handleDefer}
+                        onOpen={setEditingTask}
                       />
                     ))}
                   </AnimatePresence>
@@ -217,6 +220,11 @@ export function ForecastColumns({ buckets, businesses }: ForecastColumnsProps) {
           );
         })}
       </div>
+      <TaskModal
+        open={editingTask !== null}
+        onOpenChange={(v) => { if (!v) setEditingTask(null); }}
+        task={editingTask ?? undefined}
+      />
     </div>
   );
 }
