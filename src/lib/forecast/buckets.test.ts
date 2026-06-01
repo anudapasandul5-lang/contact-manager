@@ -189,3 +189,109 @@ describe("ForecastBuckets — bucketize", () => {
     expect(total).toBe(4); // completed task excluded
   });
 });
+
+// REC_NOW = Mon 2026-05-11 10:00 UTC = Mon 15:30 Colombo
+// Week boundaries in Colombo: today=Mon May 11, tomorrow=Tue May 12, thisWeek=Wed-Sun May 13-17, later=May 18+
+const REC_NOW = new Date("2026-05-11T10:00:00Z"); // Mon 15:30 Colombo
+const REC_TZ = "Asia/Colombo";
+
+describe("ForecastBuckets — recurring task fan-out", () => {
+  // A) Daily recurring task with due_date = today → instances in today, tomorrow, and thisWeek
+  it("A) daily recurring task anchored today fans into today, tomorrow, thisWeek buckets", () => {
+    // Anchor = May 11 10:00 UTC (today in Colombo). FREQ=DAILY will produce:
+    // May 11 (today), May 12 (tomorrow), May 13-17 (thisWeek within the window)
+    const t = makeTask({
+      id: "rec-daily",
+      due_date: new Date("2026-05-11T10:00:00Z"), // today anchor
+      recurrence_rule: "RRULE:FREQ=DAILY",
+    });
+    const out = bucketize([t], REC_NOW, REC_TZ);
+
+    // Should have at least 1 instance today, 1 tomorrow, some thisWeek
+    expect(out.today.length).toBeGreaterThanOrEqual(1);
+    expect(out.tomorrow.length).toBeGreaterThanOrEqual(1);
+    expect(out.thisWeek.length).toBeGreaterThanOrEqual(1);
+    expect(out.later).toHaveLength(0);
+    expect(out.noDate).toHaveLength(0);
+
+    // All instances should be the same task id
+    expect(out.today[0].id).toBe("rec-daily");
+    expect(out.tomorrow[0].id).toBe("rec-daily");
+
+    // Instance due_dates should be overridden correctly
+    const todayInstance = out.today[0];
+    const tomorrowInstance = out.tomorrow[0];
+    // today instance due_date should be May 11
+    expect(todayInstance.due_date!.toISOString().startsWith("2026-05-11")).toBe(true);
+    // tomorrow instance due_date should be May 12
+    expect(tomorrowInstance.due_date!.toISOString().startsWith("2026-05-12")).toBe(true);
+  });
+
+  // B) Weekly recurring task with anchor=today → exactly 1 instance in today's bucket
+  it("B) weekly recurring task anchored today produces exactly 1 instance in today bucket", () => {
+    const t = makeTask({
+      id: "rec-weekly",
+      due_date: new Date("2026-05-11T10:00:00Z"), // today = Mon
+      recurrence_rule: "RRULE:FREQ=WEEKLY",
+    });
+    const out = bucketize([t], REC_NOW, REC_TZ);
+
+    // WEEKLY from Mon May 11 — within [todayStart, weekEnd] only May 11 falls in window
+    // (next weekly occurrence is May 18 which is past weekEnd)
+    expect(out.today).toHaveLength(1);
+    expect(out.today[0].id).toBe("rec-weekly");
+    expect(out.tomorrow).toHaveLength(0);
+    expect(out.thisWeek).toHaveLength(0);
+    expect(out.later).toHaveLength(0);
+  });
+
+  // C) Recurring task with due_date far in the future → empty occs → fallback to "later"
+  it("C) recurring task with anchor past weekEnd falls back to later bucket", () => {
+    // Anchor = Jun 1 2026 — well past weekEnd (May 17). occurrencesInWindow returns [].
+    const t = makeTask({
+      id: "rec-future",
+      due_date: new Date("2026-06-01T10:00:00Z"),
+      recurrence_rule: "RRULE:FREQ=DAILY",
+    });
+    const out = bucketize([t], REC_NOW, REC_TZ);
+
+    expect(out.later).toHaveLength(1);
+    expect(out.later[0].id).toBe("rec-future");
+    expect(out.today).toHaveLength(0);
+    expect(out.tomorrow).toHaveLength(0);
+    expect(out.thisWeek).toHaveLength(0);
+  });
+
+  // D) Recurring task with due_date = null → noDate (unchanged)
+  it("D) recurring task with null due_date lands in noDate", () => {
+    const t = makeTask({
+      id: "rec-nodate",
+      due_date: null,
+      recurrence_rule: "RRULE:FREQ=DAILY",
+    });
+    const out = bucketize([t], REC_NOW, REC_TZ);
+
+    expect(out.noDate).toHaveLength(1);
+    expect(out.noDate[0].id).toBe("rec-nodate");
+  });
+
+  // E) Non-recurring task behavior unchanged (regression)
+  it("E) non-recurring tasks behave unchanged after refactor", () => {
+    const tasks = [
+      makeTask({ id: "nr-overdue", due_date: new Date("2026-05-10T03:00:00Z") }), // overdue
+      makeTask({ id: "nr-today", due_date: new Date("2026-05-11T06:30:00Z") }),   // today (10:00 Colombo)
+      makeTask({ id: "nr-tomorrow", due_date: new Date("2026-05-12T06:30:00Z") }), // tomorrow
+      makeTask({ id: "nr-thisweek", due_date: new Date("2026-05-13T06:30:00Z") }), // thisWeek
+      makeTask({ id: "nr-later", due_date: new Date("2026-05-18T06:30:00Z") }),    // later
+      makeTask({ id: "nr-nodate", due_date: null }),
+    ];
+    const out = bucketize(tasks, REC_NOW, REC_TZ);
+
+    expect(out.overdue.map((t) => t.id)).toContain("nr-overdue");
+    expect(out.today.map((t) => t.id)).toContain("nr-today");
+    expect(out.tomorrow.map((t) => t.id)).toContain("nr-tomorrow");
+    expect(out.thisWeek.map((t) => t.id)).toContain("nr-thisweek");
+    expect(out.later.map((t) => t.id)).toContain("nr-later");
+    expect(out.noDate.map((t) => t.id)).toContain("nr-nodate");
+  });
+});
