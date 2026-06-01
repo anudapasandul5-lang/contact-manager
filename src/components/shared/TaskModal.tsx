@@ -67,8 +67,23 @@ function TaskModalInner({ open, onOpenChange, entityContext, task }: TaskModalPr
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
   const { data: network } = useNetworkQuery();
-  const projects = network?.projects ?? [];
-  const contacts = network?.contacts ?? [];
+  const allContacts = network?.contacts ?? [];
+
+  // Derive company id: from entityContext or from selected business (biz-<companyId>)
+  const activeCompanyId =
+    entityContext?.type === "company"
+      ? entityContext.id
+      : businessId !== NONE_SENTINEL
+        ? businessId.slice(4)
+        : null;
+
+  const contacts = activeCompanyId
+    ? allContacts.filter((c) =>
+        (c.contact_companies ?? []).some(
+          ({ companies }: { companies: { id: string } }) => companies.id === activeCompanyId
+        )
+      )
+    : allContacts;
 
   const recurrenceRule: string | null =
     selectedPreset === null ? null
@@ -251,28 +266,9 @@ function TaskModalInner({ open, onOpenChange, entityContext, task }: TaskModalPr
             className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-11"
           />
 
-          {entityContext?.type !== "project" && (
-            <Select value={projectId} onValueChange={(v) => setProjectId(v ?? INBOX_SENTINEL)}>
-              <SelectTrigger>
-                <SelectValue>
-                  {projectId === INBOX_SENTINEL
-                    ? "None — goes to Inbox"
-                    : (projects.find((p) => p.id === projectId)?.name ?? "None — goes to Inbox")}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={INBOX_SENTINEL}>None — goes to Inbox</SelectItem>
-                {projects.map((p) => (
-                  <SelectItem key={p.id} value={p.id} className="truncate">
-                    {p.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
 
           {businesses.length > 0 && entityContext?.type !== "company" && (
-            <Select value={businessId} onValueChange={(v) => setBusinessId(v ?? NONE_SENTINEL)}>
+            <Select value={businessId} onValueChange={(v) => { setBusinessId(v ?? NONE_SENTINEL); setContactId(NONE_SENTINEL); }}>
               <SelectTrigger>
                 <SelectValue>
                   {businessId === NONE_SENTINEL

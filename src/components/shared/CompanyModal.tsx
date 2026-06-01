@@ -363,6 +363,7 @@ export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }
         } catch (mediaSyncError) {
           qc.invalidateQueries({ queryKey: queryKeys.companies.all });
           qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
+          qc.invalidateQueries({ queryKey: queryKeys.forecast.all });
           if (!isEdit) void qc.invalidateQueries({ queryKey: queryKeys.network.all });
           onSaved();
           setMediaError(mediaSyncError instanceof Error ? mediaSyncError.message : "Failed to update logo.");
@@ -373,6 +374,7 @@ export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }
 
       qc.invalidateQueries({ queryKey: queryKeys.companies.all });
       qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
+      qc.invalidateQueries({ queryKey: queryKeys.forecast.all });
       if (!isEdit) void qc.invalidateQueries({ queryKey: queryKeys.network.all });
       onSaved();
       onOpenChange(false);
