@@ -22,6 +22,19 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       .eq("id", id)
       .eq("user_id", auth.user.id);
 
+    if (!error) {
+      // Sync matching business name+color (best-effort)
+      try {
+        await supabase
+          .from("businesses")
+          .update({ name, color: color || "#6b7280" })
+          .eq("id", `biz-${id}`)
+          .eq("user_id", auth.user.id);
+      } catch {
+        // Ignore sync errors
+      }
+    }
+
     const response = error
       ? NextResponse.json({ error: error.message }, { status: 500 })
       : NextResponse.json({ success: true });
@@ -43,7 +56,15 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   const { id } = await params;
   const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
-  // Delete the row first — media cleanup is best-effort and runs without blocking
+  const bizId = `biz-${id}`;
+
+  // Delete tasks tagged to this business (explicit — FK is SET NULL, not CASCADE)
+  await supabase.from("tasks").delete().eq("business_id", bizId).eq("user_id", auth.user.id);
+
+  // Delete business (cascades company_businesses junction via FK)
+  await supabase.from("businesses").delete().eq("id", bizId).eq("user_id", auth.user.id);
+
+  // Delete company — media cleanup is best-effort and runs without blocking
   const { error } = await supabase.from("companies").delete().eq("id", id).eq("user_id", auth.user.id);
   if (!error) {
     deleteEntityMedia(supabase as never, auth.user.id, "company", id).catch(() => {});
