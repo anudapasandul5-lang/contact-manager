@@ -26,12 +26,6 @@ export async function PATCH(
     const hasDueDate = "dueDate" in body;
     const hasRecurrenceRule = "recurrenceRule" in body;
 
-    if (!hasCompleted && !hasDueDate && !hasRecurrenceRule) {
-      const response = NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
-      applySessionCookies(response, auth.resolved);
-      return response;
-    }
-
     let task = null;
 
     if (hasCompleted) {
@@ -98,61 +92,94 @@ export async function PATCH(
           }
         }
       }
-    } else if (hasDueDate) {
-      const dueDate = body.dueDate;
-      let dueDateValue: string | null;
+    } else {
+      // General edit branch: handle any combination of editable fields
+      const hasTitle = "title" in body;
+      const hasNotes = "notes" in body;
+      const hasProjectId = "projectId" in body;
+      const hasBusinessId = "businessId" in body;
+      const hasContactId = "contactId" in body;
 
-      if (dueDate === null) {
-        dueDateValue = null;
-      } else if (typeof dueDate === "string") {
-        const d = new Date(dueDate);
-        if (isNaN(d.getTime())) {
+      if (!hasDueDate && !hasTitle && !hasNotes && !hasProjectId && !hasBusinessId && !hasContactId && !hasRecurrenceRule) {
+        const response = NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
+        applySessionCookies(response, auth.resolved);
+        return response;
+      }
+
+      const updateFields: Record<string, unknown> = {};
+
+      if (hasTitle) {
+        if (typeof body.title !== "string" || body.title.trim() === "") {
+          const response = NextResponse.json({ error: "title must be a non-empty string" }, { status: 400 });
+          applySessionCookies(response, auth.resolved);
+          return response;
+        }
+        updateFields.title = body.title.trim();
+      }
+
+      if (hasNotes) {
+        updateFields.notes = body.notes === null ? null : String(body.notes);
+      }
+
+      if (hasDueDate) {
+        const dueDate = body.dueDate;
+        if (dueDate === null) {
+          updateFields.due_date = null;
+        } else if (typeof dueDate === "string") {
+          const d = new Date(dueDate);
+          if (isNaN(d.getTime())) {
+            const response = NextResponse.json({ error: "Invalid dueDate" }, { status: 400 });
+            applySessionCookies(response, auth.resolved);
+            return response;
+          }
+          updateFields.due_date = d.toISOString();
+        } else {
           const response = NextResponse.json({ error: "Invalid dueDate" }, { status: 400 });
           applySessionCookies(response, auth.resolved);
           return response;
         }
-        dueDateValue = d.toISOString();
-      } else {
-        const response = NextResponse.json({ error: "Invalid dueDate" }, { status: 400 });
-        applySessionCookies(response, auth.resolved);
-        return response;
       }
 
-      const { data, error } = await supabase
-        .from("tasks")
-        .update({ due_date: dueDateValue, updated_at: new Date().toISOString() })
-        .eq("id", id)
-        .eq("user_id", auth.user.id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw new Error(error.message);
-      task = data;
-    } else if (hasRecurrenceRule) {
-      const parsedRrule = patchBodySchema.safeParse(body);
-      if (!parsedRrule.success) {
-        const response = NextResponse.json(
-          { error: parsedRrule.error.issues[0]?.message ?? "Invalid recurrenceRule" },
-          { status: 400 }
-        );
-        applySessionCookies(response, auth.resolved);
-        return response;
+      if (hasProjectId) {
+        updateFields.project_id = body.projectId === null ? null : String(body.projectId);
       }
-      const recurrenceRuleRaw = parsedRrule.data.recurrenceRule;
-      const recurrenceRule = !recurrenceRuleRaw || recurrenceRuleRaw.trim() === "" ? null : recurrenceRuleRaw;
 
-      if (recurrenceRule !== null) {
-        const validation = validateRrule(recurrenceRule);
-        if (!validation.ok) {
-          const response = NextResponse.json({ error: validation.error }, { status: 400 });
-          applySessionCookies(response, auth.resolved);
-          return response;
+      if (hasBusinessId) {
+        updateFields.business_id = body.businessId === null ? null : String(body.businessId);
+      }
+
+      if (hasContactId) {
+        updateFields.contact_id = body.contactId === null ? null : String(body.contactId);
+      }
+
+      if (hasRecurrenceRule) {
+        const recurrenceRuleRaw = body.recurrenceRule;
+        const recurrenceRule =
+          recurrenceRuleRaw === null || (typeof recurrenceRuleRaw === "string" && recurrenceRuleRaw.trim() === "")
+            ? null
+            : recurrenceRuleRaw;
+
+        if (recurrenceRule !== null) {
+          if (typeof recurrenceRule !== "string") {
+            const response = NextResponse.json({ error: "Invalid recurrenceRule" }, { status: 400 });
+            applySessionCookies(response, auth.resolved);
+            return response;
+          }
+          const validation = validateRrule(recurrenceRule);
+          if (!validation.ok) {
+            const response = NextResponse.json({ error: validation.error }, { status: 400 });
+            applySessionCookies(response, auth.resolved);
+            return response;
+          }
         }
+        updateFields.recurrence_rule = recurrenceRule;
       }
+
+      updateFields.updated_at = new Date().toISOString();
 
       const { data, error } = await supabase
         .from("tasks")
-        .update({ recurrence_rule: recurrenceRule, updated_at: new Date().toISOString() })
+        .update(updateFields)
         .eq("id", id)
         .eq("user_id", auth.user.id)
         .select()
@@ -174,6 +201,45 @@ export async function PATCH(
   } catch (error) {
     console.error("[api/tasks/[id] PATCH]", error);
     const message = error instanceof Error ? error.message : "Failed to update task";
+    const response = NextResponse.json({ error: message }, { status: 500 });
+    applySessionCookies(response, auth.resolved);
+    return response;
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const auth = await authenticateRequest(request);
+  if (!auth.user) return auth.response;
+
+  try {
+    const { id } = await params;
+    const supabase = getSupabaseServer(auth.resolved.accessToken ?? undefined);
+
+    const { data, error } = await supabase
+      .from("tasks")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", auth.user.id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw new Error(error.message);
+
+    if (data === null) {
+      const response = NextResponse.json({ error: "Task not found" }, { status: 404 });
+      applySessionCookies(response, auth.resolved);
+      return response;
+    }
+
+    const response = NextResponse.json({ ok: true });
+    applySessionCookies(response, auth.resolved);
+    return response;
+  } catch (error) {
+    console.error("[api/tasks/[id] DELETE]", error);
+    const message = error instanceof Error ? error.message : "Failed to delete task";
     const response = NextResponse.json({ error: message }, { status: 500 });
     applySessionCookies(response, auth.resolved);
     return response;
