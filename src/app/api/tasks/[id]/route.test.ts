@@ -19,13 +19,14 @@ const mockDelete = vi.fn(() => ({ eq: mockEq }));
 const mockInsert = vi.fn(() => Promise.resolve({ error: null }));
 const mockFrom = vi.fn();
 
-// eq chain: supports .eq().eq().select().maybeSingle() depth
-function mockEq(_col: string, _val: unknown): ReturnType<typeof mockEq> {
-  return {
-    eq: mockEq,
-    select: mockSelect,
-    delete: mockDelete,
-  } as unknown as ReturnType<typeof mockEq>;
+interface EqChain {
+  eq: (_col: string, _val: unknown) => EqChain;
+  select: typeof mockSelect;
+  delete: typeof mockDelete;
+}
+
+function mockEq(_col: string, _val: unknown): EqChain {
+  return { eq: mockEq, select: mockSelect, delete: mockDelete };
 }
 
 vi.mock("@/lib/supabase/server", () => ({
