@@ -1,4 +1,5 @@
 import type { Task } from "@/lib/repositories/tasks";
+import { occurrencesInWindow } from "@/lib/recurrence/engine";
 
 export type Bucket = "overdue" | "today" | "tomorrow" | "thisWeek" | "later" | "noDate";
 export type BucketedTasks = Record<Bucket, Task[]>;
@@ -36,32 +37,36 @@ export function bucketize(tasks: Task[], now: Date, tz: string): BucketedTasks {
   // we get the end of NEXT week (Mon–Sun) rather than collapsing thisWeek to empty.
   const weekEnd = endOfIsoWeek(tomorrowStart, tz);
 
+  function bucketForDate(due: Date): Bucket {
+    if (due.getTime() < todayStart.getTime()) return "overdue";
+    if (due.getTime() <= todayEnd.getTime()) return "today";
+    if (due.getTime() <= tomorrowEnd.getTime()) return "tomorrow";
+    if (due.getTime() >= dayAfterTomorrowStart.getTime() && due.getTime() <= weekEnd.getTime()) return "thisWeek";
+    return "later";
+  }
+
   for (const task of tasks) {
     // Filter rules
     if (task.completed_at != null) continue;
     if (task.parent_task_id != null) continue;
     if (task.defer_date != null && task.defer_date.getTime() > now.getTime()) continue;
 
-    const due = task.due_date;
-    if (due == null) {
-      buckets.noDate.push(task);
-      continue;
+    if (task.recurrence_rule !== null && task.due_date !== null) {
+      const occs = occurrencesInWindow(task.recurrence_rule, task.due_date, todayStart, weekEnd);
+      if (occs.length > 0) {
+        for (const occDate of occs) {
+          const instance = { ...task, due_date: occDate };
+          buckets[bucketForDate(occDate)].push(instance);
+        }
+        continue;
+      }
+      // fallback: empty occs → place by raw due_date (handles future/past series)
     }
 
-    if (due.getTime() < todayStart.getTime()) {
-      buckets.overdue.push(task);
-    } else if (due.getTime() <= todayEnd.getTime()) {
-      buckets.today.push(task);
-    } else if (due.getTime() <= tomorrowEnd.getTime()) {
-      buckets.tomorrow.push(task);
-    } else if (
-      due.getTime() >= dayAfterTomorrowStart.getTime() &&
-      due.getTime() <= weekEnd.getTime()
-    ) {
-      buckets.thisWeek.push(task);
-    } else {
-      buckets.later.push(task);
-    }
+    // plain path (non-recurring, or recurring with no due_date, or recurring with empty occs + fallback):
+    const due = task.due_date;
+    if (due == null) { buckets.noDate.push(task); continue; }
+    buckets[bucketForDate(due)].push(task);
   }
 
   return buckets;
