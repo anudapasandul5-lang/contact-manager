@@ -226,10 +226,8 @@ export function computeMindMapDisplayState({
       if (isCollapsed && workloadMap) {
         for (const n of nodes) {
           if (n.type !== "contact") continue;
-          const companyIds = (n.data.companyIds ?? []) as string[];
           const parentCompanyId = n.data.parentCompanyId as string | undefined;
-          const belongsHere = parentCompanyId === companyId || companyIds.includes(companyId);
-          if (!belongsHere) continue;
+          if (parentCompanyId !== companyId) continue;
           const contactId = n.data.contactId as string | undefined;
           if (!contactId) continue;
           const contactRing = workloadMap.get(contactId) ?? "none";

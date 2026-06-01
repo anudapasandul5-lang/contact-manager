@@ -64,7 +64,7 @@ export function CompanyNode({ data }: NodeProps) {
 
   return (
     <div style={{ transform: `scale(${animScale})`, transformOrigin: "center", position: "relative" }}>
-      {ringVisible && taskCount > 0 && (
+      {taskCount > 0 && (
         <span
           style={{
             position: "absolute",
