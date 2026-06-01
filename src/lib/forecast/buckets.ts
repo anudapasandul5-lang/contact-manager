@@ -64,6 +64,7 @@ export function bucketize(tasks: Task[], now: Date, tz: string): BucketedTasks {
     }
 
     // plain path (non-recurring, or recurring with no due_date, or recurring with empty occs + fallback):
+    // Recurring + null due_date: no anchor to expand from → treated as noDate below (intentional).
     const due = task.due_date;
     if (due == null) { buckets.noDate.push(task); continue; }
     buckets[bucketForDate(due)].push(task);

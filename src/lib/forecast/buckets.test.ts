@@ -207,10 +207,10 @@ describe("ForecastBuckets — recurring task fan-out", () => {
     });
     const out = bucketize([t], REC_NOW, REC_TZ);
 
-    // Should have at least 1 instance today, 1 tomorrow, some thisWeek
-    expect(out.today.length).toBeGreaterThanOrEqual(1);
-    expect(out.tomorrow.length).toBeGreaterThanOrEqual(1);
-    expect(out.thisWeek.length).toBeGreaterThanOrEqual(1);
+    // Window [May 11 start, May 17 end Colombo]: today=May11, tomorrow=May12, thisWeek=May13-17 (5 days)
+    expect(out.today).toHaveLength(1);
+    expect(out.tomorrow).toHaveLength(1);
+    expect(out.thisWeek).toHaveLength(5);
     expect(out.later).toHaveLength(0);
     expect(out.noDate).toHaveLength(0);
 
