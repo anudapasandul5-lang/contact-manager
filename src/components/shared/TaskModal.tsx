@@ -20,8 +20,11 @@ import {
 } from "@/components/ui/select";
 import { useNetworkQuery } from "@/lib/hooks/queries/useNetworkQuery";
 import { useCreateTask, type CreateTaskMutationInput } from "@/lib/hooks/mutations/useCreateTask";
+import { useUpdateTask } from "@/lib/hooks/mutations/useUpdateTask";
+import { useDeleteTask } from "@/lib/hooks/mutations/useDeleteTask";
 import { validateRrule } from "@/lib/recurrence/engine";
 import { cn } from "@/lib/utils";
+import type { Task } from "@/lib/repositories/tasks";
 
 const INBOX_SENTINEL = "__inbox__";
 const NONE_SENTINEL = "__none__";
@@ -45,9 +48,10 @@ interface TaskModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   entityContext?: EntityContext;
+  task?: Task;
 }
 
-function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
+function TaskModalInner({ open, onOpenChange, entityContext, task }: TaskModalProps) {
   const [title, setTitle] = useState("");
   const [rawDate, setRawDate] = useState("");
   const [projectId, setProjectId] = useState<string>(INBOX_SENTINEL);
@@ -60,6 +64,8 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
   const [businesses, setBusinesses] = useState<{ id: string; name: string }[]>([]);
   const isSubmittingRef = useRef(false);
   const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
+  const deleteTask = useDeleteTask();
   const { data: network } = useNetworkQuery();
   const projects = network?.projects ?? [];
   const contacts = network?.contacts ?? [];
@@ -76,6 +82,37 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
       .then((data: unknown) => setBusinesses(Array.isArray(data) ? (data as { id: string; name: string }[]) : []))
       .catch(() => {});
   }, []);
+
+  // Prefill state when editing an existing task
+  useEffect(() => {
+    if (task && open) {
+      setTitle(task.title);
+      setNotes(task.notes ?? "");
+      setRawDate(
+        task.due_date != null
+          ? new Date(task.due_date).toISOString().slice(0, 10)
+          : ""
+      );
+      setProjectId(task.project_id ?? INBOX_SENTINEL);
+      setBusinessId(task.business_id ?? NONE_SENTINEL);
+      setContactId(task.contact_id ?? NONE_SENTINEL);
+
+      if (task.recurrence_rule != null) {
+        const matchedPreset = PRESETS.find((p) => p.value === task.recurrence_rule && p.value !== "custom");
+        if (matchedPreset) {
+          setSelectedPreset(matchedPreset.value);
+          setCustomRrule("");
+        } else {
+          setSelectedPreset("custom");
+          setCustomRrule(task.recurrence_rule);
+        }
+      } else {
+        setSelectedPreset(null);
+        setCustomRrule("");
+      }
+      setValidationError(null);
+    }
+  }, [task, open]);
 
   useEffect(() => {
     if (selectedPreset !== "custom" || !customRrule.trim()) {
@@ -120,39 +157,73 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
 
   const isCustomInvalid =
     selectedPreset === "custom" && (!customRrule.trim() || validationError !== null);
-  const submitDisabled = !title.trim() || createTask.isPending || isCustomInvalid;
+  const submitDisabled =
+    !title.trim() ||
+    createTask.isPending ||
+    updateTask.isPending ||
+    isCustomInvalid;
 
   const handleSubmit = async () => {
     if (submitDisabled || isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     try {
-      const payload: CreateTaskMutationInput = {
-        title: title.trim(),
-        notes: notes.trim() || undefined,
-        dueDate: rawDate ? new Date(rawDate) : undefined,
-        projectId: projectId === INBOX_SENTINEL ? undefined : projectId,
-        recurrenceRule: recurrenceRule ?? undefined,
-      };
-      if (entityContext?.type === "contact") payload.contactId = entityContext.id;
-      if (entityContext?.type === "company") payload.companyId = entityContext.id;
-      if (entityContext?.type === "project") payload.projectId = entityContext.id;
-      if (businessId !== NONE_SENTINEL) payload.businessId = businessId;
-      if (contactId !== NONE_SENTINEL) payload.contactId = contactId;
+      if (task) {
+        // Edit mode
+        await updateTask.mutateAsync({
+          id: task.id,
+          title: title.trim(),
+          notes: notes.trim() || null,
+          dueDate: rawDate ? new Date(rawDate) : null,
+          projectId: projectId === INBOX_SENTINEL ? null : projectId,
+          businessId: businessId === NONE_SENTINEL ? null : businessId,
+          contactId: contactId === NONE_SENTINEL ? null : contactId,
+          recurrenceRule: recurrenceRule ?? null,
+        });
+        handleOpenChange(false);
+      } else {
+        // Create mode
+        const payload: CreateTaskMutationInput = {
+          title: title.trim(),
+          notes: notes.trim() || undefined,
+          dueDate: rawDate ? new Date(rawDate) : undefined,
+          projectId: projectId === INBOX_SENTINEL ? undefined : projectId,
+          recurrenceRule: recurrenceRule ?? undefined,
+        };
+        if (entityContext?.type === "contact") payload.contactId = entityContext.id;
+        if (entityContext?.type === "company") payload.companyId = entityContext.id;
+        if (entityContext?.type === "project") payload.projectId = entityContext.id;
+        if (businessId !== NONE_SENTINEL) payload.businessId = businessId;
+        if (contactId !== NONE_SENTINEL) payload.contactId = contactId;
 
-      await createTask.mutateAsync(payload);
-      handleOpenChange(false);
+        await createTask.mutateAsync(payload);
+        handleOpenChange(false);
+      }
     } catch {
-      // toast already fired in useCreateTask.onError
+      // toast already fired in mutation onError
     } finally {
       isSubmittingRef.current = false;
     }
   };
 
+  const handleDelete = async () => {
+    if (!task) return;
+    const confirmed = window.confirm("Delete this task?");
+    if (!confirmed) return;
+    try {
+      await deleteTask.mutateAsync(task.id);
+      handleOpenChange(false);
+    } catch {
+      // toast already fired in useDeleteTask onError
+    }
+  };
+
+  const isEditMode = !!task;
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange} disablePointerDismissal>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add task</DialogTitle>
+          <DialogTitle>{isEditMode ? "Edit task" : "Add task"}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-3 py-2">
@@ -288,16 +359,31 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button
-            onClick={() => void handleSubmit()}
-            disabled={submitDisabled}
-          >
-            {createTask.isPending ? "Adding..." : "Add task"}
-          </Button>
+        <DialogFooter className="flex justify-between">
+          {isEditMode && (
+            <div>
+              <Button
+                variant="destructive"
+                onClick={() => void handleDelete()}
+                disabled={deleteTask.isPending}
+              >
+                {deleteTask.isPending ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => handleOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => void handleSubmit()}
+              disabled={submitDisabled}
+            >
+              {isEditMode
+                ? (updateTask.isPending ? "Saving..." : "Save changes")
+                : (createTask.isPending ? "Adding..." : "Add task")}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
