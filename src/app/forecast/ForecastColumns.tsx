@@ -41,7 +41,7 @@ export function ForecastColumns({ buckets, businesses }: ForecastColumnsProps) {
   function filterTasks(tasks: Task[]): Task[] {
     if (selectedBizIds.size === 0) return tasks;
     return tasks.filter(
-      (t) => t.business_id === null || selectedBizIds.has(t.business_id)
+      (t) => t.business_id !== null && selectedBizIds.has(t.business_id)
     );
   }
 
