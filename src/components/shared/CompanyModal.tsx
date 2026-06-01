@@ -228,12 +228,7 @@ export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }
     onSaved();
     onOpenChange(false);
 
-    deleteCompany.mutate(companyId, {
-      onSettled: () => {
-        qc.invalidateQueries({ queryKey: queryKeys.companies.all });
-        qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
-      },
-    });
+    deleteCompany.mutate(companyId);
   }
 
   async function handleSubmit() {
