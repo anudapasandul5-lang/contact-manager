@@ -157,10 +157,8 @@ describe("RecurrenceEngine — occurrencesInWindow", () => {
     expect(out[6].toISOString()).toBe("2026-06-07T00:00:00.000Z");
   });
 
-  it("FREQ=WEEKLY, anchor=Monday 2026-06-02, window=[2026-06-01, 2026-06-07] → 1 date (Monday Jun 2)", () => {
-    // 2026-06-02 is Tuesday. Anchor on Monday means DTSTART should be Mon Jun 1 or Tue Jun 2 depending on the anchor.
-    // Task says anchor = task's due_date. If due_date is 2026-06-02 (Tuesday), then DTSTART=2026-06-02.
-    // Weekly on Tue = every Tuesday. So in [Jun 1, Jun 7], only Jun 2 (Tue).
+  it("FREQ=WEEKLY, anchor=Tuesday 2026-06-02, window=[2026-06-01, 2026-06-07] → 1 date (Tue Jun 2)", () => {
+    // 2026-06-02 is a Tuesday. DTSTART=anchor=Jun 2, weekly on Tue → only Jun 2 falls in [Jun 1, Jun 7].
     const anchor = new Date("2026-06-02T00:00:00Z"); // Tuesday
     const windowStart = new Date("2026-06-01T00:00:00Z");
     const windowEnd = new Date("2026-06-07T23:59:59Z");
@@ -186,15 +184,8 @@ describe("RecurrenceEngine — occurrencesInWindow", () => {
     expect(out).toEqual([]);
   });
 
-  it("Window where anchor is past the window end → still returns occurrences if rule generates them", () => {
-    // DAILY rule, anchor (DTSTART) is 2026-06-10, but window is [2026-06-01, 2026-06-07].
-    // Daily rule starting in the future may still have occurrences before if we're looking backward.
-    // Actually, if DTSTART is Jun 10 and window is Jun 1-7, there should be NO occurrences.
-    // Task says "still returns occurrences if rule generates them (daily wraps)" — but that doesn't make sense.
-    // Let me re-read: the task says daily doesn't care about the day-of-week, so occurrences are dense.
-    // If anchor=Jun 10 and window=[Jun 1, Jun 7], RRule.between() with DTSTART=Jun 10 would return NO occurrences.
-    // I think the intent is to test that even if anchor > windowEnd, we don't error.
-    // Let me adjust: test that a daily rule with anchor later still returns [] if before anchor.
+  it("anchor (DTSTART) after window end → [] (series has not started yet)", () => {
+    // DTSTART=Jun 10, window=[Jun 1, Jun 7]: no occurrences before DTSTART, so [].
     const anchor = new Date("2026-06-10T00:00:00Z");
     const windowStart = new Date("2026-06-01T00:00:00Z");
     const windowEnd = new Date("2026-06-07T23:59:59Z");
