@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
 import { useUpdateCompany } from "@/lib/hooks/mutations/useUpdateCompany";
+import { useDeleteCompany } from "@/lib/hooks/mutations/useDeleteCompany";
 import {
   Dialog,
   DialogContent,
@@ -67,6 +68,7 @@ interface CompanyModalProps {
 export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }: CompanyModalProps) {
   const qc = useQueryClient();
   const updateCompany = useUpdateCompany();
+  const deleteCompany = useDeleteCompany();
   const existingCompanyId = company?.id ?? null;
   const [name, setName] = useState("");
   const [industry, setIndustry] = useState("");
@@ -226,24 +228,12 @@ export function CompanyModal({ open, onOpenChange, company, onSaved, onDeleted }
     onSaved();
     onOpenChange(false);
 
-    fetch(`/api/companies/${companyId}`, { method: "DELETE" })
-      .then((res) => {
-        if (!res.ok) {
-          // Delete failed — reload to restore the node
-          qc.invalidateQueries({ queryKey: queryKeys.companies.all });
-          qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
-          qc.invalidateQueries({ queryKey: queryKeys.network.all });
-        } else {
-          qc.invalidateQueries({ queryKey: queryKeys.companies.all });
-          qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
-          qc.invalidateQueries({ queryKey: queryKeys.network.all });
-        }
-      })
-      .catch(() => {
+    deleteCompany.mutate(companyId, {
+      onSettled: () => {
         qc.invalidateQueries({ queryKey: queryKeys.companies.all });
         qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
-        qc.invalidateQueries({ queryKey: queryKeys.network.all });
-      });
+      },
+    });
   }
 
   async function handleSubmit() {
