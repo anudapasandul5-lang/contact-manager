@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { nextInstance, expandUntil, validateRrule } from "./engine";
+import { nextInstance, expandUntil, validateRrule, occurrencesInWindow } from "./engine";
 
 describe("RecurrenceEngine — validateRrule", () => {
   it("accepts FREQ=DAILY", () => {
@@ -143,5 +143,64 @@ describe("RecurrenceEngine — expandUntil", () => {
     expect(out).toHaveLength(2);
     expect(out[0].toISOString()).toBe("2026-05-10T09:00:00.000Z");
     expect(out[1].toISOString()).toBe("2026-05-11T09:00:00.000Z");
+  });
+});
+
+describe("RecurrenceEngine — occurrencesInWindow", () => {
+  it("FREQ=DAILY, anchor=today, window=[today, today+6days] → 7 dates", () => {
+    const anchor = new Date("2026-06-01T00:00:00Z"); // Monday
+    const windowStart = new Date("2026-06-01T00:00:00Z");
+    const windowEnd = new Date("2026-06-07T23:59:59Z");
+    const out = occurrencesInWindow("RRULE:FREQ=DAILY", anchor, windowStart, windowEnd);
+    expect(out).toHaveLength(7);
+    expect(out[0].toISOString()).toBe("2026-06-01T00:00:00.000Z");
+    expect(out[6].toISOString()).toBe("2026-06-07T00:00:00.000Z");
+  });
+
+  it("FREQ=WEEKLY, anchor=Tuesday 2026-06-02, window=[2026-06-01, 2026-06-07] → 1 date (Tue Jun 2)", () => {
+    // 2026-06-02 is a Tuesday. DTSTART=anchor=Jun 2, weekly on Tue → only Jun 2 falls in [Jun 1, Jun 7].
+    const anchor = new Date("2026-06-02T00:00:00Z"); // Tuesday
+    const windowStart = new Date("2026-06-01T00:00:00Z");
+    const windowEnd = new Date("2026-06-07T23:59:59Z");
+    const out = occurrencesInWindow("RRULE:FREQ=WEEKLY", anchor, windowStart, windowEnd);
+    expect(out).toHaveLength(1);
+    expect(out[0].getUTCDate()).toBe(2);
+  });
+
+  it("FREQ=MONTHLY, anchor=2026-06-01, window=[2026-06-01, 2026-06-30] → 1 date (Jun 1)", () => {
+    const anchor = new Date("2026-06-01T00:00:00Z");
+    const windowStart = new Date("2026-06-01T00:00:00Z");
+    const windowEnd = new Date("2026-06-30T23:59:59Z");
+    const out = occurrencesInWindow("RRULE:FREQ=MONTHLY", anchor, windowStart, windowEnd);
+    expect(out).toHaveLength(1);
+    expect(out[0].getUTCDate()).toBe(1);
+  });
+
+  it("Malformed rule string → returns [] (no throw)", () => {
+    const anchor = new Date("2026-06-01T00:00:00Z");
+    const windowStart = new Date("2026-06-01T00:00:00Z");
+    const windowEnd = new Date("2026-06-07T23:59:59Z");
+    const out = occurrencesInWindow("garbage-rule", anchor, windowStart, windowEnd);
+    expect(out).toEqual([]);
+  });
+
+  it("anchor (DTSTART) after window end → [] (series has not started yet)", () => {
+    // DTSTART=Jun 10, window=[Jun 1, Jun 7]: no occurrences before DTSTART, so [].
+    const anchor = new Date("2026-06-10T00:00:00Z");
+    const windowStart = new Date("2026-06-01T00:00:00Z");
+    const windowEnd = new Date("2026-06-07T23:59:59Z");
+    const out = occurrencesInWindow("RRULE:FREQ=DAILY", anchor, windowStart, windowEnd);
+    expect(out).toEqual([]);
+  });
+
+  it("FREQ=WEEKLY;INTERVAL=2, anchor=2026-06-02 (Mon→Tue), window=[2026-06-01, 2026-06-14] → 1 date (Jun 2 only)", () => {
+    // 2026-06-02 is Tuesday. Bi-weekly on Tuesday = Jun 2, Jun 16, ...
+    // Window [Jun 1, Jun 14] only includes Jun 2.
+    const anchor = new Date("2026-06-02T00:00:00Z");
+    const windowStart = new Date("2026-06-01T00:00:00Z");
+    const windowEnd = new Date("2026-06-14T23:59:59Z");
+    const out = occurrencesInWindow("RRULE:FREQ=WEEKLY;INTERVAL=2", anchor, windowStart, windowEnd);
+    expect(out).toHaveLength(1);
+    expect(out[0].getUTCDate()).toBe(2);
   });
 });

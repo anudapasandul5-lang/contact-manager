@@ -203,7 +203,7 @@ export function ForecastColumns({ buckets, businesses }: ForecastColumnsProps) {
                   <AnimatePresence initial={false}>
                     {tasks.map((task) => (
                       <ForecastTaskCard
-                        key={task.id}
+                        key={`${task.id}:${task.due_date ? task.due_date.toISOString() : "nodate"}`}
                         task={task}
                         business={businesses.find((b) => b.id === task.business_id) ?? undefined}
                         onComplete={handleComplete}

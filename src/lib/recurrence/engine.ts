@@ -43,3 +43,43 @@ export function validateRrule(rruleStr: string): ValidationResult {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
 }
+
+/**
+ * All occurrences of a recurrence rule within a date window (inclusive on both ends).
+ *
+ * @param rruleStr RRULE string, potentially bare (no DTSTART), e.g. `"RRULE:FREQ=DAILY"`
+ * @param anchor `Date` — the task's `due_date`; used as DTSTART to keep weekly/monthly aligned
+ * @param windowStart `Date` — start of the window (inclusive)
+ * @param windowEnd `Date` — end of the window (inclusive)
+ * @returns array of `Date` for every occurrence in [windowStart, windowEnd], or `[]` on parse error
+ *
+ * Error safety: catch-all try/catch — never throws, returns `[]` on any parse/runtime error.
+ */
+export function occurrencesInWindow(
+  rruleStr: string,
+  anchor: Date,
+  windowStart: Date,
+  windowEnd: Date,
+): Date[] {
+  try {
+    // Strip any DTSTART lines from the input string
+    const lines = rruleStr.split("\n").filter((line) => !line.startsWith("DTSTART:"));
+    const cleanRruleStr = lines.join("\n").trim();
+
+    // Parse the bare RRULE to get options
+    const opts = RRule.parseString(cleanRruleStr);
+
+    // Set the anchor as DTSTART
+    opts.dtstart = anchor;
+
+    // Create the RRule with the anchor
+    const rule = new RRule(opts);
+
+    // Get all occurrences in [windowStart, windowEnd] inclusive
+    // true = inclusive on both ends
+    return rule.between(windowStart, windowEnd, true);
+  } catch {
+    // Error safety: return empty array on any parse/runtime error
+    return [];
+  }
+}
