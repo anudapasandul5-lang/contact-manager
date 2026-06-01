@@ -25,6 +25,7 @@ import {
   uploadEntityMediaClient,
 } from "@/lib/media/client";
 import type { Company, ContactType, ContactWithRelations, Project } from "@/lib/supabase/types";
+import { useUpdateContact } from "@/lib/hooks/mutations/useUpdateContact";
 
 const CONTACT_TYPE_LABELS: Record<ContactType, string> = {
   employee: "Employee",
@@ -58,6 +59,7 @@ interface ContactModalProps {
 
 export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactModalProps) {
   const qc = useQueryClient();
+  const updateContact = useUpdateContact();
   const existingContactId = contact?.id ?? null;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -215,36 +217,59 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
       setError("Name is required.");
       return;
     }
+    const isEdit = Boolean(activeContactId);
     setSaving(true);
     setError(null);
     setMediaError(null);
     try {
-      const method = activeContactId ? "PUT" : "POST";
-      const url = activeContactId ? `/api/contacts/${activeContactId}` : "/api/contacts";
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim() || null,
-          phone: phone.trim() || null,
-          role: role.trim() || null,
-          bio: bio.trim() || null,
-          type,
-          companyIds,
-          projectIds,
-        }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || "Failed to save.");
-        return;
-      }
-      const savedContact = await res.json().catch(() => null);
-      const savedContactId = activeContactId ?? savedContact?.id;
-      if (!savedContactId) {
-        setError("Contact saved, but the contact id was missing.");
-        return;
+      let savedContactId: string;
+      if (activeContactId) {
+        // EDIT PATH — use hook for optimistic update + rollback
+        try {
+          await updateContact.mutateAsync({
+            id: activeContactId,
+            name: name.trim(),
+            email: email.trim() || null,
+            phone: phone.trim() || null,
+            role: role.trim() || null,
+            bio: bio.trim() || null,
+            type,
+            companyIds,
+            projectIds,
+          });
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "Failed to save.");
+          return;
+        }
+        savedContactId = activeContactId;
+      } else {
+        // CREATE PATH — keep raw fetch (hook is update-only)
+        const res = await fetch("/api/contacts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.trim(),
+            email: email.trim() || null,
+            phone: phone.trim() || null,
+            role: role.trim() || null,
+            bio: bio.trim() || null,
+            type,
+            companyIds,
+            projectIds,
+          }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          setError((data as { error?: string } | null)?.error || "Failed to save.");
+          return;
+        }
+        const savedContact = await res.json().catch(() => null);
+        const newId = (savedContact as { id?: string } | null)?.id;
+        if (!newId) {
+          setError("Contact saved, but the contact id was missing.");
+          return;
+        }
+        savedContactId = newId;
       }
 
       setPersistedContactId(savedContactId);
@@ -254,7 +279,7 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
           await syncMedia(savedContactId);
         } catch (mediaSyncError) {
           qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
-          qc.invalidateQueries({ queryKey: queryKeys.network.all });
+          if (!isEdit) void qc.invalidateQueries({ queryKey: queryKeys.network.all });
           onSaved();
           setMediaError(mediaSyncError instanceof Error ? mediaSyncError.message : "Failed to update photo.");
           setMediaStatus("Contact saved. You can retry the photo upload.");
@@ -263,7 +288,9 @@ export function ContactModal({ open, onOpenChange, contact, onSaved }: ContactMo
       }
 
       qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
-      qc.invalidateQueries({ queryKey: queryKeys.network.all });
+      if (!isEdit) {
+        void qc.invalidateQueries({ queryKey: queryKeys.network.all });
+      }
       onSaved();
       if (addAnother) {
         if (flashTimerRef.current) clearTimeout(flashTimerRef.current);

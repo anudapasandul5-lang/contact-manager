@@ -24,6 +24,7 @@ import { validateRrule } from "@/lib/recurrence/engine";
 import { cn } from "@/lib/utils";
 
 const INBOX_SENTINEL = "__inbox__";
+const NONE_SENTINEL = "__none__";
 
 const PRESETS = [
   { label: "Daily",    value: "RRULE:FREQ=DAILY" },
@@ -54,16 +55,27 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [customRrule, setCustomRrule] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [businessId, setBusinessId] = useState<string>(NONE_SENTINEL);
+  const [contactId, setContactId] = useState<string>(NONE_SENTINEL);
+  const [businesses, setBusinesses] = useState<{ id: string; name: string }[]>([]);
   const isSubmittingRef = useRef(false);
   const createTask = useCreateTask();
   const { data: network } = useNetworkQuery();
   const projects = network?.projects ?? [];
+  const contacts = network?.contacts ?? [];
 
   const recurrenceRule: string | null =
     selectedPreset === null ? null
     : selectedPreset === "custom"
       ? (validationError === null && customRrule.trim() ? customRrule.trim() : null)
       : selectedPreset;
+
+  useEffect(() => {
+    fetch("/api/businesses")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: unknown) => setBusinesses(Array.isArray(data) ? (data as { id: string; name: string }[]) : []))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (selectedPreset !== "custom" || !customRrule.trim()) {
@@ -100,6 +112,8 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
       setSelectedPreset(null);
       setCustomRrule("");
       setValidationError(null);
+      setBusinessId(NONE_SENTINEL);
+      setContactId(NONE_SENTINEL);
     }
     onOpenChange(next);
   };
@@ -122,6 +136,8 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
       if (entityContext?.type === "contact") payload.contactId = entityContext.id;
       if (entityContext?.type === "company") payload.companyId = entityContext.id;
       if (entityContext?.type === "project") payload.projectId = entityContext.id;
+      if (businessId !== NONE_SENTINEL) payload.businessId = businessId;
+      if (contactId !== NONE_SENTINEL) payload.contactId = contactId;
 
       await createTask.mutateAsync(payload);
       handleOpenChange(false);
@@ -179,6 +195,42 @@ function TaskModalInner({ open, onOpenChange, entityContext }: TaskModalProps) {
                   <SelectItem key={p.id} value={p.id} className="truncate">
                     {p.name}
                   </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {businesses.length > 0 && entityContext?.type !== "company" && (
+            <Select value={businessId} onValueChange={(v) => setBusinessId(v ?? NONE_SENTINEL)}>
+              <SelectTrigger>
+                <SelectValue>
+                  {businessId === NONE_SENTINEL
+                    ? "No business"
+                    : (businesses.find((b) => b.id === businessId)?.name ?? "No business")}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE_SENTINEL}>No business</SelectItem>
+                {businesses.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {contacts.length > 0 && entityContext?.type !== "contact" && (
+            <Select value={contactId} onValueChange={(v) => setContactId(v ?? NONE_SENTINEL)}>
+              <SelectTrigger>
+                <SelectValue>
+                  {contactId === NONE_SENTINEL
+                    ? "No person"
+                    : (contacts.find((c) => c.id === contactId)?.name ?? "No person")}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE_SENTINEL}>No person</SelectItem>
+                {contacts.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

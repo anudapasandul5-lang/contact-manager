@@ -37,6 +37,8 @@ export function useDeleteCompany() {
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: queryKeys.network.all });
+      void qc.invalidateQueries({ queryKey: queryKeys.companies.all });
+      void qc.invalidateQueries({ queryKey: queryKeys.contacts.all });
     },
   });
 }

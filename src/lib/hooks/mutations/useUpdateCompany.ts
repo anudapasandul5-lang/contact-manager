@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { queryKeys } from "@/lib/query/keys";
 import type { NetworkData } from "@/lib/supabase/types";
 
@@ -13,7 +12,7 @@ export interface UpdateCompanyInput {
   is_owned?: boolean;
 }
 
-async function updateCompany(input: UpdateCompanyInput): Promise<void> {
+export async function updateCompany(input: UpdateCompanyInput): Promise<void> {
   const { id, ...body } = input;
   const res = await fetch(`/api/companies/${id}`, {
     method: "PUT",
@@ -57,7 +56,6 @@ export function useUpdateCompany() {
       if (context?.previous) {
         qc.setQueryData(queryKeys.network.all, context.previous);
       }
-      toast.error(err instanceof Error ? err.message : "Couldn't update company.");
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: queryKeys.network.all });

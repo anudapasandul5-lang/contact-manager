@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
+import { useUpdateVendor } from "@/lib/hooks/mutations/useUpdateVendor";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,7 @@ const PRESET_COLORS = ["#f97316", "#ea580c", "#fb923c", "#fdba74", "#c2410c", "#
 
 export function VendorModal({ open, onOpenChange, vendor, onSaved }: VendorModalProps) {
   const qc = useQueryClient();
+  const updateVendor = useUpdateVendor();
   const [name, setName] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [notes, setNotes] = useState("");
@@ -139,38 +141,63 @@ export function VendorModal({ open, onOpenChange, vendor, onSaved }: VendorModal
     setSaving(true);
     setError(null);
 
-    try {
-      const url = vendor ? `/api/vendors/${vendor.id}` : "/api/vendors";
-      const method = vendor ? "PUT" : "POST";
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          specialty: specialty.trim() || null,
-          notes: notes.trim() || null,
-          color,
-          companyIds,
-          projectIds,
-          people: people.map((person) => ({
-            id: vendor ? person.id : null,
-            name: person.name.trim(),
-            role: person.role.trim() || null,
-            email: person.email.trim() || null,
-            phone: person.phone.trim() || null,
-            bio: person.bio.trim() || null,
-          })),
-        }),
-      });
+    const isEdit = Boolean(vendor);
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => null);
-        setError(payload?.error || "Failed to save vendor.");
-        return;
+    try {
+      if (vendor) {
+        try {
+          await updateVendor.mutateAsync({
+            id: vendor.id,
+            name: name.trim(),
+            specialty: specialty.trim() || null,
+            notes: notes.trim() || null,
+            color,
+            companyIds,
+            projectIds,
+            people: people.map((p) => ({
+              id: p.id,
+              name: p.name.trim(),
+              role: p.role.trim() || null,
+              email: p.email.trim() || null,
+              phone: p.phone.trim() || null,
+              bio: p.bio.trim() || null,
+            })),
+          });
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "Failed to save.");
+          return;
+        }
+      } else {
+        const response = await fetch("/api/vendors", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.trim(),
+            specialty: specialty.trim() || null,
+            notes: notes.trim() || null,
+            color,
+            companyIds,
+            projectIds,
+            people: people.map((p) => ({
+              id: null,
+              name: p.name.trim(),
+              role: p.role.trim() || null,
+              email: p.email.trim() || null,
+              phone: p.phone.trim() || null,
+              bio: p.bio.trim() || null,
+            })),
+          }),
+        });
+
+        if (!response.ok) {
+          const payload = await response.json().catch(() => null);
+          setError((payload as { error?: string } | null)?.error || "Failed to save vendor.");
+          return;
+        }
       }
 
       qc.invalidateQueries({ queryKey: queryKeys.vendors.all });
-      qc.invalidateQueries({ queryKey: queryKeys.network.all });
+      if (!isEdit) void qc.invalidateQueries({ queryKey: queryKeys.network.all });
       onSaved();
       onOpenChange(false);
     } catch {
