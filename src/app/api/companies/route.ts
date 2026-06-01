@@ -46,6 +46,25 @@ export async function POST(request: NextRequest) {
       .single();
     const [payload] = data ? await attachSignedMediaUrls(supabase as never, "company", [data]) : [];
 
+    // Auto-create matching business for forecast/task grouping (best-effort)
+    if (data) {
+      try {
+        const bizId = `biz-${data.id}`;
+        await supabase.from("businesses").insert({
+          id: bizId,
+          user_id: auth.user.id,
+          name,
+          color: color || "#6b7280",
+        });
+        await supabase.from("company_businesses").insert({
+          company_id: data.id,
+          business_id: bizId,
+        });
+      } catch {
+        // Silently ignore business sync errors; company creation succeeds regardless
+      }
+    }
+
     const response = error
       ? NextResponse.json({ error: error.message }, { status: 500 })
       : NextResponse.json(payload ?? data, { status: 201 });
